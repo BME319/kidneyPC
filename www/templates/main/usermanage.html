@@ -1,0 +1,44 @@
+<!-- <div class="tab-pane fade in active" id="data">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-xs-1" role="navigation">
+        <ul id="mypills" class="nav nav-pills nav-stacked" style="text-align: center;font-size: 15px">
+          <li><a href="#sampling" data-toggle="pill">所有用户</a></li>
+          <li><a href="#testResult" data-toggle="pill">医生</a></li>
+          <li><a href="#reagent" data-toggle="pill">护士</a></li>
+          <li><a href="#instrument" data-toggle="pill">患者</a></li>
+          <li><a href="#newSample" data-toggle="pill">保险人员</a></li>
+          <li><a href="#newReagent" data-toggle="pill">健康专员</a></li>
+          <li><a href="#newReagent" data-toggle="pill">管理员</a></li>
+        </ul>
+      </div>
+      <div class="col-xs-11" style="margin-top:10px">
+      	<div ui-view></div>
+      </div>
+    </div>  
+  </div>
+</div>
+<script>
+  $('#mypills a[href="#sampling"]').tab('show');
+</script>
+ -->
+<div>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-xs-1" style="text-align:center; font-size:20px; margin-top:10px">
+          <uib-tabset active="activePill" vertical="true" type="pills">
+            <uib-tab index="0" heading="所有用户" select="toallUsers()"></uib-tab>
+            <uib-tab index="1" heading="医生" select="todoctors()"></uib-tab>
+            <uib-tab index="2" heading="护士" select="tonurses()"></uib-tab>
+            <uib-tab index="3" heading="患者" select="topatients()"></uib-tab>
+            <uib-tab index="4" heading="保险人员" select="toinsuranceOfficers()"></uib-tab>
+            <uib-tab index="5" heading="健康专员" select="tohealthOfficers()"></uib-tab>
+            <uib-tab index="6" heading="管理员" select="toadministrators()"></uib-tab>
+          </uib-tabset>
+      </div>
+      <div class="col-xs-11" style="margin-top:30px;">
+      	<div ui-view></div>
+      </div>
+    </div>  
+  </div>
+</div>

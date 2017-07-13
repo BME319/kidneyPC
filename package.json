@@ -1,0 +1,19 @@
+{
+  "name": "Kidney_Web",
+  "private": true,
+  "version": "0.0.0",
+  "description": "",
+  "repository": "",
+  "license": "MIT",
+
+  "scripts": {
+    "postinstall": "bower install",
+    "start": "npm run lite -c configs/bs-config.json",
+    "lite": "lite-server"
+  },
+
+  "devDependencies": {
+    "bower": "^1.7.7",
+    "lite-server": "^2.2.2"
+  }
+}

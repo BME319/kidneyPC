@@ -1,0 +1,15 @@
+<div>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-xs-1" style="text-align: center;font-size: 20px;margin-top: 120px">
+          <uib-tabset active="activePill" vertical="true" type="pills">
+            <uib-tab index="0" heading="未审核" select="tounchecked()"></uib-tab>
+            <uib-tab index="1" heading="已审核" select="tochecked()"></uib-tab>
+          </uib-tabset>
+      </div>
+      <div class="col-xs-11" style="margin-top:30px;">
+      	<div ui-view></div>
+      </div>
+    </div>  
+  </div>
+</div>

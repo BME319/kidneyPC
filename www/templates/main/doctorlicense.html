@@ -1,0 +1,42 @@
+<div class="container-fluid">
+	<div style="margin-left:300px;margin-right:300px;margin-top:50px">
+		<div style="width:100%;height:200px;background-color:#707070;color:white">
+			<p style="padding-top:30px">
+				<span style="padding-left:30px;font-size:30px">{{doctorinfos.name}}</span>
+				<span style="margin-left:20px;font-size:20px">{{doctorinfos.age}}岁</span>
+				<span style="margin-left:20px;font-size:20px">{{doctorinfos.IDNo}}</span>
+			</p>
+			<p style="padding-left:30px;font-size:20px;padding-top:10px">{{doctorinfos.province}}{{doctorinfos.city}}</p>
+			<p style="padding-left:30px;font-size:20px;padding-top:10px">
+				<span>{{doctorinfos.workUnit}}</span>
+				<span>{{doctorinfos.department}}</span>
+				<span>{{doctorinfos.title}}</span>
+			</p>
+		</div>
+		<div>
+			<h3 style="padding-left:30px">简介</h3>
+			<textarea style="width:100%;font-size:20px" row="3" disabled="disabled"></textarea>
+			<h3 style="padding-left:30px">擅长</h3>
+			<textarea style="width:100%;font-size:20px" row="3" disabled="disabled"></textarea>
+		</div>
+		<div uib-carousel active="active" style="height:300px;background-color:gray;margin-top:30px">
+			<div uib-slide>
+
+			</div>
+		</div>
+		<div style="margin-top:20px;font-size:20px">
+			<p>
+				<span>审核状态:</span>
+				<span style="margin-left:50px">{{review.reviewStatus}}</span>
+				<span style="margin-left:200px">审核人:</span>
+				<span style="margin-left:50px">{{review.adminId}}</span>
+				<span style="margin-left:200px">审核日期:</span>
+				<span style="margin-left:50px">{{review.reviewDate}}</span>
+			</p>
+			<p>
+				审核内容
+			</p>
+			<textarea style="width:100%;font-size:20px" row="3" disabled="disabled"></textarea>
+		</div>
+	</div>
+</div>

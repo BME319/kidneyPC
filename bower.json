@@ -1,0 +1,17 @@
+{
+  "name": "IntelligentDetector",
+  "description": "",
+  "version": "0.0.0",
+  "homepage": "",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "angular": "1.5.x",
+    "angular-animate": "1.5.x",
+    "angular-mocks": "1.5.x",
+    "angular-resource": "1.5.x",
+    "angular-ui-router":"0.3.1",
+    "bootstrap": "3.3.x",
+    "jquery": "2.2.x"
+  }
+}
