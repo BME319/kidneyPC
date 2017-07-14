@@ -1,0 +1,36 @@
+<div class="container-fluid">
+	<div style="margin-left:300px;margin-right:300px;margin-top:50px;font-size:25px">
+		<p style="margin-left:40px;padding-top:10px;vertical-align:middle"><ng-md-icon icon="person" style="fill:#4876FF;margin-right:10px" size="26"></ng-md-icon>患者A</p>
+		<span style="margin-left:40px;margin-top:20px">化验信息</span>
+		<div style="height:600px">
+			<img ng-src="{{photolist.photo}}" style="height:600px;margin-left:30%">
+		</div>
+		<div class="row" style="margin-top:20px;font-size:16px">		
+			<div class="col-md-3">
+				化验类别: <select ng-model="LabType.selected" ng-options="o as o for o in LabType.options"></select>
+			</div>
+			<div class="col-md-3">
+				化验值: <input type="number" style="width:100px" ng-model="LabValue">
+			</div>
+			<div class="col-md-1">
+				化验时间:   
+			</div>
+			<div class="col-md-3">
+		        <p class="input-group">
+		          <input type="text" class="form-control" uib-datepicker-popup ng-model="dt" is-open="popup.opened" datepicker-options="dateOptions" ng-required="true" close-text="关闭" current-text="今天" clear-text="清除" />
+		          <span class="input-group-btn">
+		            <button type="button" class="btn btn-default" ng-click="open()"><i class="glyphicon glyphicon-calendar"></i></button>
+		          </span>
+		        </p>
+			</div>
+		</div>
+		<div class="row" style="margin-top:30px">
+			<div class="col-md-4 col-md-offset-5">
+				<button class="btn btn-primary" type="button" ng-click="modify()" style="width:120px;height:40px;font-size:20px">保存修改
+				</button>
+				<span style="font-size:15px">{{status}}</span>
+			</div>
+		</div>
+	</div>
+	
+</div>

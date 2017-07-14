@@ -1,0 +1,68 @@
+<h4>所有用户总数：{{totalItems}}位</h4>
+<!-- 分页 -->
+<!-- 所有用户列表-张桠童 -->
+<table ng-table="tableParams" class="table table-condensed" show-filter="true">
+	<tr ng-repeat="user in $data" style="text-align: center;">
+		<td title="'用户ID'" filter="{ userId: 'text'}" sortable="'userId'">{{user.userId}}
+		</td>
+		<td title="'姓名'" filter="{ name: 'text'}" sortable="'name'">{{user.name}}
+		</td>
+		<td title="'性别'" filter="{ gender: 'select'}" filter-data="genders">{{user.gender|gender}}
+		</td>
+		<td title="'手机号码'" filter="{ phoneNo: 'text'}" sortable="'phoneNo'">{{user.phoneNo}}
+		</td>
+		<td title="'角色'" filter="{ role: 'text'}" sortable="'role'"><span ng-repeat="ro in user.role">{{ro|role}}&nbsp;</span>
+		</td>
+		<td title="'操作'">
+		  <button class="btn btn-link" style="text-decoration:none; outline:none; padding:0px; border:0px; font-size:10px;" ng-click="confirm(user.userId)">注销</button>
+		</td>
+	</tr>
+</table>
+<!-- 每页数量 -->
+<div class="btn-group  btn-group-sm pull-right" style="margin-top: 18px">
+    <button type="button" class="btn btn-default" ng-click="changeLimit(20)">20</button>
+    <button type="button" class="btn btn-default" ng-click="changeLimit(30)">30</button>
+    <button type="button" class="btn btn-default" ng-click="changeLimit(50)">50</button>
+    <button type="button" class="btn btn-default" ng-click="changeLimit(100)">100</button>
+</div>
+<!-- 分页条 -->
+<ul uib-pagination  
+	max-size="10" 
+	class="pagination" 
+	boundary-links="true" 
+	boundary-link-numbers="true"
+	direction-links="true"
+	first-text="首页"
+	last-text="末页"
+	previous-text="上一页"
+	next-text="下一页"
+	force-ellipses="true"
+	rotate="true" 
+	total-items="totalItems"
+	items-per-page="itemsPerPage"
+	ng-change="pageChanged()"
+	ng-model="currentPage"
+	>
+</ul>
+<!-- 注销用户modal -->
+<script type="text/ng-template" id="confirm.html">
+	<div class="modal-header">
+		<button type="button" class="close" ng-click="close()">&times;</button>
+        <h3 class="modal-title" id="modal-title">警告</h3>
+    </div>
+    <div class="modal-body" id="modal-body">
+        <span>确定注销该用户？</span>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" ng-click="ok()">确定</button>
+        <button class="btn btn-warning" type="button" ng-click="close()">取消</button>
+    </div>
+</script>
+<!-- 提示注销成功modal -->
+<div class="modal fade" id="confirmSuccess">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content" style="text-align: center; font-size: 20px">
+      注销成功！
+    </div>
+  </div>
+</div>
