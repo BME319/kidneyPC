@@ -95,26 +95,6 @@
     </div>
   </div>
 </div>
-
-<!-- 更改角色modal -->
-<!-- <script type="text/ng-template" id="changeRoles.html">
-	<div class="modal-header">
-		<button type="button" class="close" ng-click="close()">&times;</button>
-        <h3 class="modal-title" id="modal-title">更改角色</h3>
-    </div>
-    <div class="modal-body" id="modal-body">
-	    <label ng-repeat="role in roles" class="checkbox" style="margin-left: 30px">
-			<input type="checkbox" checklist-model="role_end" checklist-value="role.id"> {{role.name}}
-		</label>
-    </div>
-    <div class="modal-footer">
-        <button class="btn btn-primary" type="button" ng-click="ok()">更改</button>
-        <button class="btn btn-warning" type="button" ng-click="close()">取消</button>
-    </div>
-</script> -->
-
-
-
 <!-- 更改角色modal -->
 <div class="modal fade" id="changeRoles" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-sm">
@@ -127,44 +107,40 @@
 		    	<form id = "changeRolesForm">
 			    	<div class="form-group">
 			    		<label class="checkbox">
-						  	<input type="checkbox" ng-model="role_end.Leader" value="Leader"> 地区负责人
+						  	<input type="checkbox" ng-model="role_end.Leader" ng-disabled="ifDisabled.Leader" value="Leader"> 地区负责人
 						</label>
 						<label class="checkbox">
-						  	<input type="checkbox" ng-model="role_end.master" value="master"> 科主任
+						  	<input type="checkbox" ng-model="role_end.master" ng-disabled="ifDisabled.master" value="master"> 科主任
 						</label>
 						<label class="checkbox">
-						  	<input type="checkbox" ng-model="role_end.doctor" value="doctor"> 普通医生
+						  	<input type="checkbox" ng-model="role_end.doctor" ng-disabled="ifDisabled.doctor" value="doctor"> 普通医生
 						</label>
 						<label class="checkbox">
-						  	<input type="checkbox" ng-model="role_end.patient" value="patient"> 患者
+						  	<input type="checkbox" ng-model="role_end.patient" ng-disabled="ifDisabled.patient" value="patient"> 患者
 						</label>
 						<label class="checkbox">
-						  	<input type="checkbox" ng-model="role_end.nurse" value="nurse"> 护士
+						  	<input type="checkbox" ng-model="role_end.nurse" ng-disabled="ifDisabled.nurse" value="nurse"> 护士
 						</label>
 						<label class="checkbox">
-						  	<input type="checkbox" ng-model="role_end.insuranceC" value="insuranceC"> 保险主管
+						  	<input type="checkbox" ng-model="role_end.insuranceC" ng-disabled="ifDisabled.insuranceC" value="insuranceC"> 保险主管
 						</label>
 						<label class="checkbox">
-						  	<input type="checkbox" ng-model="role_end.insuranceA" value="insuranceA"> 沟通人员
+						  	<input type="checkbox" ng-model="role_end.insuranceA" ng-disabled="ifDisabled.insuranceA" value="insuranceA"> 沟通人员
 						</label>
 						<label class="checkbox">
-						  	<input type="checkbox" ng-model="role_end.insuranceR" value="insuranceR"> 录入人员
+						  	<input type="checkbox" ng-model="role_end.insuranceR" ng-disabled="ifDisabled.insuranceR" value="insuranceR"> 录入人员
 						</label>
 						<label class="checkbox">
-						  	<input type="checkbox" ng-model="role_end.health" value="health"> 健康专员
+						  	<input type="checkbox" ng-model="role_end.health" ng-disabled="ifDisabled.health" value="health"> 健康专员
 						</label>
 						<label class="checkbox">
-						  	<input type="checkbox" ng-model="role_end.admin" value="admin"> 管理员
+						  	<input type="checkbox" ng-model="role_end.admin" ng-disabled="ifDisabled.admin" value="admin"> 管理员
 						</label>
 			    	</div>
 			    	<button type="submit" class="btn btn-primary" ng-click="toChangeOrNot()">确定</button>
 			    	<button type="button" class="btn btn-warning" ng-click="modal_close('#changeRoles')">取消</button>
 				</form>
 		    </div>
-		    <!-- <div class="modal-footer">
-		        <button class="btn btn-primary" type="button" ng-click="toChangeOrNot()">确定</button>
-		        <button class="btn btn-warning" type="button" ng-click="modal_close('#changeRoles')">取消</button>
-		    </div> -->
 		</div>
 	</div>
 </div>

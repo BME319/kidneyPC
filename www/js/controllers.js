@@ -1498,9 +1498,50 @@ angular.module('controllers',['ngResource','services'])
       }
       console.log(role_temp)
       // 初始化
-      // var role_temp2 = role_temp;
-      // $scope.role_before = role_temp2;
       $scope.role_end = role_temp;
+      // 是否无效 true为无效
+      $scope.ifDisabled = {
+        Leader:false,
+        master:false,
+        doctor:false,
+        patient:false,
+        nurse:false,
+        insuranceA:false,
+        insuranceC:false,
+        insuranceR:false,
+        health:false,
+        admin:false
+      }
+      if (existRole('doctor',userdetail.role)) {
+        $scope.ifDisabled.doctor=true;
+        $scope.ifDisabled.patient=true;
+      }
+      else if (existRole('nurse',userdetail.role)) {
+        $scope.ifDisabled.patient=true;
+      }
+      else if (existRole('patient',userdetail.role)) {
+        $scope.ifDisabled.patient=true;
+        $scope.ifDisabled.doctor=true;
+        $scope.ifDisabled.Leader=true;
+        $scope.ifDisabled.master=true;
+        $scope.ifDisabled.nurse=true;
+      }
+      else if (existRole('admin',userdetail.role)) {
+        $scope.ifDisabled.patient=true;
+        $scope.ifDisabled.doctor=true;
+        $scope.ifDisabled.Leader=true;
+        $scope.ifDisabled.master=true;
+        $scope.ifDisabled.nurse=true;
+      }
+      else {
+        $scope.ifDisabled.patient=true;
+        $scope.ifDisabled.doctor=true;
+        $scope.ifDisabled.Leader=true;
+        $scope.ifDisabled.master=true;
+        $scope.ifDisabled.nurse=true;
+        $scope.ifDisabled.admin=true;
+      }
+
     }
     // 确定是否更改
     $scope.toChangeOrNot = function () {
