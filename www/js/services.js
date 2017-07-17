@@ -17,14 +17,14 @@ angular.module('services',['ngResource'])
 }])
 .constant('CONFIG', {
   baseUrl: 'http://121.43.107.106:4060/Api/v2/',  
-  logInbaseUrl: 'http://121.43.107.106:4060/Api/v1/',  
+  logInbaseUrl: 'http://121.43.107.106:4060/Api/v2/',  
 })
 .factory('Data', ['$resource', '$q', '$interval', 'CONFIG', 'Storage', function($resource,$q,$interval ,CONFIG,Storage){ 
 	var serve={};
 	var abort = $q.defer;
 
   var User = function () {
-    return $resource(CONFIG.logInbaseUrl + ':path/:route', {path:'user'}, {
+    return $resource(CONFIG.logInbaseUrl + ':path/:route', {path:'alluser'}, {
       logIn:{method:'POST', params:{route: 'login'}, timeout: 100000}
     })
   }
