@@ -51,12 +51,12 @@ angular.module('services',['ngResource'])
   var Alluser = function () {
     return $resource(CONFIG.baseUrl + ':path/:route',{path:'alluser'},{
       getUserList:{method:'GET', params:{route:'userList',token:'@token',limit:'@limit',skip:'@skip'}, timeout: 10000},
-      getDoctorList:{method:'GET', params:{route:'doctorList',token:'@token'}, timeout: 10000},
-      getPatientList:{method:'GET', params:{route:'patientList',token:'@token'}, timeout: 10000},
-      getNurseList:{method:'GET', params:{route:'nurseList',token:'@token'}, timeout: 10000},
-      getInsuranceList:{method:'GET', params:{route:'insuranceList',token:'@token'}, timeout: 10000},
-      getHealthList:{method:'GET', params:{route:'healthList',token:'@token'}, timeout: 10000},
-      getAdminList:{method:'GET', params:{route:'adminList',token:'@token'}, timeout: 10000},
+      getDoctorList:{method:'GET', params:{route:'doctorList',token:'@token',limit:'@limit',skip:'@skip'}, timeout: 10000},
+      getPatientList:{method:'GET', params:{route:'patientList',token:'@token',limit:'@limit',skip:'@skip'}, timeout: 10000},
+      getNurseList:{method:'GET', params:{route:'nurseList',token:'@token',limit:'@limit',skip:'@skip'}, timeout: 10000},
+      getInsuranceList:{method:'GET', params:{route:'insuranceList',token:'@token',limit:'@limit',skip:'@skip'}, timeout: 10000},
+      getHealthList:{method:'GET', params:{route:'healthList',token:'@token',limit:'@limit',skip:'@skip'}, timeout: 10000},
+      getAdminList:{method:'GET', params:{route:'adminList',token:'@token',limit:'@limit',skip:'@skip'}, timeout: 10000},
       cancelUser:{method:'POST', params:{route:'cancelUser'}, timeout: 10000},
       register:{method:'POST', params:{route:'register',phoneNo:'@phoneNo',password:'@password',role:'@role'}, timeout: 10000},
       modify:{method:'POST', params:{route:'alluser'}, timeout: 10000},
@@ -215,54 +215,54 @@ angular.module('services',['ngResource'])
     });
     return deferred.promise;
   };
-  self.getDoctorList = function (_token) {
+  self.getDoctorList = function (obj) {
     var deferred = $q.defer();
-    Data.Alluser.getDoctorList({token:_token},function (data, headers) {
+    Data.Alluser.getDoctorList(obj,function (data, headers) {
       deferred.resolve(data);
     }, function(err){
       deferred.reject(err);
     });
     return deferred.promise;
   };
-  self.getPatientList = function (_token) {
+  self.getPatientList = function (obj) {
     var deferred = $q.defer();
-    Data.Alluser.getPatientList({token:_token},function (data, headers) {
+    Data.Alluser.getPatientList(obj,function (data, headers) {
       deferred.resolve(data);
     }, function(err){
       deferred.reject(err);
     });
     return deferred.promise;
   };
-  self.getNurseList = function (_token) {
+  self.getNurseList = function (obj) {
     var deferred = $q.defer();
-    Data.Alluser.getNurseList({token:_token},function (data, headers) {
+    Data.Alluser.getNurseList(obj,function (data, headers) {
       deferred.resolve(data);
     }, function(err){
       deferred.reject(err);
     });
     return deferred.promise;
   };
-  self.getInsuranceList = function (_token) {
+  self.getInsuranceList = function (obj) {
     var deferred = $q.defer();
-    Data.Alluser.getInsuranceList({token:_token},function (data, headers) {
+    Data.Alluser.getInsuranceList(obj,function (data, headers) {
       deferred.resolve(data);
     }, function(err){
       deferred.reject(err);
     });
     return deferred.promise;
   };
-  self.getHealthList = function (_token) {
+  self.getHealthList = function (obj) {
     var deferred = $q.defer();
-    Data.Alluser.getHealthList({token:_token},function (data, headers) {
+    Data.Alluser.getHealthList(obj,function (data, headers) {
       deferred.resolve(data);
     }, function(err){
       deferred.reject(err);
     });
     return deferred.promise;
   };
-  self.getAdminList = function (_token) {
+  self.getAdminList = function (obj) {
     var deferred = $q.defer();
-    Data.Alluser.getAdminList({token:_token},function (data, headers) {
+    Data.Alluser.getAdminList(obj,function (data, headers) {
       deferred.resolve(data);
     }, function(err){
       deferred.reject(err);
