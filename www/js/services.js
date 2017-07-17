@@ -17,13 +17,14 @@ angular.module('services',['ngResource'])
 }])
 .constant('CONFIG', {
   baseUrl: 'http://121.43.107.106:4060/Api/v2/',  
+  logInbaseUrl: 'http://121.43.107.106:4060/Api/v1/',  
 })
 .factory('Data', ['$resource', '$q', '$interval', 'CONFIG', 'Storage', function($resource,$q,$interval ,CONFIG,Storage){ 
 	var serve={};
 	var abort = $q.defer;
 
   var User = function () {
-    return $resource(CONFIG.baseUrl + ':path/:route', {path:'user'}, {
+    return $resource(CONFIG.logInbaseUrl + ':path/:route', {path:'user'}, {
       logIn:{method:'POST', params:{route: 'login'}, timeout: 100000}
     })
   }
@@ -58,7 +59,7 @@ angular.module('services',['ngResource'])
       getHealthList:{method:'GET', params:{route:'healthList',token:'@token'}, timeout: 10000},
       getAdminList:{method:'GET', params:{route:'adminList',token:'@token'}, timeout: 10000},
       cancelUser:{method:'POST', params:{route:'cancelUser'}, timeout: 10000},
-      register:{method:'POST', params:{route:'register',phoneNo:'@phoneNo',password:'@password',role:'@role'}, timeout: 10000},
+      // register:{method:'POST', params:{route:'register',phoneNo:'@phoneNo',password:'@password',role:'@role'}, timeout: 10000},
       modify:{method:'POST', params:{route:'alluser'}, timeout: 10000},
       getCount:{method:'GET', params:{route:'count',token:'@token',role:'@role'}, timeout: 10000},
     })
