@@ -1,5 +1,6 @@
 'use strict';
 
+
 angular.module('Kidney_Web',['ui.router','ui.bootstrap','controllers','services','filters','directives','ngTable', 'ngMdIcons'])
 
 .config(['$stateProvider','$urlRouterProvider',function ($stateProvider, $urlRouterProvider) {
