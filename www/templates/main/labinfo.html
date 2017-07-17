@@ -20,6 +20,8 @@
 		<div uib-slide ng-repeat="slide in slides" index="$index">
 			<img ng-src="{{slide.photo}}" style="height:600px">
 			<button type="button" class="btn btn-danger" style="margin-left:30px" ng-click="getphoto($index)">选定当前图片</button>
+			<button class="btn btn-primary" ng-click="skipphoto($index)">跳过当前图片
+			</button>
 			<!-- <div class="carousel-caption">
         		<button type="button" class="btn" style="border-color:black;background:transparent;color:red" ng-click="getphoto($index)"><b>选定当前图片</b></button>
         	</div> -->
@@ -28,17 +30,20 @@
 	</div>
 	<div class="modal fade" id="selecttype" tabindex="-1" role="dialog" aria-labelledby="selecttypeLabel" aria-hidden="true">
 		<div class="modal-dialog">
-			<div class="modal-content" style="text-align:center">
-				<div class="modal-header">
+			<div class="modal-content">
+				<div class="modal-header" style="text-align:center">
 					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
 						&times;
 					</button>
 					<h3 class="modal-title" id="selecttypeLabel">
-						请输入图片类型
+						请选择图片类型
 					</h3>
 				</div>
-				<div class="modal-body" style="font-size:18px">
-					<input type="text" ng-model="type">
+				<div class="modal-body" style="font-size:16px">
+					图片类型: <select ng-model="select.selected" ng-options="o.option for o in selecttype.options">
+					</select>
+					<!-- 其他化验类型 -->
+					<span style="margin-left:50px">*化验单题目:<input type="text" ng-model="custype" ng-disabled="select.selected.disable"></span>
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-primary col-xs-2 col-xs-offset-4" ng-click="gettype()">
@@ -83,14 +88,11 @@
 			</div>
 		</div>
 		<div class="row" style="margin-top:30px">
-			<div class="col-md-2 col-md-offset-3">
+			<div class="col-md-2 col-md-offset-5">
 				<button class="btn btn-primary" ng-click="checkphoto()" style="width:120px;height:40px;font-size:20px">保存
 				</button>
 			</div>
-			<div class="col-md-2 col-md-offset-1">
-				<button class="btn btn-primary" ng-click="checkskip()" style="width:120px;height:40px;font-size:20px">跳过
-				</button>
-			</div>
+			
 				<div class="modal fade" id="save" tabindex="-1" role="dialog" aria-labelledby="saveLabel" aria-hidden="true">
 					<div class="modal-dialog">
 						<div class="modal-content" style="text-align:center">
@@ -150,7 +152,7 @@
 								</h3>
 							</div>
 							<div class="modal-body" style="font-size:18px">
-								请输入图片类型
+								请选择图片类型
 							</div>
 							<div class="modal-footer">
 								
@@ -202,7 +204,7 @@
 			</div>
 			<div>
 				<span style="margin-left:40px;margin-top:20px">历史化验</span>
-				<table ng-table="tableParams" class="table table-condensed" show-filter="true" style="font-size:15px;margin-top:20px;text-align:center">
+				<table ng-table="tableParams" class="table table-condensed table-bordered table-striped" style="font-size:15px;margin-top:20px;text-align:center">
 				    <!-- <tr ng-repeat="user in $data">
 				      <td title="'化验类别'" filter="{ ReagentId: 'text'}" sortable="'ReagentId'">
 				      </td>

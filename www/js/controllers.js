@@ -30,7 +30,7 @@ angular.module('controllers',['ngResource','services'])
   }
 }])
 // 未审核-LZN
-.controller('UncheckedCtrl', ['$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', '$uibModal', function ($scope, $state, Review, Storage, $timeout, NgTableParams, $uibModal) {
+.controller('UncheckedCtrl', ['$scope', '$state', 'Review', 'Alluser', 'Storage', '$timeout', 'NgTableParams', '$uibModal', function ($scope, $state, Review, Alluser, Storage, $timeout, NgTableParams, $uibModal) {
   
   $scope.review = {
     "reviewStatus":0,
@@ -90,19 +90,29 @@ angular.module('controllers',['ngResource','services'])
               $('#accepted').modal('hide');
             },1000);
             $('#accepted').on('hidden.bs.modal', function () {
-              Review.GetReviewInfo($scope.review).then(
+              var sms = {
+                  "mobile":"18626860001",
+                  "smsType":3,
+                  "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTEyZTllYmRjODNmNmE4YjdkY2JkZTgiLCJ1c2VySWQiOiJVMjAxNzAzMTQyMDE4Iiwicm9sZSI6InBhdGllbnQiLCJleHBpcmVBZnRlciI6MTQ5NzQwNzI2MzgzMywiaWF0IjoxNDk3NDA3MjYzfQ.5UITzg6NaHcIIEQESCLLB7mx_suISw9Bj6K1OBaiaDk",
+              }
+              Alluser.sms(sms).then(
                 function (data) {
-                  $scope.doctorinfos = data.results;
-                  console.log($scope.doctorinfos);
-                  $scope.tableParams = new NgTableParams({
-                      count:15
-                  },
-                  {   counts:[],
-                      dataset:$scope.doctorinfos
-                  });
+                  Review.GetReviewInfo($scope.review).then(
+                  function (data) {
+                    $scope.doctorinfos = data.results;
+                    console.log($scope.doctorinfos);
+                    $scope.tableParams = new NgTableParams({
+                        count:15
+                    },
+                    {   counts:[],
+                        dataset:$scope.doctorinfos
+                    });
+                  }, function (e) {
+
+                  }); 
                 }, function (e) {
 
-                }); 
+                })
             })
         } 
       }, function (e) {
@@ -135,20 +145,33 @@ angular.module('controllers',['ngResource','services'])
               $('#rejected').modal('hide');
             },1000);
             $('#rejected').on('hidden.bs.modal', function () {
-              $scope.RejectReason={};
-              Review.GetReviewInfo($scope.review).then(
-              function (data) {
-                $scope.doctorinfos = data.results;
-                console.log($scope.doctorinfos);
-                $scope.tableParams = new NgTableParams({
-                    count:15
-                },
-                {   counts:[],
-                    dataset:$scope.doctorinfos
-                });
-              }, function (e) {
+              var sms = {
+                  "mobile":"18626860001",
+                  "smsType":4,
+                  "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTEyZTllYmRjODNmNmE4YjdkY2JkZTgiLCJ1c2VySWQiOiJVMjAxNzAzMTQyMDE4Iiwicm9sZSI6InBhdGllbnQiLCJleHBpcmVBZnRlciI6MTQ5NzQwNzI2MzgzMywiaWF0IjoxNDk3NDA3MjYzfQ.5UITzg6NaHcIIEQESCLLB7mx_suISw9Bj6K1OBaiaDk",
+                  "reason":$scope.RejectReason.reason
+              }
+                Alluser.sms(sms).then(
+                  function (data) {
+                    console.log(data.results);
+                    $scope.RejectReason={};
+                    Review.GetReviewInfo($scope.review).then(
+                    function (data) {
+                      $scope.doctorinfos = data.results;
+                      console.log($scope.doctorinfos);
+                      $scope.tableParams = new NgTableParams({
+                          count:15
+                      },
+                      {   counts:[],
+                          dataset:$scope.doctorinfos
+                      });
+                    }, function (e) {
 
-              }); 
+                    }); 
+                  }, function (e) {
+
+                  })
+              
               })
               
           })  
@@ -253,7 +276,7 @@ angular.module('controllers',['ngResource','services'])
 
 // }])
 // 查看医生资质证书-LZN
-.controller('DoctorLicenseCtrl',['$scope', '$state', 'Review', 'Storage', '$timeout', function ($scope, $state, Review, Storage, $timeout) {
+.controller('DoctorLicenseCtrl',['$scope', '$state', 'Review', 'Alluser', 'Storage', '$timeout', function ($scope, $state, Review, Alluser, Storage, $timeout) {
   var id = Storage.get('docId');
   $scope.status = Storage.get('reviewstatus');
   console.log(id);
@@ -313,7 +336,18 @@ angular.module('controllers',['ngResource','services'])
             $('#accepted').modal('hide');
           },1000);
           $('#accepted').on('hidden.bs.modal', function () {
-            $state.go('main.checkornot.unchecked');
+            var sms = {
+              "mobile":"18626860001",
+              "smsType":3,
+              "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTEyZTllYmRjODNmNmE4YjdkY2JkZTgiLCJ1c2VySWQiOiJVMjAxNzAzMTQyMDE4Iiwicm9sZSI6InBhdGllbnQiLCJleHBpcmVBZnRlciI6MTQ5NzQwNzI2MzgzMywiaWF0IjoxNDk3NDA3MjYzfQ.5UITzg6NaHcIIEQESCLLB7mx_suISw9Bj6K1OBaiaDk",
+            }
+            Alluser.sms(sms).then(
+              function (data) {
+                $state.go('main.checkornot.unchecked');
+              }, function (e) {
+                
+              })
+            
           })
         }
       }, function (e) {
@@ -343,7 +377,20 @@ angular.module('controllers',['ngResource','services'])
             },1000);
           })
           $('#rejected').on('hidden.bs.modal', function () {
-            $state.go('main.checkornot.unchecked');
+            var sms = {
+                  "mobile":"18626860001",
+                  "smsType":4,
+                  "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTEyZTllYmRjODNmNmE4YjdkY2JkZTgiLCJ1c2VySWQiOiJVMjAxNzAzMTQyMDE4Iiwicm9sZSI6InBhdGllbnQiLCJleHBpcmVBZnRlciI6MTQ5NzQwNzI2MzgzMywiaWF0IjoxNDk3NDA3MjYzfQ.5UITzg6NaHcIIEQESCLLB7mx_suISw9Bj6K1OBaiaDk",
+                  "reason":$scope.RejectReason.reason
+            }
+            Alluser.sms(sms).then(
+              function (data) {
+                console.log(data.results);
+                $scope.RejectReason={};
+                $state.go('main.checkornot.unchecked');
+              }, function (e) {
+              })
+            
           })
           // 拒绝提示
         } 
@@ -737,6 +784,74 @@ angular.module('controllers',['ngResource','services'])
     ],
     selected:'血肌酐'
   };
+  // $scope.selecttype = {
+  //   options:[
+  //     '血常规',
+  //     '血生化',
+  //     '单次血糖',
+  //     '药物浓度',
+  //     '甲状旁腺激素',
+  //     '血培养',
+  //     '其他血液检查',
+  //     '腹透液常规',
+  //     '腹透液生化',
+  //     '腹透液培养',
+  //     '尿常规',
+  //     '尿蛋白定量',
+  //     '尿培养',
+  //     '其他尿液检查',
+  //     '大便常规',
+  //     '其他化验'
+  //   ],
+  //   selected:''
+  // };
+  $scope.select={};
+  $scope.selecttype = {'options':
+  [
+    {'option':'血常规', 'disable':true},
+    {'option':'血生化', 'disable':true},
+    {'option':'单次血糖', 'disable':true},
+    {'option':'药物浓度', 'disable':true},
+    {'option':'甲状旁腺激素', 'disable':true},
+    {'option':'血培养', 'disable':true},
+    {'option':'*其他血液检查', 'disable':false},
+    {'option':'腹透液常规', 'disable':true},
+    {'option':'腹透液生化', 'disable':true},
+    {'option':'腹透液培养', 'disable':true},
+    {'option':'尿常规', 'disable':true},
+    {'option':'尿蛋白定量', 'disable':true},
+    {'option':'尿培养', 'disable':true},
+    {'option':'*其他尿液检查', 'disable':false},
+    {'option':'大便常规', 'disable':true},
+    {'option':'*其他化验', 'disable':false}
+  ],
+  'selected':''
+}
+console.log($scope.select.selected);
+  $scope.custype = '';
+  //   options:[
+  //     '血常规',
+  //     '血生化',
+  //     '单次血糖',
+  //     '药物浓度',
+  //     '甲状旁腺激素',
+  //     '血培养',
+  //     '其他血液检查',
+  //     '腹透液常规',
+  //     '腹透液生化',
+  //     '腹透液培养',
+  //     '尿常规',
+  //     '尿蛋白定量',
+  //     '尿培养',
+  //     '其他尿液检查',
+  //     '大便常规',
+  //     '其他化验'
+  //   ],
+  //   selected:''
+  // };
+  // 其他化验类型
+   // if($scope.selecttype.selected == '其他血液检查' || $scope.selecttype.selected == '其他尿液检查' || $scope.selecttype.selected == '其他化验')
+            
   $scope.today = function() {
       $scope.Lab.dt = new Date();
     };
@@ -836,18 +951,30 @@ angular.module('controllers',['ngResource','services'])
         console.log($scope.slides);
         // console.log($scope.slides[$index]);
         $scope.photoId = '';
-        $scope.phototype = '';
         $scope.getphoto = function (index) {
           $scope.photoId = $scope.slides[index].photoId;
           console.log($scope.photoId);
+          console.log($scope.phototype);
           $('#selecttype').modal('show');
+         
         }
-        $scope.type = '';
+        $scope.skipphoto = function (index) {
+          $scope.photoId = $scope.slides[index].photoId;
+            console.log($scope.photoId);
+            $('#skip').modal('show');
+        }
         $scope.gettype = function () {
-          $scope.phototype = $scope.type;
+          if($scope.custype == '') 
+            {
+              if(typeof($scope.select.selected) != 'undefined') $scope.phototype = $scope.select.selected.option;
+              else $scope.phototype = '';
+            }
+          else $scope.phototype = $scope.custype;
+          console.log($scope.select.selected);
           $('#selecttype').modal('hide');
           $('#selecttype').on('hidden.bs.modal', function () {
-            $scope.type = '';
+            $scope.select = {};
+            $scope.custype = '';
             console.log($scope.phototype);
           })
         }
@@ -921,18 +1048,18 @@ angular.module('controllers',['ngResource','services'])
       else if($scope.photoId == '') $('#selectphoto').modal('show');
       else $('#inputtype').modal('show');
     }
-    $scope.checkskip = function () {
-      console.log($scope.photoId);
-      if($scope.photoId != '' && $scope.phototype != '') {
-        $('#skip').modal('show');
-        $('#skip').on('hidden.bs.modal', function () {
-        $scope.photoId = '';
-        $scope.phototype = '';
-        })
-      }
-      else if($scope.photoId == '') $('#selectphoto').modal('show');
-      else $('#inputtype').modal('show');
-    }
+    // $scope.checkskip = function (index) {
+    //   console.log($scope.photoId);
+    //   if($scope.photoId != '' && $scope.phototype != '') {
+    //     $('#skip').modal('show');
+    //     $('#skip').on('hidden.bs.modal', function () {
+    //     $scope.photoId = '';
+    //     $scope.phototype = '';
+    //     })
+    //   }
+    //   else if($scope.photoId == '') $('#selectphoto').modal('show');
+    //   else $('#inputtype').modal('show');
+    // }
     $scope.save = function () {
       console.log($scope.postBack);
       console.log($scope.photoId);
@@ -1036,12 +1163,22 @@ angular.module('controllers',['ngResource','services'])
                     console.log($scope.photoId);
                     $('#selecttype').modal('show');
                   }
-                  $scope.type = '';
+                  $scope.skipphoto = function (index) {
+                    $scope.photoId = $scope.slides[index].photoId;
+                    console.log($scope.photoId);
+                    $('#skip').modal('show');
+                  }
                   $scope.gettype = function () {
-                    $scope.phototype = $scope.type;
+                    if($scope.custype == '') 
+                    {
+                      if(typeof($scope.select.selected) != 'undefined') $scope.phototype = $scope.select.selected.option;
+                      else $scope.phototype = '';
+                    }
+                    else $scope.phototype = $scope.custype;
                     $('#selecttype').modal('hide');
                     $('#selecttype').on('hidden.bs.modal', function () {
-                      $scope.type = '';
+                      $scope.select = {};
+                      $scope.custype = '';
                       console.log($scope.phototype);
                     })
                   }
@@ -1072,7 +1209,6 @@ angular.module('controllers',['ngResource','services'])
               },1000);
               $('#skiped').on('hidden.bs.modal', function () {
                 $scope.photoId = '';
-                $scope.phototype = '';
                 var patient = {
                   'patientId':Storage.get('patId'),
                   'token':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImhlYWx0aCIsImV4cCI6MTQ5OTY4Nzg2OTI5NSwiaWF0IjoxNDk5Njg0MjY5fQ.p87yOwwsumsi-G5uprWamdSH8_Ij1NgY3XAi1yFdv0U'
@@ -1092,12 +1228,18 @@ angular.module('controllers',['ngResource','services'])
                       console.log($scope.photoId);
                       $('#selecttype').modal('show');
                     }
-                    $scope.type = '';
+                    $scope.skipphoto = function (index) {
+                      $scope.photoId = $scope.slides[index].photoId;
+                      console.log($scope.photoId);
+                      $('#skip').modal('show');
+                    }
                     $scope.gettype = function () {
-                      $scope.phototype = $scope.type;
+                      if($scope.custype == '') $scope.phototype = $scope.select.selected.option;
+                      else $scope.phototype = $scope.custype;
                       $('#selecttype').modal('hide');
                       $('#selecttype').on('hidden.bs.modal', function () {
-                        $scope.type = '';
+                        $scope.select = {};
+                        $scope.custype = '';
                         console.log($scope.phototype);
                       })
                     }
