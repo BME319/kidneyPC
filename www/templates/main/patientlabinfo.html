@@ -4,7 +4,7 @@
 		<span style="margin-left:40px;margin-top:20px">化验信息</span>
 	
 		
-		<table ng-table="tableParams" class="table table-condensed" show-filter="true" style="font-size:15px;margin-top:20px;text-align:center">
+		<table ng-table="tableParams" class="table table-condensed table-bordered table-striped" style="font-size:15px;margin-top:20px;text-align:center">
 		    <tr ng-repeat="patientlabtest in $data">
 		      <td title="'化验类别'" sortable="'type'">
 		      	{{patientlabtest.type}}

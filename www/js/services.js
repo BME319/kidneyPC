@@ -63,6 +63,7 @@ angular.module('services',['ngResource'])
       register:{method:'POST', params:{route:'register',phoneNo:'@phoneNo',password:'@password',role:'@role'}, timeout: 10000},
       modify:{method:'POST', params:{route:'alluser'}, timeout: 10000},
       getCount:{method:'GET', params:{route:'count',token:'@token',role:'@role'}, timeout: 10000},
+      sms:{method:'POST', params:{route:'sms'}, timeout:10000}
     })
   };
 
@@ -325,7 +326,15 @@ angular.module('services',['ngResource'])
     });
     return deferred.promise;
   };
-
+  self.sms = function (obj) {
+    var deferred = $q.defer();
+    Data.Alluser.sms(obj,function (data, headers) {
+      deferred.resolve(data);
+    }, function(err){
+      deferred.reject(err);
+    });
+    return deferred.promise;
+  };
   return self;
 }])
 
