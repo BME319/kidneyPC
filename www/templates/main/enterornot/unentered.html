@@ -1,14 +1,16 @@
 <div class="tab-pane fade in active" id="reagent" style="font-size:15px">
-  <div style="padding-bottom: 30px;"> <b style="font-size: 18px">患者搜索</b> <input style="width:20%;height:30px;margin-left:30px" ng-model="patientname" />
+  <div style="padding-bottom: 30px;">
+    <span style="font-size: 18px">当前未录入患者总人数 : {{count}}位</span> 
+    <b style="font-size: 18px;margin-left:300px">患者搜索</b> <input style="width:20%;height:30px;margin-left:30px" ng-model="patientname" />
       <button class="btn btn-primary" style="margin-left:15px" ng-click="search()">查找</button> 
   </div>
-  <table ng-table="tableParams" class="table table-condensed" show-filter="true" style="text-align:center">
+  <table ng-table="tableParams" class="table table-condensed" style="text-align:center">
     <tr ng-repeat="labtestinfo in $data">
       <td title="'姓名'"  sortable="'name'">
         {{labtestinfo.name}}
       </td>
       <td title="'上传日期'" sortable="'uploadtime'">
-        {{labtestinfo.uploadtime}}
+        {{labtestinfo.latestUploadTime}}
       </td>
       <td title="'操作'">
           <a href="#/main/labinfo" ng-click="getpatId($index)">化验信息录入</a>
