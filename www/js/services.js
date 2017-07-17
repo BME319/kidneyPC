@@ -33,6 +33,7 @@ angular.module('services',['ngResource'])
       GetReviewInfo:{method:'GET', params:{route:'reviewInfo', reviewStatus:'@reviewInfo', limit:'@limit', skip:'@skip', name:'@name', token:'@token'}, timeout:100000},
       GetCertificate:{method:'GET', params:{route:'certificate', doctorId:'@doctorId', token:'@token'}, timeout:100000},
       PostReviewInfo:{method:'POST',params:{route:'reviewInfo'}, timeout: 100000},
+      GetCount:{method:'GET', params:{route:'countByStatus', reviewStatus:'@reviewStatus', token:'@token'}, timeout:100000}
     })
   }
 
@@ -44,7 +45,8 @@ angular.module('services',['ngResource'])
       GetPhotobyLabtest:{method:'GET', params:{route:'photoByLabtest', labtestId:'@labtestId', token:'@token'}, timeout:100000},
       PostLabTestInfo:{method:'POST', params:{route:''}, timeout:100000},
       LabelPhoto:{method:'POST', params:{route:'labelphoto'}, timeout:100000},
-      EditResult:{method:'POST', params:{route:'edit'}, timeout:100000}
+      EditResult:{method:'POST', params:{route:'edit'}, timeout:100000},
+      GetCount:{method:'GET', params:{route:'countByStatus', labtestImportStatus:'@labtestImportStatus', token:'@token'}, timeout:100000}
     })
   }
 
@@ -133,6 +135,15 @@ angular.module('services',['ngResource'])
     });
     return deferred.promise;
   }
+  self.GetCount = function (params) {
+    var deferred = $q.defer();
+    Data.Review.GetCount(params, function (data, headers) {
+      deferred.resolve(data);
+    }, function (err) {
+      deferred.reject(err);
+    });
+    return deferred.promise;
+  }
   return self;
 }])
 
@@ -195,6 +206,15 @@ angular.module('services',['ngResource'])
   self.EditResult = function (params) {
     var deferred = $q.defer();
     Data.LabtestImport.EditResult(params, function (data, headers) {
+      deferred.resolve(data);
+    }, function (err) {
+      deferred.reject(err);
+    });
+    return deferred.promise;
+  }
+  self.GetCount = function (params) {
+    var deferred = $q.defer();
+    Data.LabtestImport.GetCount(params, function (data, headers) {
       deferred.resolve(data);
     }, function (err) {
       deferred.reject(err);
