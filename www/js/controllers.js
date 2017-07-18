@@ -1,23 +1,110 @@
 angular.module('controllers',['ngResource','services'])
 
-.controller('LoginCtrl', ['$scope', '$state', 'Storage', '$timeout', function ($scope, $state, Storage, $timeout) {
-  $scope.LogIn = function () {
-    $state.go('main.usermanage.allUsers');
-    // $state.go('main.checkornot.checked');
-  }
+.controller('LoginCtrl', ['$scope', '$timeout', '$state', 'Storage', '$sce', 'Data', 'User', function($scope, $timeout, $state, Storage, $sce, Data, User) {
+
+    if (Storage.get('USERNAME') != null && Storage.get('USERNAME') != undefined) {
+        $scope.logOn = { username: Storage.get('USERNAME'), password: '' }
+    } else {
+        $scope.logOn = { username: '', password: '' }
+    }
+
+    $scope.LogIn = function(logOn) {
+        switch (logOn.role) {
+            // case 'doctor':
+            //     userrole = '普通医生'
+            //     break
+            // case 'patient':
+            //     userrole = '患者'
+            //     break
+            case 'health':
+                userrole = '健康专员'
+                break
+            case 'admin':
+                userrole = '管理员'
+                break
+        }
+        $scope.logStatus = ''
+        if ((logOn.username != '') && (logOn.password != '')) {
+            var phoneReg = /^(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$/
+            if (!phoneReg.test(logOn.username)) {
+                $scope.logStatus = '手机号验证失败！'
+            } else {
+                Storage.set('USERNAME', logOn.username)
+                User.logIn({ username: logOn.username, password: logOn.password, role: logOn.role }).then(function(data) {
+                    if (data.results == 1) {
+                        $scope.logStatus = '请确认账号密码无误且角色选择正确！'
+                    } else if (data.results.mesg == 'login success!') {
+                        $scope.logStatus = '登录成功！'
+                        $state.go('main.usermanage.allUsers')
+                        Storage.set('PASSWORD', logOn.password)
+                        Storage.set('TOKEN', data.results.token)
+                        Storage.set('isSignIN', 'Yes')
+                        var username = data.results.userName ? data.results.userName : data.results.userId
+                        Storage.set('UName', username)
+                        Storage.set('ROLE', userrole)
+                    }
+                }, function(err) {
+                    if (err.results == null && err.status == 0) {
+                        $scope.logStatus = '网络错误！'
+                        return
+                    }
+                    if (err.status == 404) {
+                        $scope.logStatus = '连接服务器失败！'
+                    }
+                })
+            }
+        } else {
+            $scope.logStatus = '请输入完整信息！'
+        }
+    }
+
+    $scope.toReset = function() {
+        $state.go('phonevalid', { phonevalidType: 'reset' })
+    }
 }])
 
-.controller('MainCtrl', ['$scope', '$state', 'Storage', '$timeout', function ($scope, $state, Storage, $timeout) {
-	$scope.tounchecked = function () {
-		$state.go('main.checkornot.unchecked');
-	}
-	$scope.touser = function () {
-		$state.go('main.usermanage.allUsers');
-	}
-	$scope.tounentered = function () {
-		$state.go('main.enterornot.unentered');
-	}
+.controller('MainCtrl', ['$scope', '$state', 'Storage', '$timeout', function($scope, $state, Storage, $timeout) {
+    $scope.UserName = Storage.get('UName')
+    $scope.UserRole = Storage.get('ROLE')
+    console.log($scope.UserRole)
+
+    switch ($scope.UserRole) {
+    case '健康专员' :
+        $scope.flagdoctor = false
+        $scope.flaguser = false
+        $scope.flaghealth = true
+        break
+    case '管理员' :
+        $scope.flagdoctor = true
+        $scope.flaguser = true
+        $scope.flaghealth = true
+        break 
+    // case '患者' :
+    //     $scope.flagdoctor = true
+    //     $scope.flaguser = true
+    //     $scope.flaghealth = true
+    //     break 
+    // case '普通医生' :
+    //     $scope.flagdoctor = true
+    //     $scope.flaguser = false
+    //     $scope.flaghealth = false
+    //     break       
+    }
+    console.log($scope.flagdoctor)
+    console.log($scope.flaguser)
+    console.log($scope.flaghealth)
+
+    $scope.tounchecked = function() {
+        $state.go('main.checkornot.unchecked');
+    }
+    $scope.touser = function() {
+        $state.go('main.usermanage.allUsers');
+    }
+    $scope.tounentered = function() {
+        $state.go('main.enterornot.unentered');
+    }
 }])
+
 .controller('CheckOrNotCtrl', ['$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function ($scope, $state, Review, Storage, $timeout, NgTableParams) {
   $scope.flag = 0;
   $scope.tochecked = function () {
@@ -434,7 +521,6 @@ angular.module('controllers',['ngResource','services'])
                 dataset:$scope.doctorinfos
             });
     }, function (e) {
-
     });
   $scope.count = '';
   var count = {
@@ -445,7 +531,6 @@ angular.module('controllers',['ngResource','services'])
     function (data) {
       $scope.count = data.results;
     }, function (e) {
-
     }); 
   $scope.lastpage = function () {
     if($scope.review.skip - $scope.review.limit >= 0) {

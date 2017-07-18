@@ -23,7 +23,7 @@ angular.module('services',['ngResource'])
 	var abort = $q.defer;
 
   var User = function () {
-    return $resource(CONFIG.baseUrl + ':path/:route', {path:'user'}, {
+    return $resource(CONFIG.baseUrl + ':path/:route', {path:'alluser'}, {
       logIn:{method:'POST', params:{route: 'login'}, timeout: 100000}
     })
   }
@@ -60,7 +60,7 @@ angular.module('services',['ngResource'])
       getHealthList:{method:'GET', params:{route:'healthList',token:'@token',limit:'@limit',skip:'@skip'}, timeout: 10000},
       getAdminList:{method:'GET', params:{route:'adminList',token:'@token',limit:'@limit',skip:'@skip'}, timeout: 10000},
       cancelUser:{method:'POST', params:{route:'cancelUser'}, timeout: 10000},
-      register:{method:'POST', params:{route:'register',phoneNo:'@phoneNo',password:'@password',role:'@role'}, timeout: 10000},
+      // register:{method:'POST', params:{route:'register',phoneNo:'@phoneNo',password:'@password',role:'@role'}, timeout: 10000},
       modify:{method:'POST', params:{route:'alluser'}, timeout: 10000},
       getCount:{method:'GET', params:{route:'count',token:'@token',role:'@role'}, timeout: 10000},
       sms:{method:'POST', params:{route:'sms'}, timeout:10000}
