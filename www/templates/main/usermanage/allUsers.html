@@ -1,19 +1,48 @@
-<h4>所有用户总数：{{totalItems}}位</h4>
-<!-- 分页 -->
+<h4>所有用户总数：{{totalNums}}位</h4>
+<!-- 搜索 -->
+<form class="form-inline">
+  <div class="form-group">
+    <label class="sr-only">用户ID</label>
+    <input type="text" class="form-control" ng-model="userlist.userId" placeholder="请输入用户ID">
+  </div>
+  <div class="form-group">
+    <label class="sr-only">用户姓名</label>
+    <input type="text" class="form-control" ng-model="userlist.name" placeholder="请输入用户姓名">
+  </div>
+  <div class="form-group">
+    <label class="sr-only">手机号码</label>
+    <input type="text" class="form-control" ng-model="userlist.phoneNo" placeholder="请输入用户手机号码">
+  </div>
+  <div class="form-group">
+    <label class="sr-only">角色</label>
+	<select class="form-control" ng-model="userlist.role" ng-options="role.id as role.name for role in search_roles">
+		<option value=''>请选择角色</option>
+	</select>
+  </div>
+  <div class="form-group">
+    <label class="sr-only">性别</label>
+    <select class="form-control" ng-model="userlist.gender" ng-options="gender.id as gender.name for gender in search_genders">
+		<option value=''>请选择性别</option>
+	</select>
+  </div>
+  <button type="submit" class="btn btn-default" ng-click="searchList()">搜索</button>
+  <button type="button" class="btn btn-default" ng-click="searchClear()">清空搜索</button>
+</form>
 <!-- 所有用户列表-张桠童 -->
-<table ng-table="tableParams" class="table table-condensed" show-filter="true">
+<table ng-table="tableParams" class="table table-condensed table-bordered table-striped" style="margin-top: 10px">
 	<tr ng-repeat="user in $data" style="text-align: center;">
-		<td title="'用户ID'" filter="{ userId: 'text'}" sortable="'userId'">{{user.userId}}
+		<td title="'用户ID'" sortable="'userId'">{{user.userId}}
 		</td>
-		<td title="'姓名'" filter="{ name: 'text'}" sortable="'name'">{{user.name}}
+		<td title="'姓名'" sortable="'name'">{{user.name}}
 		</td>
-		<td title="'性别'" filter="{ gender: 'select'}" filter-data="genders">{{user.gender|gender}}
+		<td title="'性别'">{{user.gender|gender}}
 		</td>
-		<td title="'手机号码'" filter="{ phoneNo: 'text'}" sortable="'phoneNo'">{{user.phoneNo}}
+		<td title="'手机号码'" sortable="'phoneNo'">{{user.phoneNo}}
 		</td>
-		<td title="'角色'" filter="{ role: 'text'}" sortable="'role'"><span ng-repeat="ro in user.role">{{ro|role}}&nbsp;</span>
+		<td title="'角色'" sortable="'role'"><span ng-repeat="ro in user.role">{{ro|role}}&nbsp;</span>
 		</td>
 		<td title="'操作'">
+		  <button class="btn btn-link" style="text-decoration:none; outline:none; padding:0px; border:0px; font-size:10px;" data-toggle="modal" data-target="#changeRoles" ng-click="openChangeRoles(user)">更改角色</button>
 		  <button class="btn btn-link" style="text-decoration:none; outline:none; padding:0px; border:0px; font-size:10px;" ng-click="confirm(user.userId)">注销</button>
 		</td>
 	</tr>
@@ -63,6 +92,99 @@
   <div class="modal-dialog modal-sm" role="document">
     <div class="modal-content" style="text-align: center; font-size: 20px">
       注销成功！
+    </div>
+  </div>
+</div>
+<!-- 更改角色modal -->
+<div class="modal fade" id="changeRoles" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="modal_close('#changeRoles')">&times;</button>
+		        <h3 class="modal-title" id="modal-title">更改角色</h3>
+		    </div>
+		    <div class="modal-body" id="modal-body" style="margin-left: 30px">
+		    	<form id = "changeRolesForm">
+			    	<div class="form-group">
+			    		<label class="checkbox">
+						  	<input type="checkbox" ng-model="role_end.Leader" ng-disabled="ifDisabled.Leader" value="Leader"> 地区负责人
+						</label>
+						<label class="checkbox">
+						  	<input type="checkbox" ng-model="role_end.master" ng-disabled="ifDisabled.master" value="master"> 科主任
+						</label>
+						<label class="checkbox">
+						  	<input type="checkbox" ng-model="role_end.doctor" ng-disabled="ifDisabled.doctor" value="doctor"> 普通医生
+						</label>
+						<label class="checkbox">
+						  	<input type="checkbox" ng-model="role_end.patient" ng-disabled="ifDisabled.patient" value="patient"> 患者
+						</label>
+						<label class="checkbox">
+						  	<input type="checkbox" ng-model="role_end.nurse" ng-disabled="ifDisabled.nurse" value="nurse"> 护士
+						</label>
+						<label class="checkbox">
+						  	<input type="checkbox" ng-model="role_end.insuranceC" ng-disabled="ifDisabled.insuranceC" value="insuranceC"> 保险主管
+						</label>
+						<label class="checkbox">
+						  	<input type="checkbox" ng-model="role_end.insuranceA" ng-disabled="ifDisabled.insuranceA" value="insuranceA"> 沟通人员
+						</label>
+						<label class="checkbox">
+						  	<input type="checkbox" ng-model="role_end.insuranceR" ng-disabled="ifDisabled.insuranceR" value="insuranceR"> 录入人员
+						</label>
+						<label class="checkbox">
+						  	<input type="checkbox" ng-model="role_end.health" ng-disabled="ifDisabled.health" value="health"> 健康专员
+						</label>
+						<label class="checkbox">
+						  	<input type="checkbox" ng-model="role_end.admin" ng-disabled="ifDisabled.admin" value="admin"> 管理员
+						</label>
+			    	</div>
+			    	<button type="submit" class="btn btn-primary" ng-click="toChangeOrNot()">确定</button>
+			    	<button type="button" class="btn btn-warning" ng-click="modal_close('#changeRoles')">取消</button>
+				</form>
+		    </div>
+		</div>
+	</div>
+</div>
+<!-- 表单验证 -->
+<script>
+	$(document).ready(function() {
+	    $('#changeRolesForm').formValidation({
+	        framework: 'bootstrap',
+	        excluded: ':disabled',
+	        icon: {
+	            valid: 'glyphicon glyphicon-ok',
+	            invalid: 'glyphicon glyphicon-remove',
+	            validating: 'glyphicon glyphicon-refresh'
+	        }
+	    })
+	    .on('success.form.fv',function(e){
+	        // Prevent form submission
+	        e.preventDefault();
+	    });
+	});
+</script>
+<!-- 是否更改角色modal -->
+<div class="modal fade" id="changeRolesOrNot" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="modal_close('#changeRolesOrNot')">&times;</button>
+		        <h3 class="modal-title" id="modal-title">警告</h3>
+		    </div>
+		    <div class="modal-body" id="modal-body">
+		        <span>确定更改角色？</span>
+		    </div>
+		    <div class="modal-footer">
+		        <button class="btn btn-primary" type="button" ng-click="roles_change()">确定</button>
+		        <button class="btn btn-warning" type="button" ng-click="modal_close('#changeRolesOrNot')">取消</button>
+		    </div>
+		</div>
+	</div>
+</div>
+<!-- 提示更改角色成功modal -->
+<div class="modal fade" id="changeRolesSuccess">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content" style="text-align: center; font-size: 20px">
+      更改角色成功！
     </div>
   </div>
 </div>

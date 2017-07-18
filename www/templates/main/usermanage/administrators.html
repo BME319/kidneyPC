@@ -1,4 +1,4 @@
-<h4>所有用户总数：{{totalItems}}位</h4>
+<h4>管理员总数：{{totalNums}}位</h4>
 <!-- 新建用户-张桠童 -->
 <div class="dropdown" style="margin-bottom: 10px">
 	<button type="button" class="btn btn-default dropdown-toggle" id="dropdownMenu1" 
@@ -13,6 +13,29 @@
 		</li>
 	</ul>
 </div>
+<!-- 搜索 -->
+<form class="form-inline">
+  <div class="form-group">
+    <label class="sr-only">用户ID</label>
+    <input type="text" class="form-control" ng-model="userlist.userId" placeholder="请输入用户ID">
+  </div>
+  <div class="form-group">
+    <label class="sr-only">用户姓名</label>
+    <input type="text" class="form-control" ng-model="userlist.name" placeholder="请输入用户姓名">
+  </div>
+  <div class="form-group">
+    <label class="sr-only">手机号码</label>
+    <input type="text" class="form-control" ng-model="userlist.phoneNo" placeholder="请输入用户手机号码">
+  </div>
+  <div class="form-group">
+    <label class="sr-only">性别</label>
+    <select class="form-control" ng-model="userlist.gender" ng-options="gender.id as gender.name for gender in search_genders">
+		<option value=''>请选择性别</option>
+	</select>
+  </div>
+  <button type="submit" class="btn btn-default" ng-click="searchList()">搜索</button>
+  <button type="button" class="btn btn-default" ng-click="searchClear()">清空搜索</button>
+</form>
 <!-- 注册新用户modal -->
 <div class="modal fade" id="new_register" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog">
@@ -282,25 +305,51 @@
   </div>
 </div>
 <!-- 管理员列表-张桠童 -->
-<table ng-table="tableParams" class="table table-condensed" show-filter="true">
+<table ng-table="tableParams" class="table table-condensed table-bordered table-striped" style="margin-top: 10px">
 	<tr ng-repeat="user in $data" style="text-align: center;">
-		<td title="'用户ID'" filter="{ userId: 'text'}" sortable="'userId'">{{user.userId}}
+		<td title="'用户ID'" sortable="'userId'">{{user.userId}}
 		</td>
-		<td title="'姓名'" filter="{ name: 'text'}" sortable="'name'">{{user.name}}
+		<td title="'姓名'" sortable="'name'">{{user.name}}
 		</td>
-		<td title="'性别'" filter="{ gender: 'select'}" filter-data="genders">{{user.gender|gender}}
+		<td title="'性别'">{{user.gender|gender}}
 		</td>
-		<td title="'手机号码'" filter="{ phoneNo: 'text'}" sortable="'phoneNo'">{{user.phoneNo}}
+		<td title="'手机号码'" sortable="'phoneNo'">{{user.phoneNo}}
 		</td>
-		<td title="'所属单位'" filter="{ workUnit: 'text'}" sortable="'workUnit'">{{user.workUnit}}
+		<td title="'所属单位'" sortable="'workUnit'">{{user.workUnit}}
 		</td>
-		<td title="'创建时间'" filter="{ creationTime: 'text'}" sortable="'creationTime'">{{user.creationTime}}
+		<td title="'创建时间'" sortable="'creationTime'">{{user.creationTime}}
 		</td>
 		<td title="'操作'">
 		  <button class="btn btn-link" style="text-decoration:none; outline:none; padding:0px; border:0px; font-size:10px;" ng-click="openDetail(user)">查看</button>
 		</td>
 	</tr>
 </table>
+<!-- 每页数量 -->
+<div class="btn-group  btn-group-sm pull-right" style="margin-top: 18px">
+    <button type="button" class="btn btn-default" ng-click="changeLimit(20)">20</button>
+    <button type="button" class="btn btn-default" ng-click="changeLimit(30)">30</button>
+    <button type="button" class="btn btn-default" ng-click="changeLimit(50)">50</button>
+    <button type="button" class="btn btn-default" ng-click="changeLimit(100)">100</button>
+</div>
+<!-- 分页条 -->
+<ul uib-pagination  
+	max-size="10" 
+	class="pagination" 
+	boundary-links="true" 
+	boundary-link-numbers="true"
+	direction-links="true"
+	first-text="首页"
+	last-text="末页"
+	previous-text="上一页"
+	next-text="下一页"
+	force-ellipses="true"
+	rotate="true" 
+	total-items="totalItems"
+	items-per-page="itemsPerPage"
+	ng-change="pageChanged()"
+	ng-model="currentPage"
+	>
+</ul>
 <!-- 查看详细信息modal（包括注销用户、去除角色功能） -->
 <script type="text/ng-template" id="detail_admin.html">
 	<div class="modal-header">

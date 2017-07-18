@@ -1,12 +1,11 @@
 'use strict';
 
-
-angular.module('Kidney_Web',['ui.router','ui.bootstrap','controllers','services','filters','directives','ngTable', 'ngMdIcons'])
+angular.module('Kidney_Web',['ui.router','ui.bootstrap','controllers','services','filters','directives','ngTable', 'ngMdIcons', 'checklist-model'])
 
 .config(['$stateProvider','$urlRouterProvider',function ($stateProvider, $urlRouterProvider) {
   $urlRouterProvider.otherwise("/login");
   $stateProvider
-  // 登陆
+  // 登陆, 'checklist-model'
   .state('login', {
     url:"/login",
     templateUrl:"templates/login.html",

@@ -521,7 +521,6 @@ angular.module('controllers',['ngResource','services'])
                 dataset:$scope.doctorinfos
             });
     }, function (e) {
-
     });
   $scope.count = '';
   var count = {
@@ -532,7 +531,6 @@ angular.module('controllers',['ngResource','services'])
     function (data) {
       $scope.count = data.results;
     }, function (e) {
-
     }); 
   $scope.lastpage = function () {
     if($scope.review.skip - $scope.review.limit >= 0) {

@@ -1,10 +1,10 @@
 <div class="container-fluid">
 	<div style="margin-left:300px;margin-right:300px;margin-top:50px;font-size:25px">
-		<p style="margin-left:40px;padding-top:10px;vertical-align:middle"><ng-md-icon icon="person" style="fill:#4876FF;margin-right:10px" size="26"></ng-md-icon>患者A</p>
+		<p style="margin-left:40px;padding-top:10px;vertical-align:middle"><ng-md-icon icon="person" style="fill:#4876FF;margin-right:10px" size="26"></ng-md-icon>患者 {{patname}}</p>
 		<span style="margin-left:40px;margin-top:20px">化验信息</span>
 	
 		
-		<table ng-table="tableParams" class="table table-condensed" show-filter="true" style="font-size:15px;margin-top:20px;text-align:center">
+		<table ng-table="tableParams" class="table table-condensed table-bordered table-striped" style="font-size:15px;margin-top:20px;text-align:center">
 		    <tr ng-repeat="patientlabtest in $data">
 		      <td title="'化验类别'" sortable="'type'">
 		      	{{patientlabtest.type}}
