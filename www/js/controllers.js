@@ -679,7 +679,7 @@ angular.module('controllers',['ngResource','services'])
   // 搜索
   $scope.search = function () {
     $scope.lab = {
-     "labtestImportStatus":1,
+     "labtestImportStatus":0,
       "limit":$scope.itemsPerPage,
       "skip":($scope.currentPage-1) * $scope.itemsPerPage,
       "name":$scope.patientname,
