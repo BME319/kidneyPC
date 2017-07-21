@@ -18,8 +18,14 @@
     </div> -->
     <div uib-carousel active="active" style="height:600px" interval="myInterval" no-wrap="noWrapSlides">
 		<div uib-slide ng-repeat="slide in slides" index="$index">
+			
 			<img ng-src="{{slide.photo}}" style="height:600px">
-			<div class="row">
+			<!-- ;transform:rotate({{slide.rotate}}deg) -->
+			<!-- <div class="row">
+				<button class="btn btn-primary" ng-click="slide.rotate=slide.rotate+90">向右转</button>
+				<button class="btn btn-primary" ng-click="slide.rotate=slide.rotate-90">向左转</button>
+			</div> -->
+			<div class="row" style="margin-top:15px">
 				<button type="button" class="btn btn-danger" ng-click="getphoto($index)">选定当前图片</button>
 				<button class="btn btn-primary" ng-click="skipphoto($index)">跳过当前图片
 				</button>
@@ -62,7 +68,7 @@
 
 
 		
-		<div class="row" style="margin-top:50px;font-size:16px" ng-repeat="Lab in postBack track by $index">		
+		<div class="row" style="margin-top:100px;font-size:16px" ng-repeat="Lab in postBack track by $index">		
 			<div class="col-md-3">
 				化验类别: <select ng-model="Lab.LabType.selected" ng-options="o as o for o in Lab.LabType.options"></select>
 			</div>
@@ -108,7 +114,7 @@
 								</h3>
 							</div>
 							<div class="modal-body" style="font-size:18px">
-								确认完成本条信息的录入?
+								确认本张图片信息已全部录入?确认后不能新增记录
 							</div>
 							<div class="modal-footer">
 								<button type="button" class="btn btn-primary col-xs-2 col-xs-offset-4" ng-click="save()">

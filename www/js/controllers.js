@@ -1056,6 +1056,9 @@ console.log($scope.select.selected);
         // var test=data.results;
         // $scope.slides = test;
         console.log(patient);
+        // for(var i=0;i<$scope.slides.length;i++) {
+        //   $scope.slides[i].rotate = 0;
+        // }
         console.log($scope.slides);
         // console.log($scope.slides[$index]);
         $scope.photoId = '';
@@ -1515,7 +1518,8 @@ console.log($scope.select.selected);
     LabtestImport.GetPhotobyLabtest(labtest).then(
       function (data) {
         $scope.photolist = data.results;
-        
+        // $scope.photolist.rotate=0;
+        console.log($scope.photolist);
       }, function (e) {
 
       })

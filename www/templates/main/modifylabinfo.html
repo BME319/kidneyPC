@@ -4,7 +4,12 @@
 		<span style="margin-left:40px;margin-top:20px">化验信息</span>
 		<div style="height:600px">
 			<img ng-src="{{photolist.photo}}" style="height:600px;margin-left:10%">
+			<!-- ;transform:rotate({{photolist.rotate}}deg) -->
 		</div>
+		<!-- <div class="row" style="margin-left:20%">
+			<button class="btn btn-primary col-offset-2" ng-click="photolist.rotate=photolist.rotate+90">向右转</button>
+			<button class="btn btn-primary" ng-click="photolist.rotate=photolist.rotate-90">向左转</button>
+		</div> -->
 		<div class="row" style="margin-top:20px;font-size:16px">		
 			<div class="col-md-3">
 				化验类别: <select ng-model="LabType.selected" ng-options="o as o for o in LabType.options"></select>
