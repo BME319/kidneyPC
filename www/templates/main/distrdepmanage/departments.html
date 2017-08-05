@@ -1,0 +1,251 @@
+<!-- 科室列表显示界面-茹画 -->
+<h4 style="font-size: 15px;margin-top: -10px;">所有科室总数：{{totalItems}}个</h4>
+<form class="form-inline">
+    <!-- 新建科室按钮 -->
+    <button type="button" class="btn btn-default" ng-click="createdepartment()" style="background:#347ab6;color:white ">新建科室
+    </button>
+    <!-- 科室搜索 -->
+    <div class="form-group">
+        <label class="sr-only">科室名称</label>
+        <input type="text" class="form-control" ng-model="departmentlist.department" placeholder="请输入科室名称" style="width: 130px">
+    </div>
+    <!--     <div class="form-group">
+        <label class="sr-only">科室负责人</label>
+        <input type="text" class="form-control" ng-model="departmentlist.departleader" placeholder="请输入科室负责人" style="width: 150px;">
+    </div> -->
+    <div class="form-group">
+        <label class="sr-only">科室所在地区</label>
+        <input type="text" class="form-control" ng-model="departmentlist.district" placeholder="请输入地区名称" style="width: 120px;">
+    </div>
+    <!--     <div class="form-group">
+        <label class="sr-only">地区负责人</label>
+        <input type="text" class="form-control" ng-model="departmentlist.portleader" placeholder="请输入地区负责人" style="width: 150px;">
+    </div> -->
+    <div class="form-group">
+        <label class="sr-only">科室所在医院</label>
+        <input type="text" class="form-control" ng-model="departmentlist.hospital" placeholder="请输入医院" style="width: 120px;">
+    </div>
+    <button type="submit" class="btn btn-default" ng-click="searchList()">搜索</button>
+    <button type="button" class="btn btn-default" ng-click="searchClear()">清空搜索</button>
+</form>
+<!-- 科室列表 -->
+<table ng-table="tableParams" class="table table-condensed table-bordered table-striped" style="margin-top: 10px;text-align: center;" id="departmentlist">
+    <tr ng-repeat="department in $data">
+        <td title="'科室名称'" sortable="'department'">{{department.department}}
+        </td>
+        <td title="'科室负责人'" sortable="'departleader'">{{department.departLeader|departleadername}}
+        </td>
+        <td title="'科室所在地区'" sortable="'district'">{{department.district}}
+        </td>
+        <td title="'地区负责人'" sortable="'portleader'">{{department.portleader|portleadername}}
+        </td>
+        <td title="'科室所在医院'" sortable="'hospital'">{{department.hospital}}
+        </td>
+        <td title="'科室包含医生列表'">
+            <button class="btn btn-link" style="text-decoration:none; outline:none; padding:0px; border:0px; font-size:10px;" ng-click="showdoctor(department)">查看医生列表</button>
+        </td>
+        <td title="'操作'">
+            <button class="btn btn-link" style="text-decoration:none; outline:none; padding:0px; border:0px; font-size:10px;" ng-click="editdepartment(department)">修改</button>
+            <button class="btn btn-link" style="text-decoration:none; outline:none; padding:0px; border:0px; font-size:10px;" ng-click="deletedepartment(department)">删除</button>
+        </td>
+    </tr>
+</table>
+<!-- 新建科室modal -->
+<div class="modal fade" id="new_department" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" ng-click="modal_close('#new_department')" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h3 class="modal-title">新建科室</h3>
+            </div>
+            <div class="modal-body" style="margin-left: 15%;margin-right: 15%">
+                <form data-fv-framework="bootstrap" data-fv-icon-valid="glyphicon glyphicon-ok" data-fv-icon-invalid="glyphicon glyphicon-remove" data-fv-icon-validating="glyphicon glyphicon-refresh">
+                    <div class="form-group">
+                        <label>地区：</label>
+                    </div>
+                    <div class="form-group">
+                        <select class="form-control" ng-model="registerInfo.district" ng-options="district.district as district.district for district in districtlist">
+                            <option value=''>请选择科室所在地区</option>
+                        </select>
+                        <!--                        <span class="input-group-btn"><button type="button" class="btn btn-primary" ng-click="addnewlabel(changeInfo.newdistrict)" >确认</button></span> -->
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <br>科室名：</label>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" ng-model="registerInfo.department" data-fv-notempty="true" placeholder="请输入科室名称" data-fv-notempty-message="该项为必填项" />
+                        <!--         <span class="input-group-btn"><button type="button" class="btn btn-primary" ng-click="addnewlabel(changeInfo.newdistrict)" >确认</button></span> -->
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <br>添加负责人：</label><span><label id="newdepartleader"> </label></span>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" class="form-control" ng-model="userlist.departleader" placeholder="请输入姓名进行搜索" data-fv-notempty="true" data-fv-notempty-message="该项为必填项" />
+                        <span class="input-group-btn">
+                        <button type="button" class="btn btn-default" ng-click="searchUser(userlist.departleader)" >搜索</button></span>
+                    </div>
+                    <div ng-show="newflagleader">
+                        <div class="form-group">
+                            <label><br>搜索结果</label>
+                        </div>
+                        <div class="input-group">
+                            <select class="form-control" ng-model="newdepartleader._id" ng-options="user._id as ('用户名：'+user.name+'，'+'userId：'+user.userId) for user in userlist.userlist_search">
+                                <option value="">请选择用户</option>
+                            </select><span class="input-group-btn"><button type="button" class="btn btn-primary" ng-click="addnewlabel(newdepartleader._id);addRole(newdepartleader._id);" >添加</button></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <br>科室包含医生：</label><span><label id="newdoctor"> </label></span>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" class="form-control" ng-model="userlist.doctor" placeholder="请输入姓名进行搜索" data-fv-notempty="true" data-fv-notempty-message="该项为必填项" /><span class="input-group-btn">
+                        <button type="button" class="btn btn-default" ng-click="searchUser(userlist.doctor)" >搜索</button></span>
+                    </div>
+                    <div ng-show="newflagdoctor">
+                        <div class="form-group">
+                            <label><br>搜索结果</label>
+                        </div>
+                        <div class="input-group">
+                            <select class="form-control" ng-model="newdoctor._id" ng-options="user._id as ('用户名：'+user.name+'，'+'userId：'+user.userId) for user in userlist.userlist_search">
+                                <option value="">请选择用户</option>
+                            </select><span class="input-group-btn"><button type="button" class="btn btn-primary" ng-click="addnewlabel(newdoctor._id);addRole(newdoctor._id);"" >添加</button></span>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <div class="col-xs-offset-3">
+                            <button type="submit" class="btn btn-primary" ng-click="register()">确认新建</button>
+                            <button type="button" class="btn btn-default" ng-click="modal_close('#new_department')">取消</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 修改科室信息modal -->
+<div class="modal fade" id="changeInfo" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" ng-click="modal_close('#changeInfo')">&times;</button>
+                <h3 class="modal-title" id="modal-title">修改科室信息</h3>
+            </div>
+            <div class="modal-body" style="margin-left: 15%;margin-right: 15%">
+                <form id="changeForm" name="changeForm" data-fv-framework="bootstrap" data-fv-icon-valid="glyphicon glyphicon-ok" data-fv-icon-invalid="glyphicon glyphicon-remove" data-fv-icon-validating="glyphicon glyphicon-refresh">
+                    <div class="form-group">
+                        <label>地区名称：</label><span><label id="editdistrict"> </label></span>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="name" ng-model="changeInfo.newdistrict" data-fv-notempty="true" placeholder="请输入新地区名" data-fv-notempty-message="该项为必填项" />
+                        <span class="input-group-btn"><button type="button" class="btn btn-primary" ng-click="addeditlabel(changeInfo.newdistrict)" >确认</button></span>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <br>
+                            <br>地区负责人:</label>
+                        <span><label id="editportleader"> </label></span>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" class="form-control" ng-model="userlist.name" placeholder="请输入姓名进行搜索" data-fv-notempty="true" data-fv-notempty-message="该项为必填项" /> <span class="input-group-btn">
+                        <button type="button" class="btn btn-default" ng-click="searchUser(userlist.name)">搜索</button></span>
+                    </div>
+                    <br>
+                    <div ng-show="editflag">
+                        <div class="form-group">
+                            <label>搜索结果</label>
+                        </div>
+                        <div class="input-group">
+                            <select class="form-control" ng-model="changeInfo._id" ng-options="user._id as ('用户名：'+user.name+'，'+'userId：'+user.userId) for user in userlist.userlist_search">
+                                <option value="">请选择用户</option>
+                            </select> <span class="input-group-btn"><button type="button" class="btn btn-default" ng-click="addeditlabel(changeInfo._id);addRole();" >增加</button></span>
+                        </div>
+                    </div>
+                    <br>
+                    <br>
+                    <div class="form-group">
+                        <div class="col-xs-offset-3">
+                            <button type="submit" class="btn btn-primary" ng-click="change()">确认提交</button>
+                            <button type="button" class="btn btn-default" ng-click="modal_close('#changeInfo')">取消</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 是否删除科室modal -->
+<script type="text/ng-template" id="departmentdelete.html">
+    <div class="modal-header">
+        <button type="button" class="close" ng-click="close()">&times;</button>
+        <h3 class="modal-title" id="modal-title">警告</h3>
+    </div>
+    <div class="modal-body" id="modal-body">
+        <span>确定删除该科室？</span>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" ng-click="ok()">确定</button>
+        <button class="btn btn-warning" type="button" ng-click="close()">取消</button>
+    </div>
+</script>
+<!-- 提示输入用户名modal -->
+<div class="modal fade" id="nameUndefined">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content" style="text-align: center; font-size: 15px">
+            请输入搜索信息！
+        </div>
+    </div>
+</div>
+<!-- 提示删除成功modal -->
+<div class="modal fade" id="deleteSuccess">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content" style="text-align: center; font-size: 20px">
+            删除成功！
+        </div>
+    </div>
+</div>
+<!-- 提示选择待添加角色的用户modal -->
+<div class="modal fade" id="userIdUndefined">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content" style="text-align: center; font-size: 15px">
+            请选择待添加角色的用户！
+        </div>
+    </div>
+</div>
+<!-- 提示添加成功modal -->
+<div class="modal fade" id="addSuccess">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content" style="text-align: center; font-size: 15px">
+            添加成功！
+        </div>
+    </div>
+</div>
+<!-- 提示地区名未输入modal -->
+<div class="modal fade" id="NoDepartment">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content" style="text-align: center; font-size: 20px">
+            请输入完整的地区、医院和科室名！
+        </div>
+    </div>
+</div>
+<!-- 提示修改成功modal -->
+<div class="modal fade" id="changeSuccess">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content" style="text-align: center; font-size: 20px">
+            修改成功！
+        </div>
+    </div>
+</div>
+<!-- 提示注册成功modal -->
+<div class="modal fade" id="registerSuccess">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content" style="text-align: center; font-size: 20px">
+            新建成功！
+        </div>
+    </div>
+</div>

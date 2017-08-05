@@ -1,8 +1,8 @@
 
 <div class="tab-pane fade in active" style="font-size:15px">
   <div style="padding-bottom: 30px">
-      <span style="font-size: 18px">当前已审核医生总人数 : {{count}}位</span>  
-      <b style="font-size: 18px;margin-left:300px">医生搜索</b> <input style="width:20%;height:30px;margin-left:30px" ng-model="doctorname" />
+      <span style="font-size: 15px;margin-top: -10px;font-weight: bold;">当前已审核医生总人数 : {{count}}位</span>  
+      <b style="font-size: 18px;margin-left:300px">医生搜索</b> <input style="width:20%;height: 34px;font-size: 14px;border: 1px solid #ccc;border-radius: 4px;background-color: white;margin-left:30px" ng-model="doctorname" placeholder="请输入医生姓名"/>
       <button class="btn btn-primary" style="margin-left:15px" ng-click="search()">查找</button>
 
     </div>
@@ -40,11 +40,35 @@
       </td>
     </tr>
   </table>
-  <button class="btn btn-primary" style="margin-left:30%;margin-top:40px;height:60px;width:100px;font-size:20px" ng-click="lastpage()">
+  <!-- <button class="btn btn-primary" style="margin-left:30%;margin-top:40px;height:60px;width:100px;font-size:20px" ng-click="lastpage()">
       上一页
   </button>
   <button class="btn btn-primary" style="margin-left:20%;margin-top:40px;height:60px;width:100px;font-size:20px" ng-click="nextpage()">
       下一页
-  </button>
-  
+  </button> -->
+  <div class="btn-group  btn-group-sm pull-right" style="margin-top: 18px">
+    <button type="button" class="btn btn-default" ng-click="changeLimit(20)">20</button>
+    <button type="button" class="btn btn-default" ng-click="changeLimit(30)">30</button>
+    <button type="button" class="btn btn-default" ng-click="changeLimit(50)">50</button>
+    <button type="button" class="btn btn-default" ng-click="changeLimit(100)">100</button>
+  </div>
+<!-- 分页条 -->
+  <ul uib-pagination  
+    max-size="10" 
+    class="pagination" 
+    boundary-links="true" 
+    boundary-link-numbers="true"
+    direction-links="true"
+    first-text="首页"
+    last-text="末页"
+    previous-text="上一页"
+    next-text="下一页"
+    force-ellipses="true"
+    rotate="true" 
+    total-items="count"
+    items-per-page="itemsPerPage"
+    ng-change="pageChanged()"
+    ng-model="currentPage"
+    >
+  </ul>
 </div>

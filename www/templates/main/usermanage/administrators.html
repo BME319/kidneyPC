@@ -1,4 +1,4 @@
-<h4>管理员总数：{{totalNums}}位</h4>
+<h4 style="font-size: 15px;margin-top: -10px;font-weight: bold;">管理员总数：{{totalNums}}位</h4>
 <!-- 新建用户-张桠童 -->
 <div class="dropdown" style="margin-bottom: 10px">
 	<button type="button" class="btn btn-default dropdown-toggle" id="dropdownMenu1" 
@@ -172,7 +172,7 @@
 				        <label class="col-xs-3 control-label">创建时间</label>
 				        <div class="col-xs-5 date">
 				            <div class="input-group input-append date" id="datetimePicker">
-				                <input type="text" class="form-control" name="creationTime" ng-model="newUserInfo.creationTime"
+				                <input type="text" class="form-control" name="creationTime" ng-model="newUserInfo.creationTime|timeFormat:'YYYY-MM-DD h:m'"
 				                data-fv-notempty="true"
 				                data-fv-notempty-message="该项为必填项" readonly/>
 				                <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
@@ -317,7 +317,7 @@
 		</td>
 		<td title="'所属单位'" sortable="'workUnit'">{{user.workUnit}}
 		</td>
-		<td title="'创建时间'" sortable="'creationTime'">{{user.creationTime}}
+		<td title="'创建时间'" sortable="'creationTime'">{{user.creationTime|timeFormat:'YYYY-MM-DD h:m'}}
 		</td>
 		<td title="'操作'">
 		  <button class="btn btn-link" style="text-decoration:none; outline:none; padding:0px; border:0px; font-size:10px;" ng-click="openDetail(user)">查看</button>
@@ -363,7 +363,7 @@
 		  <li class="list-group-item">性别：{{adminInfo.gender|gender}}</li>
 		  <li class="list-group-item">手机号码：{{adminInfo.phoneNo}}</li>
 		  <li class="list-group-item">所属单位：{{adminInfo.workUnit}}</li>
-		  <li class="list-group-item">创建时间：{{adminInfo.creationTime}}</li>
+		  <li class="list-group-item">创建时间：{{adminInfo.creationTime|timeFormat:'YYYY-MM-DD h:m'}}</li>
 		</ul>
     </div>
     <div class="modal-footer">
@@ -488,7 +488,7 @@
 				        <label class="col-xs-3 control-label">创建时间</label>
 				        <div class="col-xs-5 date">
 				            <div class="input-group input-append date" id="datetimePicker2">
-				                <input type="text" class="form-control" name="creationTime" ng-model="changeInfo.creationTime"
+				                <input type="text" class="form-control" name="creationTime" ng-model="changeInfo.creationTime|timeFormat:'YYYY-MM-DD h:m'"
 				                data-fv-notempty="true"
 				                data-fv-notempty-message="该项为必填项" readonly/>
 				                <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
@@ -507,44 +507,6 @@
 	    </div>
     </div>
 </div>
-<!-- 修改健康专员表单验证 -->
-<script>
-	$(document).ready(function() {
-	    $('#changeForm').formValidation({
-	        framework: 'bootstrap',
-	        excluded: ':disabled',
-	        icon: {
-	            valid: 'glyphicon glyphicon-ok',
-	            invalid: 'glyphicon glyphicon-remove',
-	            validating: 'glyphicon glyphicon-refresh'
-	        }
-	    })
-	    .on('success.form.fv',function(e){
-	        // Prevent form submission
-	        e.preventDefault();
-	    });
-	});
-	$(document).ready(function() {
-	    $('#datetimePicker2')
-	    .datetimepicker({
-	        format: 'yyyy-mm-dd',
-	        // format: 'yyyy-mm-dd hh:ii',
-	        language:  'zh-CN',
-	        pickerPosition: "bottom-left",
-	        minView: 3,
-	        todayBtn:  true,
-	        autoclose: true,
-	        todayHighlight: true,
-	        forceParse: 0,
-	        // minuteStep:1,
-	        initialDate:new Date()
-	    })
-	    .on('changeDate',function(e){
-	        // Revalidate the date field
-	        $('#changeForm').formValidation('revalidateField', 'SamplingTime');
-	    });
-	});
-</script>
 <!-- 提示修改成功modal -->
 <div class="modal fade" id="changeSuccess">
   <div class="modal-dialog modal-sm" role="document">

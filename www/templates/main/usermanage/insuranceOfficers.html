@@ -1,4 +1,4 @@
-<h4>保险人员总数：{{totalNums}}位</h4>
+<h4 style="font-size: 15px;margin-top: -10px;font-weight: bold;">保险人员总数：{{totalNums}}位</h4>
 <!-- 新建用户-张桠童 -->
 <div class="dropdown" style="margin-bottom: 10px">
 	<button type="button" class="btn btn-default dropdown-toggle" id="dropdownMenu1" 
@@ -192,7 +192,7 @@
 				        <label class="col-xs-3 control-label">入职时间</label>
 				        <div class="col-xs-5 date">
 				            <div class="input-group input-append date" id="datetimePicker">
-				                <input type="text" class="form-control" name="boardingTime" ng-model="newUserInfo.boardingTime"
+				                <input type="text" class="form-control" name="boardingTime" ng-model="newUserInfo.boardingTime|timeFormat:'YYYY-MM-DD h:m'"
 				                data-fv-notempty="true"
 				                data-fv-notempty-message="该项为必填项" readonly/>
 				                <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
@@ -367,7 +367,7 @@
 		</td>
 		<td title="'手机号码'" sortable="'phoneNo'">{{user.phoneNo}}
 		</td>
-		<td title="'入职时间'" sortable="'boardingTime'">{{user.boardingTime}}
+		<td title="'入职时间'" sortable="'boardingTime'">{{user.boardingTime|timeFormat:'YYYY-MM-DD h:m'}}
 		</td>
 		<td title="'保险角色'" sortable="'role'">{{user.role|role}}
 		</td>
@@ -416,7 +416,7 @@
 		  <li class="list-group-item">姓名：{{insuranceInfo.name}}</li>
 		  <li class="list-group-item">性别：{{insuranceInfo.gender|gender}}</li>
 		  <li class="list-group-item">手机号码：{{insuranceInfo.phoneNo}}</li>
-		  <li class="list-group-item">入职时间：{{insuranceInfo.boardingTime}}</li>
+		  <li class="list-group-item">入职时间：{{insuranceInfo.boardingTime|timeFormat:'YYYY-MM-DD h:m'}}</li>
 		  <li class="list-group-item">角色：{{insuranceInfo.role|role}}</li>
 		  <li class="list-group-item">工作量：{{insuranceInfo.workAmounts}}</li>
 		</ul>
@@ -534,7 +534,7 @@
 				        <label class="col-xs-3 control-label">入职时间</label>
 				        <div class="col-xs-5 date">
 				            <div class="input-group input-append date" id="datetimePicker2">
-				                <input type="text" class="form-control" name="boardingTime" ng-model="changeInfo.boardingTime"
+				                <input type="text" class="form-control" name="boardingTime" ng-model="changeInfo.boardingTime|timeFormat:'YYYY-MM-DD h:m'"
 				                data-fv-notempty="true"
 				                data-fv-notempty-message="该项为必填项" readonly/>
 				                <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
@@ -585,44 +585,7 @@
 	    </div>
     </div>
 </div>
-<!-- 修改保险人员表单验证 -->
-<script>
-	$(document).ready(function() {
-	    $('#changeForm').formValidation({
-	        framework: 'bootstrap',
-	        excluded: ':disabled',
-	        icon: {
-	            valid: 'glyphicon glyphicon-ok',
-	            invalid: 'glyphicon glyphicon-remove',
-	            validating: 'glyphicon glyphicon-refresh'
-	        }
-	    })
-	    .on('success.form.fv',function(e){
-	        // Prevent form submission
-	        e.preventDefault();
-	    });
-	});
-	$(document).ready(function() {
-	    $('#datetimePicker2')
-	    .datetimepicker({
-	        format: 'yyyy-mm-dd',
-	        // format: 'yyyy-mm-dd hh:ii',
-	        language:  'zh-CN',
-	        pickerPosition: "bottom-left",
-	        minView: 3,
-	        todayBtn:  true,
-	        autoclose: true,
-	        todayHighlight: true,
-	        forceParse: 0,
-	        // minuteStep:1,
-	        initialDate:new Date()
-	    })
-	    .on('changeDate',function(e){
-	        // Revalidate the date field
-	        $('#changeForm').formValidation('revalidateField', 'SamplingTime');
-	    });
-	});
-</script>
+
 <!-- 提示修改成功modal -->
 <div class="modal fade" id="changeSuccess">
   <div class="modal-dialog modal-sm" role="document">
