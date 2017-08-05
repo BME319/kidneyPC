@@ -152,162 +152,162 @@ angular.module('controllers', ['ngResource', 'services'])
                     counts: [],
                     dataset: $scope.doctorinfos
                 })
-            },
-            function(e) {
-
-            })
-        $scope.count = ''
-        var count = {
-            'reviewStatus': 0,
-            'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNDk5ODY0NDQ4Nzk3LCJpYXQiOjE0OTk4NjA4NDh9.PUG7L5RqBTuaLuZUc_vbrHd6KvDz6uIS07_lQLJWJkA'
-        }
-        Review.GetCount(count).then(
-            function(data) {
-                $scope.count = data.results
-            },
-            function(e) {
-
-            })
-        $scope.getdocId = function(index) {
-            Storage.set('docId', $scope.doctorinfos[index].userId)
-            Storage.set('reviewstatus', 0)
-        }
-        $scope.accept = function(index) {
-            var postreview = {
-                'doctorId': $scope.doctorinfos[index].userId,
-                'reviewStatus': 1,
-                'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNDk5ODY0NDQ4Nzk3LCJpYXQiOjE0OTk4NjA4NDh9.PUG7L5RqBTuaLuZUc_vbrHd6KvDz6uIS07_lQLJWJkA'
             }
-            Review.PostReviewInfo(postreview).then(
-                function(data) {
-                    console.log(data.results)
-                    if (data.results == '审核信息保存成功') {
-                        $('#accepted').modal('show')
-                        $timeout(function() {
-                            $('#accepted').modal('hide')
-                        }, 1000)
-                        $('#accepted').on('hidden.bs.modal', function() {
-                            var sms = {
-                                'mobile': '18626860001',
-                                'smsType': 3,
-                                'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTEyZTllYmRjODNmNmE4YjdkY2JkZTgiLCJ1c2VySWQiOiJVMjAxNzAzMTQyMDE4Iiwicm9sZSI6InBhdGllbnQiLCJleHBpcmVBZnRlciI6MTQ5NzQwNzI2MzgzMywiaWF0IjoxNDk3NDA3MjYzfQ.5UITzg6NaHcIIEQESCLLB7mx_suISw9Bj6K1OBaiaDk'
-                            }
-                            Alluser.sms(sms).then(
-                                function(data) {
-                                    Review.GetReviewInfo($scope.review).then(
-                                        function(data) {
-                                            $scope.doctorinfos = data.results
-                                            console.log($scope.doctorinfos)
-                                            $scope.tableParams = new NgTableParams({
-                                                count: 15
-                                            }, {
-                                                counts: [],
-                                                dataset: $scope.doctorinfos
-                                            })
-                                        },
-                                        function(e) {
-
-                                        })
-                                },
-                                function(e) {
-
-                                })
-                        })
-                    }
-                },
-                function(e) {
-
-                })
+        } else {
+            $scope.logStatus = '请输入完整信息！'
         }
-        $scope.docId = ''
-        $scope.getId = function(index) {
-            $scope.docId = $scope.doctorinfos[index].userId
-        }
-        $scope.RejectReason = {}
-        $scope.reject = function() {
-            console.log($scope.RejectReason.reason)
-            var postreview = {
-                'doctorId': $scope.docId,
-                'reviewStatus': 2,
-                'reviewContent': $scope.RejectReason.reason,
-                'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNDk5ODY0NDQ4Nzk3LCJpYXQiOjE0OTk4NjA4NDh9.PUG7L5RqBTuaLuZUc_vbrHd6KvDz6uIS07_lQLJWJkA'
-            }
-            console.log(postreview)
-            Review.PostReviewInfo(postreview).then(
-                function(data) {
-                    console.log(data.results)
-                    if (data.results == '审核信息保存成功') {
-                        $('#reject').modal('hide')
-                        $('#reject').on('hidden.bs.modal', function() {
-                            $('#rejected').modal('show')
-                            $timeout(function() {
-                                $('#rejected').modal('hide')
-                            }, 1000)
-                            $('#rejected').on('hidden.bs.modal', function() {
-                                var sms = {
-                                    'mobile': '18626860001',
-                                    'smsType': 4,
-                                    'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTEyZTllYmRjODNmNmE4YjdkY2JkZTgiLCJ1c2VySWQiOiJVMjAxNzAzMTQyMDE4Iiwicm9sZSI6InBhdGllbnQiLCJleHBpcmVBZnRlciI6MTQ5NzQwNzI2MzgzMywiaWF0IjoxNDk3NDA3MjYzfQ.5UITzg6NaHcIIEQESCLLB7mx_suISw9Bj6K1OBaiaDk',
-                                    'reason': $scope.RejectReason.reason
-                                }
-                                Alluser.sms(sms).then(
-                                    function(data) {
-                                        console.log(data.results)
-                                        $scope.RejectReason = {}
-                                        Review.GetReviewInfo($scope.review).then(
-                                            function(data) {
-                                                $scope.doctorinfos = data.results
-                                                console.log($scope.doctorinfos)
-                                                $scope.tableParams = new NgTableParams({
-                                                    count: 15
-                                                }, {
-                                                    counts: [],
-                                                    dataset: $scope.doctorinfos
-                                                })
-                                            },
-                                            function(e) {
+    }
 
-                                            })
-                                    },
-                                    function(e) {
+    $scope.toReset = function() {
+        $state.go('phonevalid', { phonevalidType: 'reset' })
+    }
+}])
 
-                                    })
-                            })
-                        })
-                    }
-                },
-                function(e) {
+.controller('MainCtrl', ['$scope', '$state', 'Storage', '$timeout', function($scope, $state, Storage, $timeout) {
+    $scope.UserName = Storage.get('UName')
+    $scope.UserRole = Storage.get('ROLE')
+    console.log($scope.UserRole)
 
-                })
-        }
-        // $scope.reject = function () {
-        //  var modalInstance = $uibModal.open({
-        //    animation:true,
-        //    ariaLabelledBy:'modal-title',
-        //    ariaDescribedBy:'modal-body',
-        //    templateUrl:'templates/main/checkornot/reject.html',
-        //    controller:'ModalInstanceCtrl',
-        //    resolve:{
-        //      RejectReason:function () {
-        //        return $scope.RejectReason;
-        //      }
-        //    }
-        //  });
-        // }
-        $scope.lastpage = function() {
-            if ($scope.review.skip - $scope.review.limit >= 0) {
-                $scope.review.skip -= $scope.review.limit
-                Review.GetReviewInfo($scope.review).then(
-                    function(data) {
-                        $scope.doctorinfos = data.results
-                        console.log($scope.doctorinfos)
-                        console.log(data.nexturl)
-                        $scope.tableParams = new NgTableParams({
-                            count: 15
-                        }, {
-                            counts: [],
-                            dataset: $scope.doctorinfos
-                        })
+    switch ($scope.UserRole) {
+    case '健康专员' :
+        $scope.flagdoctor = false
+        $scope.flaguser = false
+        $scope.flaghealth = true
+        break
+    case '管理员' :
+        $scope.flagdoctor = true
+        $scope.flaguser = true
+        $scope.flaghealth = true
+        break 
+    // case '患者' :
+    //     $scope.flagdoctor = true
+    //     $scope.flaguser = true
+    //     $scope.flaghealth = true
+    //     break 
+    // case '普通医生' :
+    //     $scope.flagdoctor = true
+    //     $scope.flaguser = false
+    //     $scope.flaghealth = false
+    //     break       
+    }
+    console.log($scope.flagdoctor)
+    console.log($scope.flaguser)
+    console.log($scope.flaghealth)
+
+    $scope.tounchecked = function() {
+        $state.go('main.checkornot.unchecked');
+    }
+    $scope.touser = function() {
+        $state.go('main.usermanage.allUsers');
+    }
+    $scope.tounentered = function() {
+        $state.go('main.enterornot.unentered');
+    }
+}])
+
+.controller('CheckOrNotCtrl', ['$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function ($scope, $state, Review, Storage, $timeout, NgTableParams) {
+  $scope.flag = 0;
+  $scope.tochecked = function () {
+    $state.go('main.checkornot.checked');
+    $scope.flag = 1;
+  }
+  $scope.tounchecked = function () {
+    $state.go('main.checkornot.unchecked');
+    $scope.flag = 0;
+  }
+}])
+// 未审核-LZN
+.controller('UncheckedCtrl', ['$scope', '$state', 'Review', 'Alluser', 'Storage', '$timeout', 'NgTableParams', '$uibModal', function ($scope, $state, Review, Alluser, Storage, $timeout, NgTableParams, $uibModal) {
+  // 获取列表
+  var getLists = function (currentPage, itemsPerPage) {
+      $scope.review = {
+        "reviewStatus":0,
+        "limit":itemsPerPage,
+        "skip":(currentPage-1)*itemsPerPage,
+        "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNDk5ODY0NDQ4Nzk3LCJpYXQiOjE0OTk4NjA4NDh9.PUG7L5RqBTuaLuZUc_vbrHd6KvDz6uIS07_lQLJWJkA"
+      }
+      Review.GetReviewInfo($scope.review).then(
+        function (data) {
+          $scope.doctorinfos = data.results;
+          console.log($scope.doctorinfos);
+          for(var i = 0;i < $scope.doctorinfos.length;i++) {
+            if($scope.doctorinfos[i].creationTime != null) {
+              var tmp = Date.parse($scope.doctorinfos[i].creationTime);
+              var stdate = new Date(tmp);
+              $scope.doctorinfos[i].creationTime = stdate.getFullYear() + '-' + (stdate.getMonth() + 1) + '-' + stdate.getDate();
+            }   
+          }
+          $scope.tableParams = new NgTableParams({
+                count:itemsPerPage
+            },
+            {   counts:[],
+                dataset:$scope.doctorinfos
+            });
+    }, function (e) {
+
+    });
+  }
+  // 初始化
+  $scope.currentPage = 1;
+  $scope.itemsPerPage = 20;
+  getLists($scope.currentPage,$scope.itemsPerPage);
+  // 页面改变
+  $scope.pageChanged = function(){
+    console.log($scope.currentPage);
+    getLists($scope.currentPage,$scope.itemsPerPage);
+  }
+  // 当前页面的总条目数改变
+  $scope.changeLimit=function(num){
+    $scope.itemsPerPage = num;
+    $scope.currentPage = 1;
+    getLists($scope.currentPage,$scope.itemsPerPage);
+  }
+  // 获取未审核总人数
+  $scope.count = '';
+  var count = {
+    "reviewStatus":0,
+    "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNDk5ODY0NDQ4Nzk3LCJpYXQiOjE0OTk4NjA4NDh9.PUG7L5RqBTuaLuZUc_vbrHd6KvDz6uIS07_lQLJWJkA"
+  }
+  Review.GetCount(count).then(
+    function (data) {
+      $scope.count = data.results;
+    }, function (e) {
+
+    }); 
+  // 传Id和审核状态到LocalStorage
+  $scope.getdocId = function (index) {
+    Storage.set('docId',$scope.doctorinfos[index].userId);
+    Storage.set('reviewstatus',0);
+  }
+  // 通过
+  $scope.accept = function (index) {
+    var postreview = {
+      "doctorId":$scope.doctorinfos[index].userId,
+      "reviewStatus":1,
+      "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNDk5ODY0NDQ4Nzk3LCJpYXQiOjE0OTk4NjA4NDh9.PUG7L5RqBTuaLuZUc_vbrHd6KvDz6uIS07_lQLJWJkA"
+    }
+    Review.PostReviewInfo(postreview).then(
+      function (data) {
+        console.log(data.results);
+        if(data.results == "审核信息保存成功") {
+            $('#accepted').modal('show');
+            $timeout(function() {
+              $('#accepted').modal('hide');
+            },1000);
+            $('#accepted').on('hidden.bs.modal', function () {
+              var sms = {
+                  "mobile":"18626860001",
+                  "smsType":3,
+                  "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTEyZTllYmRjODNmNmE4YjdkY2JkZTgiLCJ1c2VySWQiOiJVMjAxNzAzMTQyMDE4Iiwicm9sZSI6InBhdGllbnQiLCJleHBpcmVBZnRlciI6MTQ5NzQwNzI2MzgzMywiaWF0IjoxNDk3NDA3MjYzfQ.5UITzg6NaHcIIEQESCLLB7mx_suISw9Bj6K1OBaiaDk",
+              }
+              Alluser.sms(sms).then(
+                function (data) {
+                  Review.GetReviewInfo($scope.review).then(
+                  function (data) {
+                    $scope.doctorinfos = data.results;
+                    console.log($scope.doctorinfos);
+                    $scope.tableParams = new NgTableParams({
+                        count:15
                     },
                     function(e) {
 
@@ -331,520 +331,1040 @@ angular.module('controllers', ['ngResource', 'services'])
                 function(e) {
 
                 })
-        }
-        $scope.search = function() {
-            $scope.review = {
-                'reviewStatus': 0,
-                'limit': 15,
-                'skip': 0,
-                'name': $scope.doctorname,
-                'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNDk5ODY0NDQ4Nzk3LCJpYXQiOjE0OTk4NjA4NDh9.PUG7L5RqBTuaLuZUc_vbrHd6KvDz6uIS07_lQLJWJkA'
+
+            })
+        } 
+      }, function (e) {
+
+      })
+  }
+  $scope.docId = '';
+  // 获取拒绝原因
+  $scope.getId = function (index) {
+    $scope.docId = $scope.doctorinfos[index].userId
+  }
+  $scope.RejectReason={};
+  // 拒绝
+  $scope.reject = function () {
+    console.log($scope.RejectReason.reason);
+     var postreview = {
+      "doctorId":$scope.docId,
+      "reviewStatus":2,
+      "reviewContent":$scope.RejectReason.reason,
+      "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNDk5ODY0NDQ4Nzk3LCJpYXQiOjE0OTk4NjA4NDh9.PUG7L5RqBTuaLuZUc_vbrHd6KvDz6uIS07_lQLJWJkA"
+    }
+    console.log(postreview);
+    Review.PostReviewInfo(postreview).then(
+      function (data) {
+
+        console.log(data.results);
+        if(data.results == "审核信息保存成功") {
+          $('#reject').modal('hide');
+          $('#reject').on('hidden.bs.modal', function () {
+            $('#rejected').modal('show');
+            $timeout(function() {
+              $('#rejected').modal('hide');
+            },1000);
+            $('#rejected').on('hidden.bs.modal', function () {
+              var sms = {
+                  "mobile":"18626860001",
+                  "smsType":4,
+                  "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTEyZTllYmRjODNmNmE4YjdkY2JkZTgiLCJ1c2VySWQiOiJVMjAxNzAzMTQyMDE4Iiwicm9sZSI6InBhdGllbnQiLCJleHBpcmVBZnRlciI6MTQ5NzQwNzI2MzgzMywiaWF0IjoxNDk3NDA3MjYzfQ.5UITzg6NaHcIIEQESCLLB7mx_suISw9Bj6K1OBaiaDk",
+                  "reason":$scope.RejectReason.reason
+              }
+                Alluser.sms(sms).then(
+                  function (data) {
+                    console.log(data.results);
+                    $scope.RejectReason={};
+                    getLists($scope.currentPage,$scope.itemsPerPage);
+                  }, function (e) {
+
+                  })
+              
+              })
+              
+          })  
+        } 
+      }, function (e) {
+
+      })
+  }
+  // 搜索
+  $scope.search = function () {
+    $scope.review = {
+      "reviewStatus":0,
+      "limit":$scope.itemsPerPage,
+      "skip":($scope.currentPage-1) * $scope.itemsPerPage,
+      "name":$scope.doctorname,
+      "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNDk5ODY0NDQ4Nzk3LCJpYXQiOjE0OTk4NjA4NDh9.PUG7L5RqBTuaLuZUc_vbrHd6KvDz6uIS07_lQLJWJkA"
+    }
+    Review.GetReviewInfo($scope.review).then(
+      function (data) {
+        $scope.doctorinfos = data.results;
+        // console.log($scope.doctorname);
+        // console.log($scope.review);
+        // console.log($scope.doctorinfos);
+        for(var i = 0;i < $scope.doctorinfos.length;i++) {
+        if($scope.doctorinfos[i].creationTime != null) {
+          var tmp = Date.parse($scope.doctorinfos[i].creationTime);
+          var stdate = new Date(tmp);
+          $scope.doctorinfos[i].creationTime = stdate.getFullYear() + '-' + (stdate.getMonth() + 1) + '-' + stdate.getDate();
+        }   
+      }
+        $scope.tableParams = new NgTableParams({
+                count:$scope.itemsPerPage
+            },
+            {   counts:[],
+                dataset:$scope.doctorinfos
+            });
+      }, function (e) {
+
+      })
+  }
+}])
+// 查看医生资质证书-LZN
+.controller('DoctorLicenseCtrl',['$scope', '$state', 'Review', 'Alluser', 'Storage', '$timeout', function ($scope, $state, Review, Alluser, Storage, $timeout) {
+  var id = Storage.get('docId');
+  $scope.status = Storage.get('reviewstatus');
+  console.log(id);
+  console.log($scope.status);
+  $scope.doctorinfos = {};
+  $scope.review = {};
+  var params = {
+    "doctorId":id,
+    
+    "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNDk5ODY0NDQ4Nzk3LCJpYXQiOjE0OTk4NjA4NDh9.PUG7L5RqBTuaLuZUc_vbrHd6KvDz6uIS07_lQLJWJkA"
+  }
+  Review.GetCertificate(params).then(
+    function (data) {
+      $scope.doctorinfos = data.results;
+      if($scope.doctorinfos.province == $scope.doctorinfos.city) $scope.doctorinfos.province = '';
+      console.log($scope.doctorinfos);
+      var review = {
+        "reviewStatus":$scope.status,
+        "limit":15,
+        "skip":0,
+        "name":$scope.doctorinfos.name,
+        "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNDk5ODY0NDQ4Nzk3LCJpYXQiOjE0OTk4NjA4NDh9.PUG7L5RqBTuaLuZUc_vbrHd6KvDz6uIS07_lQLJWJkA"
+      }
+      Review.GetReviewInfo(review).then(
+        function (data) {
+          $scope.review.reviewStatus = data.results[0].reviewStatus;
+          $scope.review.adminId = data.results[0].adminId;
+          $scope.review.reviewDate = data.results[0].reviewDate;
+          $scope.review.reviewContent = data.results[0].reviewContent;
+          if($scope.review.reviewStatus == 0) $scope.review.reviewStatus = "未审核";
+          if($scope.review.reviewStatus == 1) $scope.review.reviewStatus = "已通过";
+          if($scope.review.reviewStatus == 2) $scope.review.reviewStatus = "已拒绝";
+          if($scope.review.reviewDate != null) {
+          var tmp = Date.parse($scope.review.reviewDate);
+          var stdate = new Date(tmp);
+          $scope.review.reviewDate = stdate.getFullYear() + '-' + (stdate.getMonth() + 1) + '-' + stdate.getDate();
+        }   
+          console.log($scope.review);
+        }, function (e) {
+
+        });
+    }, function (e) {
+
+    });
+  // 通过
+  $scope.accept = function () {
+    var postreview = {
+      "doctorId":Storage.get('docId'),
+      "reviewStatus":1,
+      "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNDk5ODY0NDQ4Nzk3LCJpYXQiOjE0OTk4NjA4NDh9.PUG7L5RqBTuaLuZUc_vbrHd6KvDz6uIS07_lQLJWJkA"
+    }
+    Review.PostReviewInfo(postreview).then(
+      function (data) {
+        console.log(data.results);
+        if(data.results == "审核信息保存成功") {
+          $('#accepted').modal('show');
+          $timeout(function() {
+            $('#accepted').modal('hide');
+          },1000);
+          $('#accepted').on('hidden.bs.modal', function () {
+            var sms = {
+              "mobile":"18626860001",
+              "smsType":3,
+              "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTEyZTllYmRjODNmNmE4YjdkY2JkZTgiLCJ1c2VySWQiOiJVMjAxNzAzMTQyMDE4Iiwicm9sZSI6InBhdGllbnQiLCJleHBpcmVBZnRlciI6MTQ5NzQwNzI2MzgzMywiaWF0IjoxNDk3NDA3MjYzfQ.5UITzg6NaHcIIEQESCLLB7mx_suISw9Bj6K1OBaiaDk",
             }
-            Review.GetReviewInfo($scope.review).then(
-                function(data) {
-                    $scope.doctorinfos = data.results
-                    // console.log($scope.doctorname);
-                    // console.log($scope.review);
-                    // console.log($scope.doctorinfos);
-                    for (var i = 0; i < $scope.doctorinfos.length; i++) {
-                        if ($scope.doctorinfos[i].creationTime != null) {
-                            var tmp = Date.parse($scope.doctorinfos[i].creationTime)
-                            var stdate = new Date(tmp)
-                            $scope.doctorinfos[i].creationTime = stdate.getFullYear() + '-' + (stdate.getMonth() + 1) + '-' + stdate.getDate()
-                        }
-                    }
-                    $scope.tableParams = new NgTableParams({
-                        count: 15
-                    }, {
-                        counts: [],
-                        dataset: $scope.doctorinfos
-                    })
-                },
-                function(e) {
-
-                })
+            Alluser.sms(sms).then(
+              function (data) {
+                $state.go('main.checkornot.unchecked');
+              }, function (e) {
+                
+              })
+            
+          })
         }
-    }])
-    // 审核内容-拒绝原因
-    // .controller('ModalInstanceCtrl',['$scope', '$uibModalInstance', function ($scope, $uibModalInstance) {
-    //  $scope.RejectReason = '';
-    //  $scope.ok = function () {
-    //    console.log($scope.RejectReason);
-    //    $uibModalInstance.close();
+      }, function (e) {
 
-    //  };
-    //  $scope.cancel = function () {
-    //    $uibModalInstance.dismiss();
-    //  };
+      })
+  }
+  $scope.RejectReason = {};
+  // 拒绝
+  $scope.reject = function () {
+    console.log($scope.RejectReason.reason);
+     var postreview = {
+      "doctorId":Storage.get('docId'),
+      "reviewStatus":2,
+      "reviewContent":$scope.RejectReason.reason,
+      "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNDk5ODY0NDQ4Nzk3LCJpYXQiOjE0OTk4NjA4NDh9.PUG7L5RqBTuaLuZUc_vbrHd6KvDz6uIS07_lQLJWJkA"
+    }
+    console.log(postreview);
+    Review.PostReviewInfo(postreview).then(
+      function (data) {
 
-    // }])
-    // 查看医生资质证书-LZN
-    .controller('DoctorLicenseCtrl', ['$scope', '$state', 'Review', 'Alluser', 'Storage', '$timeout', function($scope, $state, Review, Alluser, Storage, $timeout) {
-        var id = Storage.get('docId')
-        $scope.status = Storage.get('reviewstatus')
-        console.log(id)
-        console.log($scope.status)
-        $scope.doctorinfos = {}
-        $scope.review = {}
+        console.log(data.results);
+        if(data.results == "审核信息保存成功") {
+          $('#reject').modal('hide');
+          $('#reject').on('hidden.bs.modal', function () {
+            $('#rejected').modal('show');
+            $timeout(function() {
+              $('#rejected').modal('hide');
+            },1000);
+          })
+          $('#rejected').on('hidden.bs.modal', function () {
+            var sms = {
+                  "mobile":"18626860001",
+                  "smsType":4,
+                  "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTEyZTllYmRjODNmNmE4YjdkY2JkZTgiLCJ1c2VySWQiOiJVMjAxNzAzMTQyMDE4Iiwicm9sZSI6InBhdGllbnQiLCJleHBpcmVBZnRlciI6MTQ5NzQwNzI2MzgzMywiaWF0IjoxNDk3NDA3MjYzfQ.5UITzg6NaHcIIEQESCLLB7mx_suISw9Bj6K1OBaiaDk",
+                  "reason":$scope.RejectReason.reason
+            }
+            Alluser.sms(sms).then(
+              function (data) {
+                console.log(data.results);
+                $scope.RejectReason={};
+                $state.go('main.checkornot.unchecked');
+              }, function (e) {
+              })
+            
+          })
+        } 
+      }, function (e) {
+
+      })
+  }
+}])
+// 已审核-LZN
+.controller('CheckedCtrl', ['$scope', '$state', 'Review', 'Storage', 'NgTableParams', '$timeout', function ($scope, $state, Review, Storage, NgTableParams, $timeout) {
+  // 获取列表
+  var getLists = function (currentPage, itemsPerPage) {
+      $scope.review = {
+        "reviewStatus":1,
+        "limit":itemsPerPage,
+        "skip":(currentPage-1)*itemsPerPage,
+        "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNDk5ODY0NDQ4Nzk3LCJpYXQiOjE0OTk4NjA4NDh9.PUG7L5RqBTuaLuZUc_vbrHd6KvDz6uIS07_lQLJWJkA"
+      }
+      Review.GetReviewInfo($scope.review).then(
+        function (data) {
+          $scope.doctorinfos = data.results;
+          for(var i = 0;i < $scope.doctorinfos.length;i++) {
+            if($scope.doctorinfos[i].reviewStatus == 1) $scope.doctorinfos[i].reviewStatus = "已通过";
+            if($scope.doctorinfos[i].reviewStatus == 2) $scope.doctorinfos[i].reviewStatus = "已拒绝";
+            if($scope.doctorinfos[i].reviewDate != null) {
+              var tmp = Date.parse($scope.doctorinfos[i].reviewDate);
+              var stdate = new Date(tmp);
+              $scope.doctorinfos[i].reviewDate = stdate.getFullYear() + '-' + (stdate.getMonth() + 1) + '-' + stdate.getDate();
+            }
+            if($scope.doctorinfos[i].creationTime != null) {
+                var tmp = Date.parse($scope.doctorinfos[i].creationTime);
+                var stdate = new Date(tmp);
+                $scope.doctorinfos[i].creationTime = stdate.getFullYear() + '-' + (stdate.getMonth() + 1) + '-' + stdate.getDate();
+            }      
+          }
+          console.log($scope.doctorinfos);
+          console.log(data.nexturl);
+          $scope.tableParams = new NgTableParams({
+                    count:itemsPerPage
+                },
+                {   counts:[],
+                    dataset:$scope.doctorinfos
+                });
+        }, function (e) {
+
+        });
+  }
+  // 初始化
+  $scope.currentPage = 1;
+  $scope.itemsPerPage = 20;
+  getLists($scope.currentPage,$scope.itemsPerPage);
+  // 页面改变
+  $scope.pageChanged = function(){
+    console.log($scope.currentPage);
+    getLists($scope.currentPage,$scope.itemsPerPage);
+  }
+  // 当前页面的总条目数改变
+  $scope.changeLimit=function(num){
+    $scope.itemsPerPage = num;
+    $scope.currentPage = 1;
+    getLists($scope.currentPage,$scope.itemsPerPage);
+  }
+  // 获取已审核总人数
+  $scope.count = '';
+  var count = {
+    "reviewStatus":1,
+    "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNDk5ODY0NDQ4Nzk3LCJpYXQiOjE0OTk4NjA4NDh9.PUG7L5RqBTuaLuZUc_vbrHd6KvDz6uIS07_lQLJWJkA"
+  }
+  Review.GetCount(count).then(
+    function (data) {
+      $scope.count = data.results;
+    }, function (e) {
+    }); 
+  // 传Id和审核状态到LocalStorage
+  $scope.getdocId = function (index) {
+    Storage.set('docId',$scope.doctorinfos[index].userId);
+    Storage.set('reviewstatus',1);
+  }
+  // 搜索
+  $scope.search = function () {
+    $scope.review = {
+      "reviewStatus":1,
+      "limit":$scope.itemsPerPage,
+      "skip":($scope.currentPage-1) * $scope.itemsPerPage,
+      "name":$scope.doctorname,
+      "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNDk5ODY0NDQ4Nzk3LCJpYXQiOjE0OTk4NjA4NDh9.PUG7L5RqBTuaLuZUc_vbrHd6KvDz6uIS07_lQLJWJkA"
+    }
+    Review.GetReviewInfo($scope.review).then(
+      function (data) {
+        $scope.doctorinfos = data.results;
+        for(var i = 0;i < $scope.doctorinfos.length;i++) {
+          if($scope.doctorinfos[i].reviewStatus == 1) $scope.doctorinfos[i].reviewStatus = "已通过";
+          if($scope.doctorinfos[i].reviewStatus == 2) $scope.doctorinfos[i].reviewStatus = "已拒绝";
+          if($scope.doctorinfos[i].reviewDate != null) {
+            var tmp = Date.parse($scope.doctorinfos[i].reviewDate);
+            var stdate = new Date(tmp);
+            $scope.doctorinfos[i].reviewDate = stdate.getFullYear() + '-' + (stdate.getMonth() + 1) + '-' + stdate.getDate();
+          }
+          if($scope.doctorinfos[i].creationTime != null) {
+            var tmp = Date.parse($scope.doctorinfos[i].creationTime);
+            var stdate = new Date(tmp);
+            $scope.doctorinfos[i].creationTime = stdate.getFullYear() + '-' + (stdate.getMonth() + 1) + '-' + stdate.getDate();
+          }   
+        }
+        console.log($scope.doctorname);
+        console.log($scope.review);
+        console.log($scope.doctorinfos);
+        $scope.tableParams = new NgTableParams({
+                count:$scope.itemsPerPage
+            },
+            {   counts:[],
+                dataset:$scope.doctorinfos
+            });
+      }, function (e) {
+
+      })
+  }
+}])
+
+.controller('EnterOrNotCtrl', ['$scope', '$state', 'Storage', '$timeout', function ($scope, $state, Storage, $timeout) {
+  $scope.toentered = function () {
+    $state.go('main.enterornot.entered');
+  }
+  $scope.tounentered = function () {
+    $state.go('main.enterornot.unentered');
+  }
+}])
+// 未录入-LZN
+.controller('UnenteredCtrl', ['$scope', '$state', 'Storage', 'LabtestImport', 'NgTableParams', '$timeout', function ($scope, $state, Storage, LabtestImport, NgTableParams, $timeout) {
+   // 获取列表
+  var getLists = function (currentPage, itemsPerPage) {
+      $scope.lab = {
+        "labtestImportStatus":0,
+        "limit":itemsPerPage,
+        "skip":(currentPage-1)*itemsPerPage,
+        "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImhlYWx0aCIsImV4cCI6MTQ5OTY4Nzg2OTI5NSwiaWF0IjoxNDk5Njg0MjY5fQ.p87yOwwsumsi-G5uprWamdSH8_Ij1NgY3XAi1yFdv0U"
+      }
+      LabtestImport.GetLabtestInfo($scope.lab).then(
+        function (data) {
+          $scope.labtestinfos = data.results;
+          for(var i = 0;i < $scope.labtestinfos.length;i++) {
+            if($scope.labtestinfos[i].latestUploadTime != null) {
+                var tmp = Date.parse($scope.labtestinfos[i].latestUploadTime);
+                var stdate = new Date(tmp);
+                $scope.labtestinfos[i].latestUploadTime = stdate.getFullYear() + '-' + (stdate.getMonth() + 1) + '-' + stdate.getDate();
+            }      
+          }
+           $scope.tableParams = new NgTableParams({
+                    count:itemsPerPage
+                },
+                {   counts:[],
+                    dataset:$scope.labtestinfos
+                });
+      }, function (e) {
+
+      });
+  }
+  // 初始化
+  $scope.currentPage = 1;
+  $scope.itemsPerPage = 20;
+  getLists($scope.currentPage,$scope.itemsPerPage);
+  // 页面改变
+  $scope.pageChanged = function(){
+    console.log($scope.currentPage);
+    getLists($scope.currentPage,$scope.itemsPerPage);
+  }
+  // 当前页面的总条目数改变
+  $scope.changeLimit=function(num){
+    $scope.itemsPerPage = num;
+    $scope.currentPage = 1;
+    getLists($scope.currentPage,$scope.itemsPerPage);
+  }
+  // $scope.labtestinfos={};
+  // $scope.lab = {
+  //   "labtestImportStatus":0,
+  //   "limit":10,
+  //   "skip":0,
+  //   "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImhlYWx0aCIsImV4cCI6MTQ5OTY4Nzg2OTI5NSwiaWF0IjoxNDk5Njg0MjY5fQ.p87yOwwsumsi-G5uprWamdSH8_Ij1NgY3XAi1yFdv0U"
+  // }
+  // LabtestImport.GetLabtestInfo($scope.lab).then(
+  //   function (data) {
+  //     $scope.labtestinfos = data.results;
+  //     for(var i = 0;i < $scope.labtestinfos.length;i++) {
+  //       if($scope.labtestinfos[i].latestUploadTime != null) {
+  //           var tmp = Date.parse($scope.labtestinfos[i].latestUploadTime);
+  //           var stdate = new Date(tmp);
+  //           $scope.labtestinfos[i].latestUploadTime = stdate.getFullYear() + '-' + (stdate.getMonth() + 1) + '-' + stdate.getDate();
+  //       }      
+  //     }
+  //      $scope.tableParams = new NgTableParams({
+  //               count:15
+  //           },
+  //           {   counts:[],
+  //               dataset:$scope.labtestinfos
+  //           });
+  // }, function (e) {
+
+  // })
+  // 获取未录入总人数
+  $scope.count = '';
+  var count = {
+    "labtestImportStatus":0,
+    "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImhlYWx0aCIsImV4cCI6MTQ5OTY4Nzg2OTI5NSwiaWF0IjoxNDk5Njg0MjY5fQ.p87yOwwsumsi-G5uprWamdSH8_Ij1NgY3XAi1yFdv0U"
+  }
+  LabtestImport.GetCount(count).then(
+    function (data) {
+      $scope.count = data.results;
+    }, function (e) {
+
+    })
+  // 传Id和Name到LocalStorage
+  $scope.getpatId = function (index) {
+    Storage.set('patId',$scope.labtestinfos[index].userId);
+    Storage.set('patName',$scope.labtestinfos[index].name);
+  }
+  // $scope.lastpage = function () {
+  //   if($scope.lab.skip - $scope.lab.limit >= 0) {
+  //     $scope.lab.skip -= $scope.lab.limit;
+  //     LabtestImport.GetLabtestInfo($scope.lab).then(
+  //     function (data) {
+  //       $scope.labtestinfos = data.results;
+  //       console.log($scope.labtestinfos);
+  //       console.log(data.nexturl);
+  //       $scope.tableParams = new NgTableParams({
+  //                 count:15
+  //             },
+  //             {   counts:[],
+  //                 dataset:$scope.labtestinfos
+  //             });
+  //     }, function (e) {
+
+  //     });
+  //   }     
+  // }
+  // $scope.nextpage = function () {
+  //   $scope.lab.skip += $scope.lab.limit;
+  //   LabtestImport.GetLabtestInfo($scope.lab).then(
+  //   function (data) {
+  //     $scope.labtestinfos = data.results;
+  //     console.log($scope.labtestinfos);
+  //     console.log(data.nexturl);
+  //     $scope.tableParams = new NgTableParams({
+  //               count:15
+  //           },
+  //           {   counts:[],
+  //               dataset:$scope.labtestinfos
+  //           });
+  //   }, function (e) {
+
+  //   });
+  // }
+  // 搜索
+  $scope.search = function () {
+    $scope.lab = {
+     "labtestImportStatus":0,
+      "limit":$scope.itemsPerPage,
+      "skip":($scope.currentPage-1) * $scope.itemsPerPage,
+      "name":$scope.patientname,
+      "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImhlYWx0aCIsImV4cCI6MTQ5OTY4Nzg2OTI5NSwiaWF0IjoxNDk5Njg0MjY5fQ.p87yOwwsumsi-G5uprWamdSH8_Ij1NgY3XAi1yFdv0U"  
+    }
+    LabtestImport.GetLabtestInfo($scope.lab).then(
+      function (data) {
+        $scope.labtestinfos = data.results;
+        if($scope.labtestinfos[0].latestUploadTime != null) {
+          var tmp = Date.parse($scope.labtestinfos[0].latestUploadTime);
+          var stdate = new Date(tmp);
+          $scope.labtestinfos[0].latestUploadTime = stdate.getFullYear() + '-' + (stdate.getMonth() + 1) + '-' + stdate.getDate();
+        }
+        console.log($scope.patientname);
+        console.log($scope.lab);
+        console.log($scope.labtestinfos);
+        $scope.tableParams = new NgTableParams({
+                count:$scope.itemsPerPage
+            },
+            {   counts:[],
+                dataset:$scope.labtestinfos
+            });
+      }, function (e) {
+
+      })
+  }
+}])
+// 已录入-LZN
+.controller('EnteredCtrl', ['$scope', '$state', 'Storage', 'LabtestImport', 'NgTableParams', '$timeout', function ($scope, $state, Storage, LabtestImport, NgTableParams, $timeout) {
+  var getLists = function (currentPage, itemsPerPage) {
+      $scope.lab = {
+        "labtestImportStatus":1,
+        "limit":itemsPerPage,
+        "skip":(currentPage-1)*itemsPerPage,
+        "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImhlYWx0aCIsImV4cCI6MTQ5OTY4Nzg2OTI5NSwiaWF0IjoxNDk5Njg0MjY5fQ.p87yOwwsumsi-G5uprWamdSH8_Ij1NgY3XAi1yFdv0U"
+      }
+      LabtestImport.GetLabtestInfo($scope.lab).then(
+        function (data) {
+          $scope.labtestinfos = data.results;
+           for(var i = 0;i < $scope.labtestinfos.length;i++) {
+            if($scope.labtestinfos[i].latestImportDate != null) {
+              var tmp = Date.parse($scope.labtestinfos[i].latestImportDate);
+              var stdate = new Date(tmp);
+              $scope.labtestinfos[i].latestImportDate = stdate.getFullYear() + '-' + (stdate.getMonth() + 1) + '-' + stdate.getDate();
+            }
+            if($scope.labtestinfos[i].latestUploadTime != null) {
+                var tmp = Date.parse($scope.labtestinfos[i].latestUploadTime);
+                var stdate = new Date(tmp);
+                $scope.labtestinfos[i].latestUploadTime = stdate.getFullYear() + '-' + (stdate.getMonth() + 1) + '-' + stdate.getDate();
+            }      
+          }
+           $scope.tableParams = new NgTableParams({
+                    count:itemsPerPage
+                },
+                {   counts:[],
+                    dataset:$scope.labtestinfos
+                });
+      }, function (e) {
+
+      });
+  }
+   // 初始化
+  $scope.currentPage = 1;
+  $scope.itemsPerPage = 20;
+  getLists($scope.currentPage,$scope.itemsPerPage);
+  // 页面改变
+  $scope.pageChanged = function(){
+    console.log($scope.currentPage);
+    getLists($scope.currentPage,$scope.itemsPerPage);
+  }
+  // 当前页面的总条目数改变
+  $scope.changeLimit=function(num){
+    $scope.itemsPerPage = num;
+    $scope.currentPage = 1;
+    getLists($scope.currentPage,$scope.itemsPerPage);
+  }
+  // $scope.labtestinfos={};
+  // $scope.lab = {
+  //   "labtestImportStatus":1,
+  //   "limit":10,
+  //   "skip":0,
+  //   "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImhlYWx0aCIsImV4cCI6MTQ5OTY4Nzg2OTI5NSwiaWF0IjoxNDk5Njg0MjY5fQ.p87yOwwsumsi-G5uprWamdSH8_Ij1NgY3XAi1yFdv0U"
+  // }
+  // LabtestImport.GetLabtestInfo($scope.lab).then(
+  //   function (data) {
+  //     $scope.labtestinfos = data.results;
+  //      for(var i = 0;i < $scope.labtestinfos.length;i++) {
+  //       if($scope.labtestinfos[i].latestImportDate != null) {
+  //         var tmp = Date.parse($scope.labtestinfos[i].latestImportDate);
+  //         var stdate = new Date(tmp);
+  //         $scope.labtestinfos[i].latestImportDate = stdate.getFullYear() + '-' + (stdate.getMonth() + 1) + '-' + stdate.getDate();
+  //       }
+  //       if($scope.labtestinfos[i].latestUploadTime != null) {
+  //           var tmp = Date.parse($scope.labtestinfos[i].latestUploadTime);
+  //           var stdate = new Date(tmp);
+  //           $scope.labtestinfos[i].latestUploadTime = stdate.getFullYear() + '-' + (stdate.getMonth() + 1) + '-' + stdate.getDate();
+  //       }      
+  //     }
+  //      $scope.tableParams = new NgTableParams({
+  //               count:15
+  //           },
+  //           {   counts:[],
+  //               dataset:$scope.labtestinfos
+  //           });
+  // }, function (e) {
+
+  // })
+  // 获取已录入总人数
+  $scope.count = '';
+  var count = {
+    "labtestImportStatus":1,
+    "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImhlYWx0aCIsImV4cCI6MTQ5OTY4Nzg2OTI5NSwiaWF0IjoxNDk5Njg0MjY5fQ.p87yOwwsumsi-G5uprWamdSH8_Ij1NgY3XAi1yFdv0U"
+  }
+  LabtestImport.GetCount(count).then(
+    function (data) {
+      $scope.count = data.results;
+    }, function (e) {
+
+    })
+  // 传Id和Name到LocalStorage
+  $scope.getpatId = function (index) {
+    Storage.set('patId',$scope.labtestinfos[index].userId);
+    Storage.set('patName',$scope.labtestinfos[index].name);
+  }
+  // $scope.lastpage = function () {
+  //   if($scope.lab.skip - $scope.lab.limit >= 0) {
+  //     $scope.lab.skip -= $scope.lab.limit;
+  //     LabtestImport.GetLabtestInfo($scope.lab).then(
+  //     function (data) {
+  //       $scope.labtestinfos = data.results;
+  //       console.log($scope.labtestinfos);
+  //       console.log(data.nexturl);
+  //       $scope.tableParams = new NgTableParams({
+  //                 count:15
+  //             },
+  //             {   counts:[],
+  //                 dataset:$scope.labtestinfos
+  //             });
+  //     }, function (e) {
+
+  //     });
+  //   }     
+  // }
+  // $scope.nextpage = function () {
+  //   $scope.lab.skip += $scope.lab.limit;
+  //   LabtestImport.GetLabtestInfo($scope.lab).then(
+  //   function (data) {
+  //     $scope.labtestinfos = data.results;
+  //     console.log($scope.labtestinfos);
+  //     console.log(data.nexturl);
+  //     $scope.tableParams = new NgTableParams({
+  //               count:15
+  //           },
+  //           {   counts:[],
+  //               dataset:$scope.labtestinfos
+  //           });
+  //   }, function (e) {
+
+  //   });
+  // }
+  // 搜索
+  $scope.search = function () {
+    $scope.lab = {
+   "labtestImportStatus":1,
+    "limit":$scope.itemsPerPage,
+    "skip":($scope.currentPage-1) * $scope.itemsPerPage,
+    "name":$scope.patientname,
+    "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImhlYWx0aCIsImV4cCI6MTQ5OTY4Nzg2OTI5NSwiaWF0IjoxNDk5Njg0MjY5fQ.p87yOwwsumsi-G5uprWamdSH8_Ij1NgY3XAi1yFdv0U"  
+  }
+    LabtestImport.GetLabtestInfo($scope.lab).then(
+      function (data) {
+        $scope.labtestinfos = data.results;
+        console.log($scope.patientname);
+        console.log($scope.lab);
+        if($scope.labtestinfos[0].latestImportDate != null) {
+          var tmp = Date.parse($scope.labtestinfos[0].latestImportDate);
+          var stdate = new Date(tmp);
+          $scope.labtestinfos[0].latestImportDate = stdate.getFullYear() + '-' + (stdate.getMonth() + 1) + '-' + stdate.getDate();
+        }
+        if($scope.labtestinfos[0].latestUploadTime != null) {
+          var tmp = Date.parse($scope.labtestinfos[0].latestUploadTime);
+          var stdate = new Date(tmp);
+          $scope.labtestinfos[0].latestUploadTime = stdate.getFullYear() + '-' + (stdate.getMonth() + 1) + '-' + stdate.getDate();
+        }
+        $scope.tableParams = new NgTableParams({
+                count:$scope.itemsPerPage
+            },
+            {   counts:[],
+                dataset:$scope.labtestinfos
+            });
+      }, function (e) {
+
+      })
+  }
+}])
+// 信息录入-LZN
+.controller('LabInfoCtrl',['$scope', '$state', 'Storage', 'LabtestImport', 'NgTableParams', '$uibModal', '$timeout', function ($scope, $state, Storage, LabtestImport, NgTableParams, $uibModal, $timeout) {
+  $scope.Lab='';
+  $scope.patname = Storage.get('patName');
+  $scope.Lab.LabType = {
+    options:[
+      '血肌酐',
+      '尿蛋白',
+      '血白蛋白',
+      '血红蛋白',
+      '肾小球滤过率'
+    ],
+    selected:'血肌酐'
+  };
+  // $scope.selecttype = {
+  //   options:[
+  //     '血常规',
+  //     '血生化',
+  //     '单次血糖',
+  //     '药物浓度',
+  //     '甲状旁腺激素',
+  //     '血培养',
+  //     '其他血液检查',
+  //     '腹透液常规',
+  //     '腹透液生化',
+  //     '腹透液培养',
+  //     '尿常规',
+  //     '尿蛋白定量',
+  //     '尿培养',
+  //     '其他尿液检查',
+  //     '大便常规',
+  //     '其他化验'
+  //   ],
+  //   selected:''
+  // };
+  $scope.select={};
+  $scope.selecttype = {'options':
+  [
+    {'option':'血常规', 'disable':true},
+    {'option':'血生化', 'disable':true},
+    {'option':'单次血糖', 'disable':true},
+    {'option':'药物浓度', 'disable':true},
+    {'option':'甲状旁腺激素', 'disable':true},
+    {'option':'血培养', 'disable':true},
+    {'option':'*其他血液检查', 'disable':false},
+    {'option':'腹透液常规', 'disable':true},
+    {'option':'腹透液生化', 'disable':true},
+    {'option':'腹透液培养', 'disable':true},
+    {'option':'尿常规', 'disable':true},
+    {'option':'尿蛋白定量', 'disable':true},
+    {'option':'尿培养', 'disable':true},
+    {'option':'*其他尿液检查', 'disable':false},
+    {'option':'大便常规', 'disable':true},
+    {'option':'*其他化验', 'disable':false}
+  ],
+  'selected':''
+}
+console.log($scope.select.selected);
+  $scope.custype = '';
+  //   options:[
+  //     '血常规',
+  //     '血生化',
+  //     '单次血糖',
+  //     '药物浓度',
+  //     '甲状旁腺激素',
+  //     '血培养',
+  //     '其他血液检查',
+  //     '腹透液常规',
+  //     '腹透液生化',
+  //     '腹透液培养',
+  //     '尿常规',
+  //     '尿蛋白定量',
+  //     '尿培养',
+  //     '其他尿液检查',
+  //     '大便常规',
+  //     '其他化验'
+  //   ],
+  //   selected:''
+  // };
+  // 其他化验类型
+   // if($scope.selecttype.selected == '其他血液检查' || $scope.selecttype.selected == '其他尿液检查' || $scope.selecttype.selected == '其他化验')
+            
+  $scope.today = function() {
+      $scope.Lab.dt = new Date();
+    };
+    $scope.today();
+
+    $scope.clear = function() {
+      $scope.Lab.dt = null;
+    };
+    $scope.inlineOptions = {
+      customClass: getDayClass,
+      minDate: new Date(),
+      showWeeks: true
+    };
+
+    $scope.dateOptions = {
+      // dateDisabled: disabled,
+      formatYear: 'yy',
+      maxDate: new Date(2020, 5, 22),
+      minDate: null,
+      startingDay: 1
+    };
+    // function disabled(data) {
+   //   var date = data.date,
+   //     mode = data.mode;
+   //   return mode === 'day' && (date.getDay() === 0 || date.getDay() === 6);
+    // }
+    $scope.open = function($index) {
+      // console.log($index);
+      $scope.popup[$index].opened = true;
+    };
+    $scope.setDate = function(year, month, day) {
+      $scope.Lab.dt = new Date(year, month, day);
+    };
+    $scope.popup = [
+      {opened:false},
+      {opened:false},
+      {opened:false},
+      {opened:false}
+      ]
+    
+    function getDayClass(data) {
+      var date = data.date,
+        mode = data.mode;
+      if (mode === 'day') {
+          var dayToCheck = new Date(date).setHours(0,0,0,0);
+          for (var i = 0; i < $scope.events.length; i++) {
+            var currentDay = new Date($scope.events[i].date).setHours(0,0,0,0);
+            if (dayToCheck === currentDay) {
+                return $scope.events[i].status;
+            }
+          }
+      }
+      return '';
+    }
+    $scope.postBack = [{LabType:{
+    options:[
+      '血肌酐',
+      '尿蛋白',
+      '血白蛋白',
+      '血红蛋白',
+      '肾小球滤过率'
+    ],
+    selected:'血肌酐'
+  },LabValue:100,dt:new Date()}];
+    $scope.Add = function ($index) {
+      // $scope.postBack.length<5
+      if($scope.postBack.length<4){
+        console.log($scope.postBack[$index].dt);
+        $scope.postBack.splice($index+1,0,{LabType:{
+      options:[
+        '血肌酐',
+        '尿蛋白',
+        '血白蛋白',
+        '血红蛋白',
+        '肾小球滤过率'
+      ],
+      selected:'血肌酐'
+      },LabValue:100,dt:new Date()});
+      }     
+    }
+    $scope.Remove = function ($index) {
+      if($scope.postBack.length>1)
+      $scope.postBack.splice($index,1);
+    }
+    //  $scope.myInterval = 5000;
+    // $scope.noWrapSlides = false;
+    $scope.active = 0;
+    $scope.slides = [];
+  
+    var patient = {
+      'patientId':Storage.get('patId'),
+      'token':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImhlYWx0aCIsImV4cCI6MTQ5OTY4Nzg2OTI5NSwiaWF0IjoxNDk5Njg0MjY5fQ.p87yOwwsumsi-G5uprWamdSH8_Ij1NgY3XAi1yFdv0U'
+    }
+    LabtestImport.GetPhotoList(patient).then(
+      function (data) {
+        $scope.slides=data.results;
+        // var test=data.results;
+        // $scope.slides = test;
+        console.log(patient);
+        console.log($scope.slides);
+        // console.log($scope.slides[$index]);
+        $scope.photoId = '';
+        $scope.phototype = '';
+        $scope.getphoto = function (index) {
+          $scope.photoId = $scope.slides[index].photoId;
+          console.log($scope.photoId);
+          console.log($scope.phototype);
+          $('#selecttype').modal('show');
+         
+        }
+        $scope.skipphoto = function (index) {
+          $scope.photoId = $scope.slides[index].photoId;
+            console.log($scope.photoId);
+            $('#skip').modal('show');
+        }
+        $scope.gettype = function () {
+          if($scope.custype == '') 
+            {
+              if(typeof($scope.select.selected) != 'undefined') $scope.phototype = $scope.select.selected.option;
+              else $scope.phototype = '';
+            }
+          else $scope.phototype = $scope.custype;
+          console.log($scope.select.selected);
+          $('#selecttype').modal('hide');
+          $('#selecttype').on('hidden.bs.modal', function () {
+            $scope.select = {};
+            $scope.custype = '';
+            console.log($scope.phototype);
+          })
+        }
+      }, function (e) {
+
+      })
+    
+    LabtestImport.GetPatientLabTest(patient).then(
+    function (data) {
+      $scope.patientlabtests = data.results;
+      for(var i = 0;i < $scope.patientlabtests.length;i++) {
+        switch($scope.patientlabtests[i].type) {
+          case 'SCr': $scope.patientlabtests[i].type = "血肌酐";break;
+          case 'PRO': $scope.patientlabtests[i].type = "尿蛋白";break;
+          case 'ALB': $scope.patientlabtests[i].type = "血白蛋白";break;
+          case 'GFR': $scope.patientlabtests[i].type = "肾小球滤过率";break;
+          case 'HB': $scope.patientlabtests[i].type = "血红蛋白";break;
+          default: break;
+        }
+        if($scope.patientlabtests[i].time != null) {
+          var tmp = Date.parse($scope.patientlabtests[i].time);
+          var stdate = new Date(tmp);
+          $scope.patientlabtests[i].time = stdate.getFullYear() + '-' + (stdate.getMonth() + 1) + '-' + stdate.getDate();
+        }
+        if($scope.patientlabtests[i].importTime != null) {
+            var tmp = Date.parse($scope.patientlabtests[i].importTime);
+            var stdate = new Date(tmp);
+            $scope.patientlabtests[i].importTime = stdate.getFullYear() + '-' + (stdate.getMonth() + 1) + '-' + stdate.getDate();
+        }      
+      }
+      console.log($scope.patientlabtests);
+      $scope.tableParams = new NgTableParams({
+                count:15
+            },
+            {   counts:[],
+                dataset:$scope.patientlabtests
+            });
+    }, function (e) {
+
+    })
+    $scope.getlabtestId = function (index) {
+      Storage.set('labtestId',$scope.patientlabtests[index].labtestId);
+      Storage.set('labtype',$scope.patientlabtests[index].type);
+      Storage.set('labvalue',$scope.patientlabtests[index].value);
+      Storage.set('labdt',$scope.patientlabtests[index].time);
+    }
+    // $scope.save = function () {
+      // var modalInstance = $uibModal.open({
+      // animation:true,
+      // ariaLabelledBy:'modal-title',
+      // ariaDescribedBy:'modal-body',
+      // templateUrl:'templates/main/enterornot/save.html',
+      // controller:'SaveImportCtrl',
+      // // resolve:{
+      // //  RejectReason:function () {
+      // //    return $scope.RejectReason;
+      // //  }
+      // // }
+
+    // });
+    // }
+    $scope.checkphoto = function () {
+      console.log($scope.photoId);
+      console.log($scope.phototype);
+      if($scope.photoId != '' && $scope.phototype != '') {
+        $('#save').modal('show');
+        $('#save').on('hidden.bs.modal', function () {
+        $scope.photoId = '';
+        $scope.phototype = '';
+        })
+      }
+      else if($scope.photoId == '') $('#selectphoto').modal('show');
+      else $('#inputtype').modal('show');
+    }
+    // $scope.checkskip = function (index) {
+    //   console.log($scope.photoId);
+    //   if($scope.photoId != '' && $scope.phototype != '') {
+    //     $('#skip').modal('show');
+    //     $('#skip').on('hidden.bs.modal', function () {
+    //     $scope.photoId = '';
+    //     $scope.phototype = '';
+    //     })
+    //   }
+    //   else if($scope.photoId == '') $('#selectphoto').modal('show');
+    //   else $('#inputtype').modal('show');
+    // }
+    $scope.save = function () {
+      console.log($scope.postBack);
+      console.log($scope.photoId);
+      for(var i = 0;i < $scope.postBack.length;i++) {
+        var date = new Date();
+        var insertTime = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+        var unit = '';
+        var type = '';
+        var time = $scope.postBack[i].dt.getFullYear() + '-' + ($scope.postBack[i].dt.getMonth() + 1) + '-' + $scope.postBack[i].dt.getDate();
+        switch($scope.postBack[i].LabType.selected) {
+            case '血肌酐':type = 'SCr';unit = 'umol/L';break;
+            case '尿蛋白':type = 'PRO';unit = 'mg/d';break;
+            case '血白蛋白':type = 'ALB';unit = 'g/L';break;
+            case '血红蛋白':type = 'HB';unit = 'g/L';break;
+            case '肾小球滤过率':type = 'GFR';unit = 'ml/min';break;
+            default:break;
+            }
         var params = {
-            'doctorId': id,
-
-            'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNDk5ODY0NDQ4Nzk3LCJpYXQiOjE0OTk4NjA4NDh9.PUG7L5RqBTuaLuZUc_vbrHd6KvDz6uIS07_lQLJWJkA'
+          "patientId":Storage.get('patId'),
+          "photoId":$scope.photoId,
+          "insertTime":insertTime,
+          "time":time,
+          "type":type,
+          "value":$scope.postBack[i].LabValue,
+          "unit":unit,
+          "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImhlYWx0aCIsImV4cCI6MTQ5OTY4Nzg2OTI5NSwiaWF0IjoxNDk5Njg0MjY5fQ.p87yOwwsumsi-G5uprWamdSH8_Ij1NgY3XAi1yFdv0U"
         }
-        Review.GetCertificate(params).then(
-            function(data) {
-                $scope.doctorinfos = data.results
-                if ($scope.doctorinfos.province == $scope.doctorinfos.city) $scope.doctorinfos.province = ''
-                console.log($scope.doctorinfos)
-                var review = {
-                    'reviewStatus': $scope.status,
-                    'limit': 15,
-                    'skip': 0,
-                    'name': $scope.doctorinfos.name,
-                    'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNDk5ODY0NDQ4Nzk3LCJpYXQiOjE0OTk4NjA4NDh9.PUG7L5RqBTuaLuZUc_vbrHd6KvDz6uIS07_lQLJWJkA'
+        console.log(params);
+        LabtestImport.PostLabTestInfo(params).then(
+          function (data) {
+            console.log(data.result);
+          }, function (e) {
+
+          })
+      }
+      var label = {
+        "photoType":$scope.phototype,
+        "photoId":$scope.photoId,
+        "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImhlYWx0aCIsImV4cCI6MTQ5OTY4Nzg2OTI5NSwiaWF0IjoxNDk5Njg0MjY5fQ.p87yOwwsumsi-G5uprWamdSH8_Ij1NgY3XAi1yFdv0U"
+      }
+      LabtestImport.LabelPhoto(label).then(
+        function (data) {
+          console.log(data.results);
+          if(data.results == "图片录入状态修改成功") {
+            $('#save').modal('hide');
+            $('#save').on('hidden.bs.modal', function () {
+              $('#saved').modal('show');
+              $timeout(function() {
+                $('#saved').modal('hide');
+              },1000);
+              $('#saved').on('hidden.bs.modal', function () {
+                $scope.photoId = '';
+                $scope.phototype = '';
+                var patient = {
+                    'patientId':Storage.get('patId'),
+                    'token':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImhlYWx0aCIsImV4cCI6MTQ5OTY4Nzg2OTI5NSwiaWF0IjoxNDk5Njg0MjY5fQ.p87yOwwsumsi-G5uprWamdSH8_Ij1NgY3XAi1yFdv0U'
                 }
-                Review.GetReviewInfo(review).then(
-                    function(data) {
-                        $scope.review.reviewStatus = data.results[0].reviewStatus
-                        $scope.review.adminId = data.results[0].adminId
-                        $scope.review.reviewDate = data.results[0].reviewDate
-                        $scope.review.reviewContent = data.results[0].reviewContent
-                        if ($scope.review.reviewStatus == 0) $scope.review.reviewStatus = '未审核'
-                        if ($scope.review.reviewStatus == 1) $scope.review.reviewStatus = '已通过'
-                        if ($scope.review.reviewStatus == 2) $scope.review.reviewStatus = '已拒绝'
-                        if ($scope.review.reviewDate != null) {
-                            var tmp = Date.parse($scope.review.reviewDate)
-                            var stdate = new Date(tmp)
-                            $scope.review.reviewDate = stdate.getFullYear() + '-' + (stdate.getMonth() + 1) + '-' + stdate.getDate()
-                        }
-                        console.log($scope.review)
-                    },
-                    function(e) {
-
-                    })
-            },
-            function(e) {
-
-            })
-        $scope.accept = function() {
-            var postreview = {
-                'doctorId': Storage.get('docId'),
-                'reviewStatus': 1,
-                'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNDk5ODY0NDQ4Nzk3LCJpYXQiOjE0OTk4NjA4NDh9.PUG7L5RqBTuaLuZUc_vbrHd6KvDz6uIS07_lQLJWJkA'
-            }
-            Review.PostReviewInfo(postreview).then(
-                function(data) {
-                    console.log(data.results)
-                    if (data.results == '审核信息保存成功') {
-                        $('#accepted').modal('show')
-                        $timeout(function() {
-                            $('#accepted').modal('hide')
-                        }, 1000)
-                        $('#accepted').on('hidden.bs.modal', function() {
-                            var sms = {
-                                'mobile': '18626860001',
-                                'smsType': 3,
-                                'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTEyZTllYmRjODNmNmE4YjdkY2JkZTgiLCJ1c2VySWQiOiJVMjAxNzAzMTQyMDE4Iiwicm9sZSI6InBhdGllbnQiLCJleHBpcmVBZnRlciI6MTQ5NzQwNzI2MzgzMywiaWF0IjoxNDk3NDA3MjYzfQ.5UITzg6NaHcIIEQESCLLB7mx_suISw9Bj6K1OBaiaDk'
-                            }
-                            Alluser.sms(sms).then(
-                                function(data) {
-                                    $state.go('main.checkornot.unchecked')
-                                },
-                                function(e) {
-
-                                })
-                        })
+                LabtestImport.GetPatientLabTest(patient).then(
+                  function (data) {
+                    $scope.patientlabtests = data.results;
+                    for(var i = 0;i < $scope.patientlabtests.length;i++) {
+                      switch($scope.patientlabtests[i].type) {
+                        case 'SCr': $scope.patientlabtests[i].type = "血肌酐";break;
+                        case 'PRO': $scope.patientlabtests[i].type = "尿蛋白";break;
+                        case 'ALB': $scope.patientlabtests[i].type = "血白蛋白";break;
+                        case 'HB': $scope.patientlabtests[i].type = "血红蛋白";break;
+                        case 'GFR': $scope.patientlabtests[i].type = "肾小球滤过率";break;
+                        default: break;
+                      }
+                      if($scope.patientlabtests[i].time != null) {
+                        var tmp = Date.parse($scope.patientlabtests[i].time);
+                        var stdate = new Date(tmp);
+                        $scope.patientlabtests[i].time = stdate.getFullYear() + '-' + (stdate.getMonth() + 1) + '-' + stdate.getDate();
+                      }
+                      if($scope.patientlabtests[i].importTime != null) {
+                          var tmp = Date.parse($scope.patientlabtests[i].importTime);
+                          var stdate = new Date(tmp);
+                          $scope.patientlabtests[i].importTime = stdate.getFullYear() + '-' + (stdate.getMonth() + 1) + '-' + stdate.getDate();
+                      }      
                     }
-                },
-                function(e) {
-
-                })
-        }
-        $scope.RejectReason = {}
-        $scope.reject = function() {
-            console.log($scope.RejectReason.reason)
-            var postreview = {
-                'doctorId': Storage.get('docId'),
-                'reviewStatus': 2,
-                'reviewContent': $scope.RejectReason.reason,
-                'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNDk5ODY0NDQ4Nzk3LCJpYXQiOjE0OTk4NjA4NDh9.PUG7L5RqBTuaLuZUc_vbrHd6KvDz6uIS07_lQLJWJkA'
-            }
-            console.log(postreview)
-            Review.PostReviewInfo(postreview).then(
-                function(data) {
-                    console.log(data.results)
-                    if (data.results == '审核信息保存成功') {
-                        $('#reject').modal('hide')
-                        $('#reject').on('hidden.bs.modal', function() {
-                            $('#rejected').modal('show')
-                            $timeout(function() {
-                                $('#rejected').modal('hide')
-                            }, 1000)
-                        })
-                        $('#rejected').on('hidden.bs.modal', function() {
-                            var sms = {
-                                'mobile': '18626860001',
-                                'smsType': 4,
-                                'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTEyZTllYmRjODNmNmE4YjdkY2JkZTgiLCJ1c2VySWQiOiJVMjAxNzAzMTQyMDE4Iiwicm9sZSI6InBhdGllbnQiLCJleHBpcmVBZnRlciI6MTQ5NzQwNzI2MzgzMywiaWF0IjoxNDk3NDA3MjYzfQ.5UITzg6NaHcIIEQESCLLB7mx_suISw9Bj6K1OBaiaDk',
-                                'reason': $scope.RejectReason.reason
-                            }
-                            Alluser.sms(sms).then(
-                                function(data) {
-                                    console.log(data.results)
-                                    $scope.RejectReason = {}
-                                    $state.go('main.checkornot.unchecked')
-                                },
-                                function(e) {})
-                        })
-                        // 拒绝提示
-                    }
-                },
-                function(e) {
-
-                })
-        }
-    }])
-    // 已审核-LZN
-    .controller('CheckedCtrl', ['$scope', '$state', 'Review', 'Storage', 'NgTableParams', '$timeout', function($scope, $state, Review, Storage, NgTableParams, $timeout) {
-        $scope.review = {
-            'reviewStatus': 1,
-            'limit': 15,
-            'skip': 0,
-            'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNDk5ODY0NDQ4Nzk3LCJpYXQiOjE0OTk4NjA4NDh9.PUG7L5RqBTuaLuZUc_vbrHd6KvDz6uIS07_lQLJWJkA'
-        }
-        $scope.doctorinfos = {}
-        Review.GetReviewInfo($scope.review).then(
-            function(data) {
-                $scope.doctorinfos = data.results
-                for (var i = 0; i < $scope.doctorinfos.length; i++) {
-                    if ($scope.doctorinfos[i].reviewStatus == 1) $scope.doctorinfos[i].reviewStatus = '已通过'
-                    if ($scope.doctorinfos[i].reviewStatus == 2) $scope.doctorinfos[i].reviewStatus = '已拒绝'
-                    if ($scope.doctorinfos[i].reviewDate != null) {
-                        var tmp = Date.parse($scope.doctorinfos[i].reviewDate)
-                        var stdate = new Date(tmp)
-                        $scope.doctorinfos[i].reviewDate = stdate.getFullYear() + '-' + (stdate.getMonth() + 1) + '-' + stdate.getDate()
-                    }
-                    if ($scope.doctorinfos[i].creationTime != null) {
-                        var tmp = Date.parse($scope.doctorinfos[i].creationTime)
-                        var stdate = new Date(tmp)
-                        $scope.doctorinfos[i].creationTime = stdate.getFullYear() + '-' + (stdate.getMonth() + 1) + '-' + stdate.getDate()
-                    }
-                }
-                console.log($scope.doctorinfos)
-                console.log(data.nexturl)
-                $scope.tableParams = new NgTableParams({
-                    count: 15
-                }, {
-                    counts: [],
-                    dataset: $scope.doctorinfos
-                })
-            },
-            function(e) {
-
-            })
-        $scope.count = ''
-        var count = {
-            'reviewStatus': 1,
-            'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNDk5ODY0NDQ4Nzk3LCJpYXQiOjE0OTk4NjA4NDh9.PUG7L5RqBTuaLuZUc_vbrHd6KvDz6uIS07_lQLJWJkA'
-        }
-        Review.GetCount(count).then(
-            function(data) {
-                $scope.count = data.results
-            },
-            function(e) {
-
-            })
-        $scope.lastpage = function() {
-            if ($scope.review.skip - $scope.review.limit >= 0) {
-                $scope.review.skip -= $scope.review.limit
-                Review.GetReviewInfo($scope.review).then(
-                    function(data) {
-                        $scope.doctorinfos = data.results
-                        for (var i = 0; i < $scope.doctorinfos.length; i++) {
-                            if ($scope.doctorinfos[i].reviewStatus == 1) $scope.doctorinfos[i].reviewStatus = '已通过'
-                            if ($scope.doctorinfos[i].reviewStatus == 2) $scope.doctorinfos[i].reviewStatus = '已拒绝'
-                        }
-                        console.log($scope.doctorinfos)
-                        console.log(data.nexturl)
-                        $scope.tableParams = new NgTableParams({
-                            count: 15
-                        }, {
-                            counts: [],
-                            dataset: $scope.doctorinfos
-                        })
-                    },
-                    function(e) {
-
-                    })
-            }
-        }
-        $scope.nextpage = function() {
-            $scope.review.skip += $scope.review.limit
-            Review.GetReviewInfo($scope.review).then(
-                function(data) {
-                    $scope.doctorinfos = data.results
-                    for (var i = 0; i < $scope.doctorinfos.length; i++) {
-                        if ($scope.doctorinfos[i].reviewStatus == 1) $scope.doctorinfos[i].reviewStatus = '已通过'
-                        if ($scope.doctorinfos[i].reviewStatus == 2) $scope.doctorinfos[i].reviewStatus = '已拒绝'
-                    }
-                    console.log($scope.doctorinfos)
-                    console.log(data.nexturl)
-                    $scope.tableParams = new NgTableParams({
-                        count: 15
-                    }, {
-                        counts: [],
-                        dataset: $scope.doctorinfos
-                    })
-                },
-                function(e) {
-
-                })
-        }
-        $scope.getdocId = function(index) {
-            Storage.set('docId', $scope.doctorinfos[index].userId)
-            Storage.set('reviewstatus', 1)
-        }
-
-        $scope.search = function() {
-            $scope.review = {
-                'reviewStatus': 1,
-                'limit': 15,
-                'skip': 0,
-                'name': $scope.doctorname,
-                'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNDk5ODY0NDQ4Nzk3LCJpYXQiOjE0OTk4NjA4NDh9.PUG7L5RqBTuaLuZUc_vbrHd6KvDz6uIS07_lQLJWJkA'
-            }
-            Review.GetReviewInfo($scope.review).then(
-                function(data) {
-                    $scope.doctorinfos = data.results
-                    for (var i = 0; i < $scope.doctorinfos.length; i++) {
-                        if ($scope.doctorinfos[i].reviewStatus == 1) $scope.doctorinfos[i].reviewStatus = '已通过'
-                        if ($scope.doctorinfos[i].reviewStatus == 2) $scope.doctorinfos[i].reviewStatus = '已拒绝'
-                        if ($scope.doctorinfos[i].reviewDate != null) {
-                            var tmp = Date.parse($scope.doctorinfos[i].reviewDate)
-                            var stdate = new Date(tmp)
-                            $scope.doctorinfos[i].reviewDate = stdate.getFullYear() + '-' + (stdate.getMonth() + 1) + '-' + stdate.getDate()
-                        }
-                        if ($scope.doctorinfos[i].creationTime != null) {
-                            var tmp = Date.parse($scope.doctorinfos[i].creationTime)
-                            var stdate = new Date(tmp)
-                            $scope.doctorinfos[i].creationTime = stdate.getFullYear() + '-' + (stdate.getMonth() + 1) + '-' + stdate.getDate()
-                        }
-                    }
-                    console.log($scope.doctorname)
-                    console.log($scope.review)
-                    console.log($scope.doctorinfos)
-                    $scope.tableParams = new NgTableParams({
-                        count: 15
-                    }, {
-                        counts: [],
-                        dataset: $scope.doctorinfos
-                    })
-                },
-                function(e) {
-
-                })
-        }
-    }])
-
-    .controller('EnterOrNotCtrl', ['$scope', '$state', 'Storage', '$timeout', function($scope, $state, Storage, $timeout) {
-        $scope.toentered = function() {
-            $state.go('main.enterornot.entered')
-        }
-        $scope.tounentered = function() {
-            $state.go('main.enterornot.unentered')
-        }
-    }])
-    // 未录入-LZN
-    .controller('UnenteredCtrl', ['$scope', '$state', 'Storage', 'LabtestImport', 'NgTableParams', '$timeout', function($scope, $state, Storage, LabtestImport, NgTableParams, $timeout) {
-        $scope.labtestinfos = {}
-        $scope.lab = {
-            'labtestImportStatus': 0,
-            'limit': 10,
-            'skip': 0,
-            'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImhlYWx0aCIsImV4cCI6MTQ5OTY4Nzg2OTI5NSwiaWF0IjoxNDk5Njg0MjY5fQ.p87yOwwsumsi-G5uprWamdSH8_Ij1NgY3XAi1yFdv0U'
-        }
-        LabtestImport.GetLabtestInfo($scope.lab).then(
-            function(data) {
-                $scope.labtestinfos = data.results
-                for (var i = 0; i < $scope.labtestinfos.length; i++) {
-                    if ($scope.labtestinfos[i].latestUploadTime != null) {
-                        var tmp = Date.parse($scope.labtestinfos[i].latestUploadTime)
-                        var stdate = new Date(tmp)
-                        $scope.labtestinfos[i].latestUploadTime = stdate.getFullYear() + '-' + (stdate.getMonth() + 1) + '-' + stdate.getDate()
-                    }
-                }
-                $scope.tableParams = new NgTableParams({
-                    count: 15
-                }, {
-                    counts: [],
-                    dataset: $scope.labtestinfos
-                })
-            },
-            function(e) {
-
-            })
-        $scope.count = ''
-        var count = {
-            'labtestImportStatus': 0,
-            'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImhlYWx0aCIsImV4cCI6MTQ5OTY4Nzg2OTI5NSwiaWF0IjoxNDk5Njg0MjY5fQ.p87yOwwsumsi-G5uprWamdSH8_Ij1NgY3XAi1yFdv0U'
-        }
-        LabtestImport.GetCount(count).then(
-            function(data) {
-                $scope.count = data.results
-            },
-            function(e) {
-
-            })
-        $scope.getpatId = function(index) {
-            Storage.set('patId', $scope.labtestinfos[index].userId)
-            Storage.set('patName', $scope.labtestinfos[index].name)
-        }
-        $scope.lastpage = function() {
-            if ($scope.lab.skip - $scope.lab.limit >= 0) {
-                $scope.lab.skip -= $scope.lab.limit
-                LabtestImport.GetLabtestInfo($scope.lab).then(
-                    function(data) {
-                        $scope.labtestinfos = data.results
-                        console.log($scope.labtestinfos)
-                        console.log(data.nexturl)
-                        $scope.tableParams = new NgTableParams({
-                            count: 15
-                        }, {
-                            counts: [],
-                            dataset: $scope.labtestinfos
-                        })
-                    },
-                    function(e) {
-
-                    })
-            }
-        }
-        $scope.nextpage = function() {
-            $scope.lab.skip += $scope.lab.limit
-            LabtestImport.GetLabtestInfo($scope.lab).then(
-                function(data) {
-                    $scope.labtestinfos = data.results
-                    console.log($scope.labtestinfos)
-                    console.log(data.nexturl)
-                    $scope.tableParams = new NgTableParams({
-                        count: 15
-                    }, {
-                        counts: [],
-                        dataset: $scope.labtestinfos
-                    })
-                },
-                function(e) {
-
-                })
-        }
-        $scope.search = function() {
-            $scope.lab = {
-                'labtestImportStatus': 0,
-                'limit': 10,
-                'skip': 0,
-                'name': $scope.patientname,
-                'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImhlYWx0aCIsImV4cCI6MTQ5OTY4Nzg2OTI5NSwiaWF0IjoxNDk5Njg0MjY5fQ.p87yOwwsumsi-G5uprWamdSH8_Ij1NgY3XAi1yFdv0U'
-            }
-            LabtestImport.GetLabtestInfo($scope.lab).then(
-                function(data) {
-                    $scope.labtestinfos = data.results
-                    if ($scope.labtestinfos[0].latestUploadTime != null) {
-                        var tmp = Date.parse($scope.labtestinfos[0].latestUploadTime)
-                        var stdate = new Date(tmp)
-                        $scope.labtestinfos[0].latestUploadTime = stdate.getFullYear() + '-' + (stdate.getMonth() + 1) + '-' + stdate.getDate()
-                    }
-                    console.log($scope.patientname)
-                    console.log($scope.lab)
-                    console.log($scope.labtestinfos)
-                    $scope.tableParams = new NgTableParams({
-                        count: 15
-                    }, {
-                        counts: [],
-                        dataset: $scope.labtestinfos
-                    })
-                },
-                function(e) {
-
-                })
-        }
-    }])
-    // 已录入-LZN
-    .controller('EnteredCtrl', ['$scope', '$state', 'Storage', 'LabtestImport', 'NgTableParams', '$timeout', function($scope, $state, Storage, LabtestImport, NgTableParams, $timeout) {
-        $scope.labtestinfos = {}
-        $scope.lab = {
-            'labtestImportStatus': 1,
-            'limit': 10,
-            'skip': 0,
-            'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImhlYWx0aCIsImV4cCI6MTQ5OTY4Nzg2OTI5NSwiaWF0IjoxNDk5Njg0MjY5fQ.p87yOwwsumsi-G5uprWamdSH8_Ij1NgY3XAi1yFdv0U'
-        }
-        LabtestImport.GetLabtestInfo($scope.lab).then(
-            function(data) {
-                $scope.labtestinfos = data.results
-                for (var i = 0; i < $scope.labtestinfos.length; i++) {
-                    if ($scope.labtestinfos[i].latestImportDate != null) {
-                        var tmp = Date.parse($scope.labtestinfos[i].latestImportDate)
-                        var stdate = new Date(tmp)
-                        $scope.labtestinfos[i].latestImportDate = stdate.getFullYear() + '-' + (stdate.getMonth() + 1) + '-' + stdate.getDate()
-                    }
-                    if ($scope.labtestinfos[i].latestUploadTime != null) {
-                        var tmp = Date.parse($scope.labtestinfos[i].latestUploadTime)
-                        var stdate = new Date(tmp)
-                        $scope.labtestinfos[i].latestUploadTime = stdate.getFullYear() + '-' + (stdate.getMonth() + 1) + '-' + stdate.getDate()
-                    }
-                }
-                $scope.tableParams = new NgTableParams({
-                    count: 15
-                }, {
-                    counts: [],
-                    dataset: $scope.labtestinfos
-                })
-            },
-            function(e) {
-
-            })
-        $scope.count = ''
-        var count = {
-            'labtestImportStatus': 1,
-            'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImhlYWx0aCIsImV4cCI6MTQ5OTY4Nzg2OTI5NSwiaWF0IjoxNDk5Njg0MjY5fQ.p87yOwwsumsi-G5uprWamdSH8_Ij1NgY3XAi1yFdv0U'
-        }
-        LabtestImport.GetCount(count).then(
-            function(data) {
-                $scope.count = data.results
-            },
-            function(e) {
-
-            })
-        $scope.getpatId = function(index) {
-            Storage.set('patId', $scope.labtestinfos[index].userId)
-            Storage.set('patName', $scope.labtestinfos[index].name)
-        }
-        $scope.lastpage = function() {
-            if ($scope.lab.skip - $scope.lab.limit >= 0) {
-                $scope.lab.skip -= $scope.lab.limit
-                LabtestImport.GetLabtestInfo($scope.lab).then(
-                    function(data) {
-                        $scope.labtestinfos = data.results
-                        console.log($scope.labtestinfos)
-                        console.log(data.nexturl)
-                        $scope.tableParams = new NgTableParams({
-                            count: 15
-                        }, {
-                            counts: [],
-                            dataset: $scope.labtestinfos
-                        })
-                    },
-                    function(e) {
-
-                    })
-            }
-        }
-        $scope.nextpage = function() {
-            $scope.lab.skip += $scope.lab.limit
-            LabtestImport.GetLabtestInfo($scope.lab).then(
-                function(data) {
-                    $scope.labtestinfos = data.results
-                    console.log($scope.labtestinfos)
-                    console.log(data.nexturl)
+                    console.log($scope.patientlabtests);
                     $scope.tableParams = new NgTableParams({
                         count: 15
                     }, {
@@ -1105,49 +1625,252 @@ angular.module('controllers', ['ngResource', 'services'])
             },
             function(e) {
 
-            })
-
-        LabtestImport.GetPatientLabTest(patient).then(
-            function(data) {
-                $scope.patientlabtests = data.results
-                for (var i = 0; i < $scope.patientlabtests.length; i++) {
-                    switch ($scope.patientlabtests[i].type) {
-                        case 'SCr':
-                            $scope.patientlabtests[i].type = '血肌酐'
-                            break
-                        case 'PRO':
-                            $scope.patientlabtests[i].type = '尿蛋白'
-                            break
-                        case 'ALB':
-                            $scope.patientlabtests[i].type = '血白蛋白'
-                            break
-                        case 'GFR':
-                            $scope.patientlabtests[i].type = '肾小球滤过率'
-                            break
-                        default:
-                            break
-                    }
-                    if ($scope.patientlabtests[i].time != null) {
-                        var tmp = Date.parse($scope.patientlabtests[i].time)
-                        var stdate = new Date(tmp)
-                        $scope.patientlabtests[i].time = stdate.getFullYear() + '-' + (stdate.getMonth() + 1) + '-' + stdate.getDate()
-                    }
-                    if ($scope.patientlabtests[i].importTime != null) {
-                        var tmp = Date.parse($scope.patientlabtests[i].importTime)
-                        var stdate = new Date(tmp)
-                        $scope.patientlabtests[i].importTime = stdate.getFullYear() + '-' + (stdate.getMonth() + 1) + '-' + stdate.getDate()
-                    }
+        })
+    }
+    $scope.skip = function () {
+      var label = {
+        "photoId":$scope.photoId,
+        "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImhlYWx0aCIsImV4cCI6MTQ5OTY4Nzg2OTI5NSwiaWF0IjoxNDk5Njg0MjY5fQ.p87yOwwsumsi-G5uprWamdSH8_Ij1NgY3XAi1yFdv0U"
+      }
+      LabtestImport.LabelPhoto(label).then(
+        function (data) {
+          console.log(data.results);
+          if(data.results == "图片录入状态修改成功") {
+            $('#skip').modal('hide');
+            $('#skip').on('hidden.bs.modal', function () {
+              $('#skiped').modal('show');
+              $timeout(function() {
+                $('#skiped').modal('hide');
+              },1000);
+              $('#skiped').on('hidden.bs.modal', function () {
+                $scope.photoId = '';
+                $scope.phototype = '';
+                var patient = {
+                  'patientId':Storage.get('patId'),
+                  'token':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImhlYWx0aCIsImV4cCI6MTQ5OTY4Nzg2OTI5NSwiaWF0IjoxNDk5Njg0MjY5fQ.p87yOwwsumsi-G5uprWamdSH8_Ij1NgY3XAi1yFdv0U'
                 }
-                console.log($scope.patientlabtests)
-                $scope.tableParams = new NgTableParams({
-                    count: 15
-                }, {
-                    counts: [],
-                    dataset: $scope.patientlabtests
-                })
-            },
-            function(e) {
+                LabtestImport.GetPhotoList(patient).then(
+                  function (data) {
+                    $scope.slides=data.results;
+                    // var test=data.results;
+                    // $scope.slides = test;
+                    console.log(patient);
+                    console.log($scope.slides);
+                    // console.log($scope.slides[$index]);
+                    $scope.photoId = '';
+                    $scope.phototype = '';
+                    $scope.getphoto = function (index) {
+                      $scope.photoId = $scope.slides[index].photoId;
+                      console.log($scope.photoId);
+                      $('#selecttype').modal('show');
+                    }
+                    $scope.skipphoto = function (index) {
+                      $scope.photoId = $scope.slides[index].photoId;
+                      console.log($scope.photoId);
+                      $('#skip').modal('show');
+                    }
+                    $scope.gettype = function () {
+                      if($scope.custype == '') $scope.phototype = $scope.select.selected.option;
+                      else $scope.phototype = $scope.custype;
+                      $('#selecttype').modal('hide');
+                      $('#selecttype').on('hidden.bs.modal', function () {
+                        $scope.select = {};
+                        $scope.custype = '';
+                        console.log($scope.phototype);
+                      })
+                    }
+                  }, function (e) {
 
+                  })
+              })
+            })
+        })
+    }
+}])
+// .controller('SaveImportCtrl',['$scope', '$uibModalInstance', function ($scope, $uibModalInstance) {
+  
+//   $scope.ok = function () {
+   
+//     $uibModalInstance.close();
+    
+//   };
+//   $scope.cancel = function () {
+//     $uibModalInstance.dismiss();
+//   };
+
+// }])
+// 已录入患者的化验信息-LZN
+.controller('PatientLabInfoCtrl', ['$scope', '$state', 'Storage', 'LabtestImport', 'NgTableParams', '$timeout', function ($scope, $state, Storage, LabtestImport, NgTableParams, $timeout) {
+  $scope.patname = Storage.get('patName')
+  $scope.patientlabtests = {};
+  var patient = {
+    "patientId":Storage.get('patId'),
+    "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImhlYWx0aCIsImV4cCI6MTQ5OTY4Nzg2OTI5NSwiaWF0IjoxNDk5Njg0MjY5fQ.p87yOwwsumsi-G5uprWamdSH8_Ij1NgY3XAi1yFdv0U"
+  }
+  LabtestImport.GetPatientLabTest(patient).then(
+    function (data) {
+      $scope.patientlabtests = data.results;
+      for(var i = 0;i < $scope.patientlabtests.length;i++) {
+        switch($scope.patientlabtests[i].type) {
+          case 'SCr': $scope.patientlabtests[i].type = "血肌酐";break;
+          case 'PRO': $scope.patientlabtests[i].type = "尿蛋白";break;
+          case 'ALB': $scope.patientlabtests[i].type = "血白蛋白";break;
+          case 'HB': $scope.patientlabtests[i].type = "血红蛋白";break;
+          case 'GFR': $scope.patientlabtests[i].type = "肾小球滤过率";break;
+          default: break;
+        }
+        if($scope.patientlabtests[i].time != null) {
+          var tmp = Date.parse($scope.patientlabtests[i].time);
+          var stdate = new Date(tmp);
+          $scope.patientlabtests[i].time = stdate.getFullYear() + '-' + (stdate.getMonth() + 1) + '-' + stdate.getDate();
+        }
+        if($scope.patientlabtests[i].importTime != null) {
+            var tmp = Date.parse($scope.patientlabtests[i].importTime);
+            var stdate = new Date(tmp);
+            $scope.patientlabtests[i].importTime = stdate.getFullYear() + '-' + (stdate.getMonth() + 1) + '-' + stdate.getDate();
+        }      
+      }
+      console.log($scope.patientlabtests);
+      $scope.tableParams = new NgTableParams({
+                count:15
+            },
+            {   counts:[],
+                dataset:$scope.patientlabtests
+            });
+    }, function (e) {
+
+    })
+  $scope.getlabtestId = function (index) {
+    Storage.set('labtestId',$scope.patientlabtests[index].labtestId);
+    Storage.set('labtype',$scope.patientlabtests[index].type);
+    Storage.set('labvalue',$scope.patientlabtests[index].value);
+    Storage.set('labdt',$scope.patientlabtests[index].time);
+  }
+}])
+// 查看/编辑已录入信息-LZN
+.controller('ModifyLabInfoCtrl', ['$scope', '$state', 'Storage', 'LabtestImport', 'NgTableParams', '$timeout', function ($scope, $state, Storage, LabtestImport, NgTableParams, $timeout) {
+  $scope.patname = Storage.get('patName');
+  var type =Storage.get('labtype');
+  switch(Storage.get('labtype')) {
+    case 'SCr':type = '血肌酐';break;
+    case 'PRO':type = '尿蛋白';break;
+    case 'GFR':type = '肾小球滤过率';break;
+    case 'ALB':type = '血白蛋白';break;
+    case 'HB': type = "血红蛋白";break;
+    default:break;
+  }
+  
+  var tmp = Date.parse(Storage.get('labdt'));
+  var dt = new Date(tmp);
+  console.log(dt);
+  $scope.LabType={
+    options:[
+      '血肌酐',
+      '尿蛋白',
+      '血白蛋白',
+      '血红蛋白',
+      '肾小球滤过率'
+    ],
+    selected:type
+  };
+  $scope.LabValue=parseFloat(Storage.get('labvalue'));
+  console.log($scope.LabValue);
+  $scope.today = function() {
+      $scope.dt = new Date();
+    };
+    // $scope.today();
+    $scope.dt = dt;
+    console.log($scope.dt);
+    $scope.clear = function() {
+      $scope.dt = null;
+    };
+    $scope.inlineOptions = {
+      customClass: getDayClass,
+      minDate: new Date(),
+      showWeeks: true
+    };
+
+    $scope.dateOptions = {
+      // dateDisabled: disabled,
+      formatYear: 'yy',
+      maxDate: new Date(2020, 5, 22),
+      minDate: null,
+      startingDay: 1
+    };
+    // function disabled(data) {
+   //   var date = data.date,
+   //     mode = data.mode;
+   //   return mode === 'day' && (date.getDay() === 0 || date.getDay() === 6);
+    // }
+    $scope.open = function() {
+      // console.log($index);
+      $scope.popup.opened = true;
+    };
+    $scope.setDate = function(year, month, day) {
+      $scope.dt = new Date(year, month, day);
+    };
+    $scope.popup = {
+      opened:false
+    }
+    
+    function getDayClass(data) {
+      var date = data.date,
+        mode = data.mode;
+      if (mode === 'day') {
+          var dayToCheck = new Date(date).setHours(0,0,0,0);
+          for (var i = 0; i < $scope.events.length; i++) {
+            var currentDay = new Date($scope.events[i].date).setHours(0,0,0,0);
+            if (dayToCheck === currentDay) {
+                return $scope.events[i].status;
+            }
+          }
+      }
+      return '';
+    }
+    $scope.photolist = {};
+    var labtest = {
+      'labtestId':Storage.get('labtestId'),
+      'token':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImhlYWx0aCIsImV4cCI6MTQ5OTY4Nzg2OTI5NSwiaWF0IjoxNDk5Njg0MjY5fQ.p87yOwwsumsi-G5uprWamdSH8_Ij1NgY3XAi1yFdv0U'
+    }
+    LabtestImport.GetPhotobyLabtest(labtest).then(
+      function (data) {
+        $scope.photolist = data.results;
+        
+      }, function (e) {
+
+      })
+    
+    $scope.modify = function () {
+      var unit = '';
+      var type = '';
+      var time = $scope.dt.getFullYear() + '-' + ($scope.dt.getMonth() + 1) + '-' + $scope.dt.getDate();
+      switch($scope.LabType.selected) {
+          case '血肌酐':type = 'SCr';unit = 'umol/L';break;
+          case '尿蛋白':type = 'PRO';unit = 'mg/d';break;
+          case '血白蛋白':type = 'ALB';unit = 'g/L';break;
+          case '血红蛋白':type = 'HB';unit = 'g/L';break;
+          case '肾小球滤过率':type = 'GFR';unit = 'ml/min';break;
+          default:break;
+          }
+      var params = {
+        "labtestId":Storage.get('labtestId'),
+        "time":time,
+        "type":type,
+        "value":$scope.LabValue,
+        "unit":unit,
+        "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImhlYWx0aCIsImV4cCI6MTQ5OTY4Nzg2OTI5NSwiaWF0IjoxNDk5Njg0MjY5fQ.p87yOwwsumsi-G5uprWamdSH8_Ij1NgY3XAi1yFdv0U"
+      }
+      console.log(params);
+      LabtestImport.EditResult(params).then(
+        function (data) {
+          console.log(data.results);
+          if(data.results == "修改成功") {
+            $('#modify').modal('show');
+            $timeout(function() {
+                $('#modify').modal('hide');
+            },1000);
+            $('#modify').on('hidden.bs.modal', function () {
+              $state.go('main.patientlabinfo');
             })
         $scope.getlabtestId = function(index) {
             Storage.set('labtestId', $scope.patientlabtests[index].labtestId)
