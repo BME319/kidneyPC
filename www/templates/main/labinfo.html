@@ -1,14 +1,11 @@
 <div class="container-fluid">
-	<div style="margin-left:300px;margin-right:300px;margin-top:50px;font-size:25px">
-		
-			<!-- <span><ng-md-icon icon="person" style="fill:#48D1CC;vertical-align:middle" size="48"></ng-md-icon></span> -->
-		<p style="margin-left:40px;padding-top:10px;vertical-align:middle"><ng-md-icon icon="person" style="fill:#4876FF;margin-right:10px" size="26"></ng-md-icon>患者 {{patname}}</p>
-		<span style="margin-left:40px;margin-top:20px">化验信息</span>
-		<!-- 图片 -->
-
-
-  <div style="height: 600px">
-   <!--  <div uib-carousel active="active" interval="myInterval" no-wrap="noWrapSlides">
+    <div style="margin-left:20%;margin-right:20%;margin-top:5px;font-size:20px">
+        <p style="margin-left:40px;padding-top:10px;vertical-align:middle">
+            <ng-md-icon icon="person" style="fill:#4876FF;margin-right:10px" size="20"></ng-md-icon>患者 {{patname}}</p>
+        <span style="margin-left:40px;margin-top:20px;font-size: 18px;">化验信息</span>
+        <!-- 图片 -->
+        <div style="height: 600px">
+            <!--  <div uib-carousel active="active" interval="myInterval" no-wrap="noWrapSlides">
       <div uib-slide ng-repeat="slide in slides" index="$index">
         <img ng-src="{{slide.photo}}" style="height:600px">
         <div class="carousel-caption">
@@ -16,6 +13,7 @@
         </div>
       </div>
     </div> -->
+
     <div uib-carousel active="active" style="height:600px" interval="myInterval" no-wrap="noWrapSlides">
 		<div uib-slide ng-repeat="slide in slides" index="$index">
 			<img ng-src="{{slide.photo}}" style="height:600px">
@@ -28,41 +26,65 @@
 			<!-- <div class="carousel-caption">
         		<button type="button" class="btn" style="border-color:black;background:transparent;color:red" ng-click="getphoto($index)"><b>选定当前图片</b></button>
         	</div> -->
-		</div>
-			
-	</div>
-	<div class="modal fade" id="selecttype" tabindex="-1" role="dialog" aria-labelledby="selecttypeLabel" aria-hidden="true">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header" style="text-align:center">
-					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-						&times;
-					</button>
-					<h3 class="modal-title" id="selecttypeLabel">
+                </div>
+            </div>
+            <div class="modal fade" id="selecttype" tabindex="-1" role="dialog" aria-labelledby="selecttypeLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header" style="text-align:center">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                &times;
+                            </button>
+                            <h3 class="modal-title" id="selecttypeLabel">
 						请选择图片类型
 					</h3>
-				</div>
-				<div class="modal-body" style="font-size:16px">
-					图片类型: <select ng-model="select.selected" ng-options="o.option for o in selecttype.options">
-					</select>
-					<!-- 其他化验类型 -->
-					<span style="margin-left:50px">*化验单题目:<input type="text" ng-model="custype" ng-disabled="select.selected.disable"></span>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-primary col-xs-2 col-xs-offset-4" ng-click="gettype()">
-						确认
-					</button>
-					<button type="button" class="btn btn-default col-xs-2" data-dismiss="modal">取消
-					</button>
-				</div>
-			</div><!-- /.modal-content -->
-		</div><!-- /.modal -->
-	</div>
-  </div>
-
-
-		
-		<div class="row" style="margin-top:50px;font-size:16px" ng-repeat="Lab in postBack track by $index">		
+                        </div>
+                        <div class="modal-body" style="font-size:16px">
+                            图片类型:
+                            <select ng-model="select.selected" ng-options="o.option for o in selecttype.options">
+                            </select>
+                            <!-- 其他化验类型 -->
+                            <span style="margin-left:50px">*化验单题目:<input type="text" ng-model="custype" ng-disabled="select.selected.disable"></span>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary col-xs-2 col-xs-offset-4" ng-click="gettype()">
+                                确认
+                            </button>
+                            <button type="button" class="btn btn-default col-xs-2" data-dismiss="modal">取消
+                            </button>
+                        </div>
+                    </div>
+                    <!-- /.modal-content -->
+                </div>
+                <!-- /.modal -->
+            </div>
+        </div>
+    </div>
+    <form class="form-inline" style="margin-top:20px;font-size:16px;text-align: center;">
+        <div class="form-group">
+            <label>化验类别：</label>
+            <select style="width:120px;height: 34px;font-size: 14px;border: 1px solid #ccc;border-radius: 4px;background-color: white;" ng-model="LabType.selected" ng-options="o as o for o in LabType.options"></select>
+        </div>
+        <div class="form-group">
+            <label>化验值：</label>
+            <input type="number" class="form-control" style="width:100px" ng-model="LabValue"> </div>
+        <div class="form-group">
+            <label>化验时间：</label>
+        </div>
+        <div class="input-group">
+            <input type="text" class="form-control" uib-datepicker-popup ng-model="dt" is-open="popup.opened" datepicker-options="dateOptions" ng-required="true" close-text="关闭" current-text="今天" clear-text="清除" />
+            <span class="input-group-btn">
+		            <button type="button" class="btn btn-default" ng-click="open()"><i class="glyphicon glyphicon-calendar"></i></button>
+		          </span>
+        </div>
+        <div class="form-group">
+            <button class="btn btn-primary" type="button" ng-click="Add($index)">添加
+            </button>
+            <button class="btn btn-danger" type="button" ng-click="Remove($index)">移除
+            </button>
+        </div>
+    </form>
+    <!-- 		<div class="row" style="margin-top:50px;font-size:16px" ng-repeat="Lab in postBack track by $index">		
 			<div class="col-md-3">
 				化验类别: <select ng-model="Lab.LabType.selected" ng-options="o as o for o in Lab.LabType.options"></select>
 			</div>
@@ -79,136 +101,141 @@
 		            <button type="button" class="btn btn-default" ng-click="open($index)"><i class="glyphicon glyphicon-calendar"></i></button>
 		          </span>
 		        </p>
-  			</div>
-  			<!-- <div class="col-md-1">
+  			</div> -->
+    <!-- <div class="col-md-1">
   				<a ng-click="Add($index)"><ng-md-icon icon="add" style="fill:#4876FF;margin-right:10px" size="26"></ng-md-icon></a><a ng-click="Add($index)"><ng-md-icon icon="remove" style="fill:#4876FF;margin-right:10px" size="26"></ng-md-icon></a>
   			</div> -->
-  			<div>
+    <!--   			<div>
 				<button class="btn btn-primary" type="button" ng-click="Add($index)">添加
 				</button>
 				<button class="btn btn-danger" type="button" ng-click="Remove($index)">移除
 				</button>
 			</div>
-		</div>
-		<div class="row" style="margin-top:30px">
-			<div class="col-md-2 col-md-offset-5">
-				<button class="btn btn-primary" ng-click="checkphoto()" style="width:120px;height:40px;font-size:20px">保存
-				</button>
-			</div>
-			
-				<div class="modal fade" id="save" tabindex="-1" role="dialog" aria-labelledby="saveLabel" aria-hidden="true">
-					<div class="modal-dialog">
-						<div class="modal-content" style="text-align:center">
-							<div class="modal-header">
-								<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-									&times;
-								</button>
-								<h3 class="modal-title" id="saveLabel">
+		</div> -->
+    <div class="row" style="margin-top:30px">
+        <div class="col-md-2 col-md-offset-5">
+            <button class="btn btn-primary" ng-click="checkphoto()" style="width:120px;height:40px;font-size:20px">保存
+            </button>
+        </div>
+        <div class="modal fade" id="save" tabindex="-1" role="dialog" aria-labelledby="saveLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content" style="text-align:center">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                            &times;
+                        </button>
+                        <h3 class="modal-title" id="saveLabel">
 									提示
 								</h3>
-							</div>
-							<div class="modal-body" style="font-size:18px">
-								确认完成本条信息的录入?
-							</div>
-							<div class="modal-footer">
-								<button type="button" class="btn btn-primary col-xs-2 col-xs-offset-4" ng-click="save()">
-									确认
-								</button>
-								<button type="button" class="btn btn-default col-xs-2" data-dismiss="modal">取消
-								</button>
-							</div>
-						</div><!-- /.modal-content -->
-					</div><!-- /.modal -->
-				</div>
-				<div class="modal fade" id="selectphoto" tabindex="-1" role="dialog" aria-labelledby="selectphotoLabel" aria-hidden="true">
-					<div class="modal-dialog">
-						<div class="modal-content" style="text-align:center">
-							<div class="modal-header">
-								<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-									&times;
-								</button>
-								<h3 class="modal-title" id="selectphotoLabel">
+                    </div>
+                    <div class="modal-body" style="font-size:18px">
+                        确认完成本条信息的录入?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary col-xs-2 col-xs-offset-4" ng-click="save()">
+                            确认
+                        </button>
+                        <button type="button" class="btn btn-default col-xs-2" data-dismiss="modal">取消
+                        </button>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal -->
+        </div>
+        <div class="modal fade" id="selectphoto" tabindex="-1" role="dialog" aria-labelledby="selectphotoLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content" style="text-align:center">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                            &times;
+                        </button>
+                        <h3 class="modal-title" id="selectphotoLabel">
 									警告
 								</h3>
-							</div>
-							<div class="modal-body" style="font-size:18px">
-								请先选定当前图片
-							</div>
-							<div class="modal-footer">
-								
-								<button type="button" class="btn btn-primary col-xs-2 col-xs-offset-5" data-dismiss="modal">
-									确认
-								</button>
-							</div>
-						</div><!-- /.modal-content -->
-					</div><!-- /.modal -->
-				</div>
-				<div class="modal fade" id="inputtype" tabindex="-1" role="dialog" aria-labelledby="inputtypeLabel" aria-hidden="true">
-					<div class="modal-dialog">
-						<div class="modal-content" style="text-align:center">
-							<div class="modal-header">
-								<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-									&times;
-								</button>
-								<h3 class="modal-title" id="inputtypeLabel">
+                    </div>
+                    <div class="modal-body" style="font-size:18px">
+                        请先选定当前图片
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary col-xs-2 col-xs-offset-5" data-dismiss="modal">
+                            确认
+                        </button>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal -->
+        </div>
+        <div class="modal fade" id="inputtype" tabindex="-1" role="dialog" aria-labelledby="inputtypeLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content" style="text-align:center">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                            &times;
+                        </button>
+                        <h3 class="modal-title" id="inputtypeLabel">
 									警告
 								</h3>
-							</div>
-							<div class="modal-body" style="font-size:18px">
-								请选择图片类型
-							</div>
-							<div class="modal-footer">
-								
-								<button type="button" class="btn btn-primary col-xs-2 col-xs-offset-5" data-dismiss="modal">
-									确认
-								</button>
-							</div>
-						</div><!-- /.modal-content -->
-					</div><!-- /.modal -->
-				</div>
-				<div class="modal fade" id="saved">
-		            <div class="modal-dialog modal-sm" role="document">
-		              <div class="modal-content" style="text-align: center; font-size: 20px">
-		                已保存！
-		              </div>
-		            </div>
-		        </div>
-		        <div class="modal fade" id="skiped">
-		            <div class="modal-dialog modal-sm" role="document">
-		              <div class="modal-content" style="text-align: center; font-size: 20px">
-		                已跳过当前图片！
-		              </div>
-		            </div>
-		         </div>
-				<div class="modal fade" id="skip" tabindex="-1" role="dialog" aria-labelledby="skipLabel" aria-hidden="true">
-					<div class="modal-dialog">
-						<div class="modal-content" style="text-align:center">
-							<div class="modal-header">
-								<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-									&times;
-								</button>
-								<h3 class="modal-title" id="skipLabel">
+                    </div>
+                    <div class="modal-body" style="font-size:18px">
+                        请选择图片类型
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary col-xs-2 col-xs-offset-5" data-dismiss="modal">
+                            确认
+                        </button>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal -->
+        </div>
+        <div class="modal fade" id="saved">
+            <div class="modal-dialog modal-sm" role="document">
+                <div class="modal-content" style="text-align: center; font-size: 20px">
+                    已保存！
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="skiped">
+            <div class="modal-dialog modal-sm" role="document">
+                <div class="modal-content" style="text-align: center; font-size: 20px">
+                    已跳过当前图片！
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="skip" tabindex="-1" role="dialog" aria-labelledby="skipLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content" style="text-align:center">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                            &times;
+                        </button>
+                        <h3 class="modal-title" id="skipLabel">
 									提示
 								</h3>
-							</div>
-							<div class="modal-body" style="font-size:18px">
-								确认跳过本张图片?
-							</div>
-							<div class="modal-footer">
-								<button type="button" class="btn btn-primary col-xs-2 col-xs-offset-4" ng-click="skip()">
-									确认
-								</button>
-								<button type="button" class="btn btn-default col-xs-2" data-dismiss="modal">取消
-								</button>
-							</div>
-						</div><!-- /.modal-content -->
-					</div><!-- /.modal -->
-				</div>
-			</div>
-			<div>
-				<span style="margin-left:40px;margin-top:20px">历史化验</span>
-				<table ng-table="tableParams" class="table table-condensed table-bordered table-striped" style="font-size:15px;margin-top:20px;text-align:center">
-				    <!-- <tr ng-repeat="user in $data">
+                    </div>
+                    <div class="modal-body" style="font-size:18px">
+                        确认跳过本张图片?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary col-xs-2 col-xs-offset-4" ng-click="skip()">
+                            确认
+                        </button>
+                        <button type="button" class="btn btn-default col-xs-2" data-dismiss="modal">取消
+                        </button>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal -->
+        </div>
+    </div>
+    <div>
+        <span style="margin-left:40px;margin-top:20px;font-size: 20px">历史化验</span>
+        <table ng-table="tableParams" class="table table-condensed table-bordered table-striped" style="font-size:12px;margin-top:20px;text-align:center">
+            <!-- <tr ng-repeat="user in $data">
 				      <td title="'化验类别'" filter="{ ReagentId: 'text'}" sortable="'ReagentId'">
 				      </td>
 				      <td title="'化验值'" filter="{ ProductDay: 'text'}" sortable="'ProductDay'">
@@ -223,27 +250,26 @@
 				      	<a href="#">查看</a>
 				      </td>
 				    </tr> -->
-				    <tr ng-repeat="patientlabtest in $data">
-			      		<td title="'化验类别'" sortable="'type'">
-			      			{{patientlabtest.type}}
-				      	</td>
-				      	<td title="'化验值'" sortable="'value'">
-				      		{{patientlabtest.value}}
-				      	</td>
-					    <td title="'化验日期'"  sortable="'time'">
-					      	{{patientlabtest.time}}
-					    </td>
-					     <td title="'录入日期'"  sortable="'importTime'">
-					      	{{patientlabtest.importTime}}
-					    </td>
-					    <td title="'录入人'"  sortable="'importer.name'">
-					      	{{patientlabtest.importer.name}}
-					    </td>
-					    <td title="'操作'">
-					      	<a href="#/main/modifylabinfo" ng-click="getlabtestId($index)">查看</a>
-					    </td>
-				    </tr>
-				</table>
-			</div>
-		</div>
-	</div>
+            <tr ng-repeat="patientlabtest in $data">
+                <td title="'化验类别'" sortable="'type'">
+                    {{patientlabtest.type}}
+                </td>
+                <td title="'化验值'" sortable="'value'">
+                    {{patientlabtest.value}}
+                </td>
+                <td title="'化验日期'" sortable="'time'">
+                    {{patientlabtest.time}}
+                </td>
+                <td title="'录入日期'" sortable="'importTime'">
+                    {{patientlabtest.importTime}}
+                </td>
+                <td title="'录入人'" sortable="'importer.name'">
+                    {{patientlabtest.importer.name}}
+                </td>
+                <td title="'操作'">
+                    <a href="#/main/modifylabinfo" ng-click="getlabtestId($index)">查看</a>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>

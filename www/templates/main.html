@@ -1,51 +1,49 @@
 <div class="container-fluid" style="padding-right: 0px; padding-left: 0px">
-  <h1 style="margin-left: 20px; margin-top: 20px; position: absolute">肾事联盟</h1>
-  <div style="margin-top: 40px">
-    <ul id="mytabs" class="nav nav-tabs" style="font-size: 15px">
-      <li class="navbar-right" style="margin-right:25px">
-        <a id="drop_info" class="navbar-brand" style="height:43px" data-toggle="dropdown">
+    <h1 style="margin-left: 20px; margin-top: 20px; position: absolute">肾事联盟</h1>
+    <div style="margin-top: 40px">
+        <ul id="mytabs" class="nav nav-tabs" style="font-size: 15px">
+            <li class="navbar-right" style="margin-right:25px">
+                <a id="drop_info" class="navbar-brand" style="height:43px" data-toggle="dropdown">
           <span class="glyphicon glyphicon-user"></span>
         </a>
-        <ul class="dropdown-menu" role="menu" aria-labelledby="drop_info" style="min-width:220px">
-          <li role="presentation">
-              <h4 style="margin-left:10px"><strong>个人信息</strong></h4>
-          </li>
-          <li role="presentation" class="divider"></li>
-          <li role="presentation" style="line-height:30px">
-            <span style="margin-left:10px"><strong>姓名：</strong></span>{{UserName}}
-          </li>
-          <li role="presentation" style="line-height:30px">
-            <span style="margin-left:10px"><strong>角色：</strong></span>{{UserRole}}
-          </li>
-<!--           <li role="presentation" style="line-height:30px">
+                <ul class="dropdown-menu" role="menu" aria-labelledby="drop_info" style="min-width:220px">
+                    <li role="presentation">
+                        <h4 style="margin-left:10px"><strong>个人信息</strong></h4>
+                    </li>
+                    <li role="presentation" class="divider"></li>
+                    <li role="presentation" style="line-height:30px">
+                        <span style="margin-left:10px"><strong>姓名：</strong></span>{{UserName}}
+                    </li>
+                    <li role="presentation" style="line-height:30px">
+                        <span style="margin-left:10px"><strong>角色：</strong></span>{{UserRole}}
+                    </li>
+                    <!--           <li role="presentation" style="line-height:30px">
             <span style="margin-left:10px"><strong>上次登录时间：</strong></span>
           </li>
           <li role="presentation" style="line-height:30px">
             <span style="margin-left:10px">{{userInfo.LastLoginTime}}</span>
           </li> -->
-          <li role="presentation">
-            <button class="btn btn-primary pull-left" style="margin-left:20px" ng-click="toChangePW()">修改密码</button>
-            <button class="btn btn-danger pull-right" style="margin-right:20px" ng-click="ifOut()">注销</button>
-          </li>
-        </ul>
-      </li>
-     <!--  <li class="navbar-right"><a href="#/main/coach" >健康专员专区</a> </li>
+          <br>
+                    <li role="presentation">
+                        <button class="btn btn-primary pull-left" style="margin-left:20px" ng-click="toChangePW()">修改密码</button>
+                        <button class="btn btn-danger pull-right" style="margin-right:20px" ng-click="ifOut()">注销</button>
+                    </li>
+                </ul>
+            </li>
+            <!--  <li class="navbar-right"><a href="#/main/coach" >健康专员专区</a> </li>
       <li class="navbar-right"><a href="#/main/usermanage" >用户管理</a> </li>
       <li class="navbar-right"><a href="#/main/check" >医生注册审核</a> </li> -->
-      
-      
-      <uib-tabset class="navbar-right" active="active">
-        <uib-tab index="0" heading="医生注册审核" select="tounchecked()" ng-show="flagdoctor"></uib-tab>
-        <uib-tab index="1" heading="用户管理" select="touser()" ng-show="flaguser"></uib-tab>
-        <uib-tab index="2" heading="健康专员专区" select="tounentered()" ng-show="flaghealth"></uib-tab>
-      </uib-tabset>
-    </ul>
-  </div>
-  <div ui-view style="margin-top: 10px"></div>
+            <uib-tabset class="navbar-right" active="active">
+                <uib-tab index="0" heading="用户管理" select="touser()" ng-show="flaguser"></uib-tab>
+                <uib-tab index="1" heading="医生注册审核" select="tounchecked()" ng-show="flagdoctor"></uib-tab>
+                <uib-tab index="2" heading="健康专员专区" select="tounentered()" ng-show="flaghealth"></uib-tab>
+                <uib-tab index="3" heading="地区/科室管理" select="todistrdep()" ng-show="flagdistrep"></uib-tab>
+                <uib-tab index="4" heading="数据监控" select="todata()" ng-show="flagdata"></uib-tab>
+            </uib-tabset>
+        </ul>
+    </div>
+    <div ui-view style="margin-top: 10px"></div>
 </div>
-
-
-
 <div class="modal fade" id="myModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -67,6 +65,8 @@
                     是
                 </button>
             </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal -->
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal -->
 </div>
