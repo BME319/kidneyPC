@@ -1,76 +1,77 @@
 <h4 style="font-size: 15px;margin-top: -10px;font-weight: bold;">医生总数：{{totalNums}}位</h4>
 <!-- 搜索 -->
 <form class="form-inline">
-  <div class="form-group">
-    <label class="sr-only">用户ID</label>
-    <input type="text" class="form-control" ng-model="userlist.userId" placeholder="请输入用户ID">
-  </div>
-  <div class="form-group">
-    <label class="sr-only">用户姓名</label>
-    <input type="text" class="form-control" ng-model="userlist.name" placeholder="请输入用户姓名">
-  </div>
-  <div class="form-group">
-    <label class="sr-only">手机号码</label>
-    <input type="text" class="form-control" ng-model="userlist.phoneNo" placeholder="请输入用户手机号码">
-  </div>
-  <div class="form-group">
-    <label class="sr-only">性别</label>
-    <select class="form-control" ng-model="userlist.gender" ng-options="gender.id as gender.name for gender in search_genders">
-		<option value=''>请选择性别</option>
-	</select>
-  </div>
-  <div class="form-group">
-    <label class="sr-only">角色</label>
-	<select class="form-control" ng-model="userlist.role" ng-options="role.id as role.name for role in search_roles">
-		<option value=''>请选择角色</option>
-	</select>
-  </div>
-  <div class="form-group">
-    <label class="sr-only">省份</label>
-    <input type="text" class="form-control" ng-model="userlist.province" placeholder="请输入省份">
-  </div>
-  <div class="form-group">
-    <label class="sr-only">城市</label>
-    <input type="text" class="form-control" ng-model="userlist.city" placeholder="请输入城市">
-  </div>
-  <div class="form-group">
-    <label class="sr-only">医院</label>
-    <input type="text" class="form-control" ng-model="userlist.workUnit" placeholder="请输入医院">
-  </div>
-  <div class="form-group">
-    <label class="sr-only">职称</label>
-    <input type="text" class="form-control" ng-model="userlist.title" placeholder="请输入职称">
-  </div>
-  <button type="submit" class="btn btn-default" ng-click="searchList()">搜索</button>
-  <button type="button" class="btn btn-default" ng-click="searchClear()">清空搜索</button>
+    <div class="form-group">
+        <label class="sr-only">用户ID</label>
+        <input type="text" class="form-control" ng-model="userlist.userId" placeholder="请输入用户ID">
+    </div>
+    <div class="form-group">
+        <label class="sr-only">用户姓名</label>
+        <input type="text" class="form-control" ng-model="userlist.name" placeholder="请输入用户姓名">
+    </div>
+    <div class="form-group">
+        <label class="sr-only">手机号码</label>
+        <input type="text" class="form-control" ng-model="userlist.phoneNo" placeholder="请输入用户手机号码">
+    </div>
+    <div class="form-group">
+        <label class="sr-only">性别</label>
+        <select class="form-control" ng-model="userlist.gender" ng-options="gender.id as gender.name for gender in search_genders">
+            <option value=''>请选择性别</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label class="sr-only">角色</label>
+        <select class="form-control" ng-model="userlist.role" ng-options="role.id as role.name for role in search_roles">
+            <option value=''>请选择角色</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label class="sr-only">省份</label>
+        <input type="text" class="form-control" ng-model="userlist.province" placeholder="请输入省份">
+    </div>
+    <div class="form-group">
+        <label class="sr-only">城市</label>
+        <input type="text" class="form-control" ng-model="userlist.city" placeholder="请输入城市">
+    </div>
+    <div class="form-group">
+        <label class="sr-only">医院</label>
+        <input type="text" class="form-control" ng-model="userlist.workUnit" placeholder="请输入医院">
+    </div>
+    <div class="form-group">
+        <label class="sr-only">职称</label>
+        <input type="text" class="form-control" ng-model="userlist.title" placeholder="请输入职称">
+    </div>
+    <button type="submit" class="btn btn-default" ng-click="searchList()">搜索</button>
+    <button type="button" class="btn btn-default" ng-click="searchClear()">清空搜索</button>
 </form>
 <!-- 医生列表-张桠童 -->
 <table ng-table="tableParams" class="table table-condensed table-bordered table-striped" style="margin-top: 10px">
-	<tr ng-repeat="user in $data" style="text-align: center;">
-		<td title="'用户ID'" sortable="'userId'">{{user.userId}}
-		</td>
-		<td title="'姓名'" sortable="'name'">{{user.name}}
-		</td>
-		<td title="'性别'">{{user.gender|gender}}
-		</td>
-		<td title="'手机号码'" sortable="'phoneNo'">{{user.phoneNo}}
-		</td>
-		<td title="'医院'" sortable="'workUnit'">{{user.workUnit}}
-		</td>
-		<td title="'科室'" sortable="'department'">{{user.department}}
-		</td>
-		<td title="'职称'" sortable="'title'">{{user.title}}
-		</td>
-		<td title="'咨询量'" sortable="'count1'">{{user.count1}}
-		</td>
-		<td title="'问诊量'" sortable="'count2'">{{user.count2}}
-		</td>
-		<td title="'评分'" sortable="'score'">{{user.score}}
-		</td>
-		<td title="'操作'">
-		  <button class="btn btn-link" style="text-decoration:none; outline:none; padding:0px; border:0px; font-size:10px;" ng-click="openDetail(user)">查看</button>
-		</td>
-	</tr>
+    <tr ng-repeat="user in $data" style="text-align: center;">
+        <td title="'用户ID'" sortable="'userId'">{{user.userId}}
+        </td>
+        <td title="'姓名'" sortable="'name'">{{user.name}}
+        </td>
+        <td title="'性别'">{{user.gender|gender}}
+        </td>
+        <td title="'手机号码'" sortable="'phoneNo'">{{user.phoneNo}}
+        </td>
+        <td title="'医院'" sortable="'workUnit'">{{user.workUnit}}
+        </td>
+        <td title="'科室'" sortable="'department'">{{user.department}}
+        </td>
+        <td title="'职称'" sortable="'title'">{{user.title}}
+        </td>
+        <td title="'咨询量'" sortable="'count1'">{{user.count1}}
+        </td>
+        <td title="'问诊量'" sortable="'count2'">{{user.count2}}
+        </td>
+        <td title="'评分'" sortable="'score'">{{user.score}}
+        </td>
+        <td title="'操作'">
+            <button class="btn btn-link" style="text-decoration:none; outline:none; padding:0px; border:0px; font-size:10px;" ng-click="openQR(user)">查看二维码</button>
+            <button class="btn btn-link" style="text-decoration:none; outline:none; padding:0px; border:0px; font-size:10px;" ng-click="openDetail(user)">查看详细信息</button>
+        </td>
+    </tr>
 </table>
 <!-- 每页数量 -->
 <div class="btn-group  btn-group-sm pull-right" style="margin-top: 18px">
@@ -80,45 +81,47 @@
     <button type="button" class="btn btn-default" ng-click="changeLimit(100)">100</button>
 </div>
 <!-- 分页条 -->
-<ul uib-pagination  
-	max-size="10" 
-	class="pagination" 
-	boundary-links="true" 
-	boundary-link-numbers="true"
-	direction-links="true"
-	first-text="首页"
-	last-text="末页"
-	previous-text="上一页"
-	next-text="下一页"
-	force-ellipses="true"
-	rotate="true" 
-	total-items="totalItems"
-	items-per-page="itemsPerPage"
-	ng-change="pageChanged()"
-	ng-model="currentPage"
-	>
+<ul uib-pagination max-size="10" class="pagination" boundary-links="true" boundary-link-numbers="true" direction-links="true" first-text="首页" last-text="末页" previous-text="上一页" next-text="下一页" force-ellipses="true" rotate="true" total-items="totalItems" items-per-page="itemsPerPage" ng-change="pageChanged()" ng-model="currentPage">
 </ul>
+<!-- 完善保险人员信息modal -->
+<div class="modal fade" id="doctorQR" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" ng-click="modal_close('#doctorQR')">&times;</button>
+                <h3 class="modal-title" id="modal-title">医生二维码</h3>
+            </div>
+            <div class="modal-body" id="modal-body">
+         <img style="width:250px;height:250px;margin-left: 20%;margin-right: 20%;" ng-src="{{TDCticket}}">
+<div class="modal-footer">
+        <button class="btn btn-primary" type="button" ng-click="modal_close('#doctorQR')">关闭</button>
+        <!-- <button class="btn btn-primary" type="button" ng-click="removeUserRoles()">去除角色</button> -->
+    </div>
+            </div>
+        </div>
+    </div>
+</div>
 <!-- 查看医生详细信息modal（包括注销用户、去除角色功能） -->
 <script type="text/ng-template" id="detail_doctor.html">
-	<div class="modal-header">
-		<button type="button" class="close" ng-click="close()">&times;</button>
+    <div class="modal-header">
+        <button type="button" class="close" ng-click="close()">&times;</button>
         <h3 class="modal-title" id="modal-title">医生</h3>
     </div>
     <div class="modal-body" id="modal-body">
         <ul class="list-group">
-		  <li class="list-group-item">用户ID：{{doctorInfo.userId}}</li>
-		  <li class="list-group-item">姓名：{{doctorInfo.name}}</li>
-		  <li class="list-group-item">性别：{{doctorInfo.gender|gender}}</li>
-		  <li class="list-group-item">手机号码：{{doctorInfo.phoneNo}}</li>
-		  <li class="list-group-item">医院：{{doctorInfo.workUnit}}</li>
-		  <li class="list-group-item">科室：{{doctorInfo.department}}</li>
-		  <li class="list-group-item">职称：{{doctorInfo.title}}</li>
-		  <li class="list-group-item">咨询量：{{doctorInfo.count1}}</li>
-		  <li class="list-group-item">问诊量：{{doctorInfo.count2}}</li>
-		  <li class="list-group-item">评分：{{doctorInfo.score}}</li>
-		  <li class="list-group-item">个人简介：{{doctorInfo.description}}</li>
-		  <li class="list-group-item">擅长方向：{{doctorInfo.major}}</li>
-		</ul>
+            <li class="list-group-item">用户ID：{{doctorInfo.userId}}</li>
+            <li class="list-group-item">姓名：{{doctorInfo.name}}</li>
+            <li class="list-group-item">性别：{{doctorInfo.gender|gender}}</li>
+            <li class="list-group-item">手机号码：{{doctorInfo.phoneNo}}</li>
+            <li class="list-group-item">医院：{{doctorInfo.workUnit}}</li>
+            <li class="list-group-item">科室：{{doctorInfo.department}}</li>
+            <li class="list-group-item">职称：{{doctorInfo.title}}</li>
+            <li class="list-group-item">咨询量：{{doctorInfo.count1}}</li>
+            <li class="list-group-item">问诊量：{{doctorInfo.count2}}</li>
+            <li class="list-group-item">评分：{{doctorInfo.score}}</li>
+            <li class="list-group-item">个人简介：{{doctorInfo.description}}</li>
+            <li class="list-group-item">擅长方向：{{doctorInfo.major}}</li>
+        </ul>
     </div>
     <div class="modal-footer">
         <button class="btn btn-primary" type="button" ng-click="cancelUser()">注销用户</button>
@@ -129,51 +132,51 @@
 <div class="modal fade" id="cancelOrNot" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-sm">
         <div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" ng-click="modal_close('#cancelOrNot')">&times;</button>
-		        <h3 class="modal-title" id="modal-title">警告</h3>
-		    </div>
-		    <div class="modal-body" id="modal-body">
-		        <span>确定注销该用户？</span>
-		    </div>
-		    <div class="modal-footer">
-		        <button class="btn btn-primary" type="button" ng-click="cancel(userdetail)">确定</button>
-		        <button class="btn btn-warning" type="button" ng-click="modal_close('#cancelOrNot')">取消</button>
-		    </div>
-		</div>
-	</div>
+            <div class="modal-header">
+                <button type="button" class="close" ng-click="modal_close('#cancelOrNot')">&times;</button>
+                <h3 class="modal-title" id="modal-title">警告</h3>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <span>确定注销该用户？</span>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" type="button" ng-click="cancel(userdetail)">确定</button>
+                <button class="btn btn-warning" type="button" ng-click="modal_close('#cancelOrNot')">取消</button>
+            </div>
+        </div>
+    </div>
 </div>
 <!-- 提示注销成功modal -->
 <div class="modal fade" id="cancelSuccess">
-  <div class="modal-dialog modal-sm" role="document">
-    <div class="modal-content" style="text-align: center; font-size: 20px">
-      注销成功！
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content" style="text-align: center; font-size: 20px">
+            注销成功！
+        </div>
     </div>
-  </div>
 </div>
 <!-- 是否去除角色modal -->
 <div class="modal fade" id="removeOrNot" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-sm">
         <div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" ng-click="modal_close('#removeOrNot')">&times;</button>
-		        <h3 class="modal-title" id="modal-title">警告</h3>
-		    </div>
-		    <div class="modal-body" id="modal-body">
-		        <span>确定去除该角色？</span>
-		    </div>
-		    <div class="modal-footer">
-		        <button class="btn btn-primary" type="button" ng-click="remove(userdetail)">确定</button>
-		        <button class="btn btn-warning" type="button" ng-click="modal_close('#removeOrNot')">取消</button>
-		    </div>
-		</div>
-	</div>
+            <div class="modal-header">
+                <button type="button" class="close" ng-click="modal_close('#removeOrNot')">&times;</button>
+                <h3 class="modal-title" id="modal-title">警告</h3>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <span>确定去除该角色？</span>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" type="button" ng-click="remove(userdetail)">确定</button>
+                <button class="btn btn-warning" type="button" ng-click="modal_close('#removeOrNot')">取消</button>
+            </div>
+        </div>
+    </div>
 </div>
 <!-- 提示去除角色成功modal -->
 <div class="modal fade" id="removeSuccess">
-  <div class="modal-dialog modal-sm" role="document">
-    <div class="modal-content" style="text-align: center; font-size: 20px">
-      角色去除成功！
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content" style="text-align: center; font-size: 20px">
+            角色去除成功！
+        </div>
     </div>
-  </div>
 </div>

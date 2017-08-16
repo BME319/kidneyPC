@@ -1,6 +1,7 @@
 angular.module('controllers', ['ngResource', 'services'])
 
     .controller('LoginCtrl', ['$scope', '$timeout', '$state', 'Storage', '$sce', 'Data', 'User', function($scope, $timeout, $state, Storage, $sce, Data, User) {
+
         if (Storage.get('USERNAME') != null && Storage.get('USERNAME') != undefined) {
             $scope.logOn = { username: Storage.get('USERNAME'), password: '' }
         } else {
@@ -124,7 +125,6 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.flag = 0
         }
     }])
-
 
     // 未审核-LZN
     .controller('UncheckedCtrl', ['$scope', '$state', 'Review', 'Alluser', 'Storage', '$timeout', 'NgTableParams', '$uibModal', function($scope, $state, Review, Alluser, Storage, $timeout, NgTableParams, $uibModal) {
@@ -2089,10 +2089,10 @@ angular.module('controllers', ['ngResource', 'services'])
                 console.log(role_temp)
                 // 初始化
                 $scope.role_end = role_temp
-                // 是否无效 true为无效
+                // 是否无效，true为无效，默认设置地区负责人和科主任无效
                 $scope.ifDisabled = {
-                    Leader: false,
-                    master: false,
+                    Leader: true,
+                    master: true,
                     doctor: false,
                     patient: false,
                     nurse: false,
@@ -2231,8 +2231,8 @@ angular.module('controllers', ['ngResource', 'services'])
         }
     ])
     // 医生--张桠童
-    .controller('doctorsCtrl', ['$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', 'Roles',
-        function($scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, Roles) {
+    .controller('doctorsCtrl', ['$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', 'Roles', 'Doctor', 'Mywechat',
+        function($scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, Roles, Doctor, Mywechat) {
             var token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTEyZTllYmRjODNmNmE4YjdkY2JkZTgiLCJ1c2VySWQiOiJVMjAxNzAzMTQyMDE4Iiwicm9sZSI6InBhdGllbnQiLCJleHBpcmVBZnRlciI6MTQ5NzQwNzI2MzgzMywiaWF0IjoxNDk3NDA3MjYzfQ.5UITzg6NaHcIIEQESCLLB7mx_suISw9Bj6K1OBaiaDk'
 
             Storage.set('Tab', 1)
@@ -2340,9 +2340,40 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.modal_close = function(target) {
                 $(target).modal('hide')
             }
+
+            $scope.openQR = function(userdetail) {
+                $scope.TDCticket = undefined
+                var promise = Doctor.getDoctorInfo({ userId: userdetail.userId })
+                promise.then(function(data) {
+                    console.log(data)
+                    if (angular.isDefined($scope.TDCticket) != true) {
+                        var params = {
+                            'role': 'doctor',
+                            'userId': userdetail.userId,
+                            'postdata': {
+                                'action_name': 'QR_LIMIT_STR_SCENE',
+                                'action_info': {
+                                    'scene': {
+                                        'scene_str': userdetail.userId
+                                    }
+                                }
+                            }
+                        }
+                        Mywechat.createTDCticket(params).then(function(data) {
+                            $scope.TDCticket = 'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=' + data.results.TDCticket
+                        }, function(err) {
+                            console.log(err)
+                        })
+                    } else {
+                        $scope.TDCticket = 'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=' + $scope.TDCticket
+                    }
+                }, function(err) {})
+                $('#doctorQR').modal('show')
+
+            }
+
             // 详细信息modal
             $scope.openDetail = function(userdetail) {
-                // console.log(userdetail);
                 var modalInstance = $uibModal.open({
                     animation: true,
                     ariaLabelledBy: 'modal-title',
@@ -4344,12 +4375,15 @@ angular.module('controllers', ['ngResource', 'services'])
         // 监听事件(表单清空)
         $('#new_district').on('hidden.bs.modal', function() {
             // $('#registerForm').formValidation('resetForm', true)
-            $scope.registerInfo.newdistrict = undefined
-            $scope.userlist.name = undefined
             var mylabel = document.getElementById("newdistrict")
             mylabel.innerHTML = ""
             var mylabel = document.getElementById("newportleader")
             mylabel.innerHTML = ""
+            if (!($scope.registerInfo.newdistrict == undefined)) {
+                $scope.registerInfo.newdistrict = undefined
+            } else if (!($scope.userlist.name == undefined)) {
+                $scope.userlist.name = undefined
+            }
         })
         $('#changeInfo').on('hidden.bs.modal', function() {
             // $('#changeForm').formValidation('destroy')
@@ -4399,7 +4433,8 @@ angular.module('controllers', ['ngResource', 'services'])
                         for (i = 0; i < $scope.userlist.userlist_search.length; i++) {
                             if ($scope.userlist.userlist_search[i]._id == inputlabel) {
                                 $scope.addInfo.userId = $scope.userlist.userlist_search[i].userId
-                                thisname = $scope.userlist.userlist_search[i].name
+                                var thisname = $scope.userlist.userlist_search[i].name
+                                var thisID = $scope.userlist.userlist_search[i]._id
                                 break;
                             }
                         }
@@ -4410,9 +4445,8 @@ angular.module('controllers', ['ngResource', 'services'])
                             _changeInfo.new.newportleader.push($scope.changeInfo._id);
                         } else {
                             for (i = 0; i < _changeInfo.new.newportleader.length; i++) {
-                                if (_changeInfo.new.newportleader[i] == thisname) {
+                                if (_changeInfo.new.newportleader[i] == thisID) {
                                     ifnewportleaderexist = true;
-                                    break;
                                 }
                             }
                             if (ifnewportleaderexist == false) {
@@ -4560,7 +4594,7 @@ angular.module('controllers', ['ngResource', 'services'])
     .controller('departmentsCtrl', ['$scope', '$state', 'Review', '$uibModal', 'Storage', '$timeout', 'Alluser', 'NgTableParams', 'Department', 'Roles', function($scope, $state, Review, $uibModal, Storage, $timeout, Alluser, NgTableParams, Department, Roles) {
         var token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTY3Mjk2MTYxMWFlMGUyNmM2MWNjNzciLCJ1c2VySWQiOiJVMjAxNzA3MTMwMDAzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNTAwOTczMjA5MTcyLCJpYXQiOjE1MDA5Njk2MDl9.VU5zbpSp-qJroE_Fp4U6gianwY_-c6d8Ga0YkgG763M'
 
-        // 地区列表
+        // 科室列表
         var district = {}
         district.token = token;
         var promise = Department.GetDistrictInfo(district)
@@ -4638,74 +4672,73 @@ angular.module('controllers', ['ngResource', 'services'])
             }
         }
 
-        // 新建地区，增加确认标签
+        // 新建科室，增加确认标签
         $scope.addnewlabel = function(inputlabel) {
-            if (inputlabel == undefined) {
-                $('#districtUndefined').modal('show')
-                $timeout(function() {
-                    $('#districtUndefined').modal('hide')
-                }, 1000)
-            } else {
-                // if ($scope.registerInfo.newdistrict == inputlabel) {
-                //     var mylabel = document.getElementById("newdistrict")
-                //     mylabel.innerHTML = inputlabel
-                //     console.log($scope.registerInfo)
-                //     districtInfo.district = $scope.registerInfo.newdistrict
-                // } else {
-                if ($scope.newdepartleader._id == inputlabel) {
-                    var ifnewdepartleaderexist = false;
-                    for (i = 0; i < $scope.userlist.userlist_search.length; i++) {
-                        if ($scope.userlist.userlist_search[i]._id == inputlabel) {
-                            newuserID.newdepartleader = $scope.userlist.userlist_search[i].userId
-                            $scope.newdepartleader.name = $scope.userlist.userlist_search[i].name
-                            break;
-                        }
-                    }
-                    for (i = 0; i < departmentInfo.new.newdepartleader.length; i++) {
-                        if ($scope.registerInfo.newdepartleader[i] == $scope.newdepartleader._id) {
-                            ifnewdepartleaderexist = true;
-                        }
-                    }
-                    if (ifnewdepartleaderexist == false) {
-                        departmentInfo.new.newdepartleader.push($scope.newdepartleader._id)
-                        var mylabel = document.getElementById("newdepartleader");
-                        mylabel.innerHTML = mylabel.innerHTML + " " + $scope.newdepartleader.name;
-                    } else {
-                        $('#addFailed').modal('show')
-                        $timeout(function() {
-                            $('#addFailed').modal('hide')
-                        }, 1000)
-                    }
-                    $scope.newflagleader = false
 
-                } else if ($scope.newdoctor._id == inputlabel) {
-                    var ifnewdoctorexist = false;
-                    for (i = 0; i < $scope.userlist.userlist_search.length; i++) {
-                        if ($scope.userlist.userlist_search[i]._id == inputlabel) {
-                            newuserID.newdoctor = $scope.userlist.userlist_search[i].userId
-                            $scope.newdoctor.name = $scope.userlist.userlist_search[i].name
-                            break;
-                        }
+            // if ($scope.registerInfo.newdistrict == inputlabel) {
+            //     var mylabel = document.getElementById("newdistrict")
+            //     mylabel.innerHTML = inputlabel
+            //     console.log($scope.registerInfo)
+            //     districtInfo.district = $scope.registerInfo.newdistrict
+            // } else {
+            var newdepartleader_id = ""
+            if (!($scope.newdepartleader == undefined)) { newdepartleader_id = $scope.newdepartleader._id }
+            if (newdepartleader_id == inputlabel) {
+                var ifnewdepartleaderexist = false;
+                for (i = 0; i < $scope.userlist.userlist_search.length; i++) {
+                    if ($scope.userlist.userlist_search[i]._id == inputlabel) {
+                        newuserID.newdepartleader = $scope.userlist.userlist_search[i].userId
+                        $scope.newdepartleader.name = $scope.userlist.userlist_search[i].name
+                        break;
                     }
-                    for (i = 0; i < departmentInfo.new.newdoctor.length; i++) {
-                        if ($scope.registerInfo.newdoctor[i] == $scope.newdoctor._id) {
-                            ifnewdoctorexist = true;
-                        }
-                    }
-                    if (ifnewdoctorexist == false) {
-                        departmentInfo.new.newdoctor.push($scope.newdoctor._id)
-                        var mylabel = document.getElementById("newdoctor");
-                        mylabel.innerHTML = mylabel.innerHTML + " " + $scope.newdoctor.name;
-                    } else {
-                        $('#addFailed').modal('show')
-                        $timeout(function() {
-                            $('#addFailed').modal('hide')
-                        }, 1000)
-                    }
-                    $scope.newflagdoctor = false
                 }
-                // }
+                for (i = 0; i < departmentInfo.new.newdepartLeader.length; i++) {
+                    if (departmentInfo.new.newdepartLeader[i] == $scope.newdepartleader._id) {
+                        ifnewdepartleaderexist = true;
+                    }
+                }
+                if (ifnewdepartleaderexist == false) {
+                    departmentInfo.new.newdepartLeader.push($scope.newdepartleader._id)
+                    var mylabel = document.getElementById("newdepartleader");
+                    mylabel.innerHTML = mylabel.innerHTML + " " + $scope.newdepartleader.name;
+                } else {
+                    $('#addFailed').modal('show')
+                    $timeout(function() {
+                        $('#addFailed').modal('hide')
+                    }, 1000)
+                }
+                $scope.newflagleader = false
+                $scope.userlist.departleader = ""
+
+            } else if ($scope.newdoctor._id == inputlabel) {
+                var ifnewdoctorexist = false;
+                for (i = 0; i < $scope.userlist.userlist_search.length; i++) {
+                    if ($scope.userlist.userlist_search[i]._id == inputlabel) {
+                        newuserID.newdoctor = $scope.userlist.userlist_search[i].userId
+                        $scope.newdoctor.name = $scope.userlist.userlist_search[i].name
+                        break;
+                    }
+                }
+                for (i = 0; i < departmentInfo.new.newdoctors.length; i++) {
+                    if (departmentInfo.new.newdoctors[i] == $scope.newdoctor._id) {
+                        ifnewdoctorexist = true;
+                    }
+                }
+                if (ifnewdoctorexist == false) {
+                    departmentInfo.new.newdoctors.push($scope.newdoctor._id)
+                    var mylabel = document.getElementById("newdoctor");
+                    mylabel.innerHTML = mylabel.innerHTML + " " + $scope.newdoctor.name;
+                } else {
+                    $('#addFailed').modal('show')
+                    $timeout(function() {
+                        $('#addFailed').modal('hide')
+                    }, 1000)
+                }
+                $scope.newflagdoctor = false
+                $scope.userlist.doctor = ""
+
             }
+            // }
         }
 
         // 添加角色
@@ -4718,15 +4751,20 @@ angular.module('controllers', ['ngResource', 'services'])
                     $('#userIdUndefined').modal('hide')
                 }, 1000)
             } else {
-                if ($scope.newdepartleader._id == addRole) {
+                if ((!($scope.newdepartleader == undefined)) && ($scope.newdepartleader == addRole)) {
                     $scope.addInfo.userID = newuserID.newdepartleader
                     $scope.addInfo.roles = 'master'
-                } else if ($scope.newdoctor._id == addRole) {
+                } else if ((!($scope.newdoctor == undefined)) && ($scope.newdoctor._id == addRole)) {
                     $scope.addInfo.userID = newuserID.newdoctor
+                    $scope.addInfo.roles = 'doctor'
+                } else if ((!($scope.editdepartleader_id == undefined)) && (editdepartleader_id == addRole)) {
+                    $scope.addInfo.userID = newuserID.editdepartleader
+                    $scope.addInfo.roles = 'master'
+                } else if ((!($scope.editdoctor == undefined)) && ($scope.editdoctor._id == addRole)) {
+                    $scope.addInfo.userID = newuserID.editdoctor
                     $scope.addInfo.roles = 'doctor'
                 }
                 $scope.addInfo.token = token
-                console.log($scope.addInfo)
                 $scope.newflagdoctor = false
                 $scope.newflagleader = false
                 $scope.userlist.departleader = ""
@@ -4736,6 +4774,8 @@ angular.module('controllers', ['ngResource', 'services'])
                     // 提示完毕，刷新列表
                     $('#addSuccess').modal('hide')
                 }, 1000)
+                console.log($scope.addInfo)
+
                 var promise = Roles.addRoles($scope.addInfo)
                 promise.then(function(data) {
                     console.log(data)
@@ -4759,18 +4799,14 @@ angular.module('controllers', ['ngResource', 'services'])
         $scope.registerInfo.newdepartleader = []
         $scope.registerInfo.newdoctor = []
         departmentInfo.new = {}
-        departmentInfo.new.newdepartleader = []
-        departmentInfo.new.newdoctor = []
+        departmentInfo.new.newdepartLeader = []
+        departmentInfo.new.newdoctors = []
         // 新建科室
         $scope.register = function() {
             departmentInfo.district = $scope.registerInfo.district
             departmentInfo.hospital = $scope.registerInfo.department
             departmentInfo.department = $scope.registerInfo.department
             departmentInfo.new.newdepartment = $scope.registerInfo.department
-            departmentInfo.portleader = [];
-            departmentInfo.portleader[0] = '59008dea0ae89f31383e6643';
-            departmentInfo.portleader[1] = '59008dea0ae89f31383e6617';
-
             console.log(departmentInfo);
             // $scope.registerInfo.newdepartleader.push($scope.registerInfo._id)
             // $scope.registerInfo.newdoctor.push($scope.registerInfo._id)
@@ -4806,103 +4842,181 @@ angular.module('controllers', ['ngResource', 'services'])
         // 监听事件(表单清空)
         $('#new_department').on('hidden.bs.modal', function() {
             // $('#registerForm').formValidation('resetForm', true)
-            $scope.registerInfo.newdistrict = undefined
-            $scope.userlist.name = undefined
-            var mylabel = document.getElementById("newdistrict")
+            $scope.registerInfo.department = ""
+            $scope.userlist.name = ""
+            var mylabel = document.getElementById("newdepartleader")
             mylabel.innerHTML = ""
-            var mylabel = document.getElementById("newportleader")
+            var mylabel = document.getElementById("newdoctor")
             mylabel.innerHTML = ""
         })
         $('#changeInfo').on('hidden.bs.modal', function() {
-            // $('#changeForm').formValidation('destroy')
-            if (!($scope.changeInfo.newdistrict == undefined)) {
-                $scope.changeInfo.newdistrict = undefined
-            } else if (!($scope.userlist.name == undefined)) {
-                $scope.userlist.name = undefined
+            // $('#changeInfo').formValidation('destroy')
+            // $('#newdepartLeader').tagEditor('destroy');
+            if (!($scope.changeInfo.newdepartment == undefined)) {
+                $scope.changeInfo.newdepartment = undefined
+            } else if (!($scope.userlist.departleader == undefined)) {
+                $scope.userlist.departleader = undefined
+            } else if (!($scope.userlist.doctor == undefined)) {
+                $scope.userlist.doctor = undefined
             }
         })
 
-        var _changeInfo = {}
-        $scope.editdepartment = function(department) {
-            _changeInfo.new = {}
-            _changeInfo.new.newportleader = []
-            $scope.editflag = false;
-            console.log(district)
-            _changeInfo.district = district.district;
-            // 显示修改信息modal
-            $('#changeInfo').modal('show')
-            // 显示已有信息
-            var mylabel = document.getElementById("editportleader")
-            mylabel.innerHTML = ""
-            for (i = 0; i < district.portleader.length; i++) {
-                mylabel.innerHTML = mylabel.innerHTML + " " + district.portleader[i].name;
-            }
-            var mylabel = document.getElementById("editdistrict")
-            mylabel.innerHTML = district.district
-        }
 
-        // 修改地区，增加确认标签
-        $scope.addeditlabel = function(inputlabel) {
-            if (inputlabel == undefined) {
-                $('#districtUndefined').modal('show')
-                $timeout(function() {
-                    $('#districtUndefined').modal('hide')
-                }, 1000)
-            } else {
-                console.log(inputlabel)
-                console.log($scope.changeInfo)
-                if ($scope.changeInfo.newdistrict == inputlabel) {
-                    var mylabel = document.getElementById("editdistrict");
-                    mylabel.innerHTML = inputlabel;
-                    _changeInfo.new.newdistrict = inputlabel;
-                } else {
-                    if ($scope.changeInfo._id == inputlabel) {
-                        console.log(_changeInfo.new.newportleader.length)
-                        for (i = 0; i < $scope.userlist.userlist_search.length; i++) {
-                            if ($scope.userlist.userlist_search[i]._id == inputlabel) {
-                                $scope.addInfo.userId = $scope.userlist.userlist_search[i].userId
-                                thisname = $scope.userlist.userlist_search[i].name
-                                break;
-                            }
-                        }
-                        var ifnewportleaderexist = false;
-                        if (_changeInfo.new.newportleader.length == 0) {
-                            var mylabel = document.getElementById("editportleader");
-                            mylabel.innerHTML = thisname;
-                            _changeInfo.new.newportleader.push($scope.changeInfo._id);
-                        } else {
-                            for (i = 0; i < _changeInfo.new.newportleader.length; i++) {
-                                if (_changeInfo.new.newportleader[i] == thisname) {
-                                    ifnewportleaderexist = true;
-                                    break;
-                                }
-                            }
-                            if (ifnewportleaderexist == false) {
-                                var mylabel = document.getElementById("editportleader");
-                                mylabel.innerHTML = mylabel.innerHTML + " " + thisname;
-                                _changeInfo.new.newportleader.push($scope.changeInfo._id);
-                            } else {
-                                $('#addFailed').modal('show')
-                                $timeout(function() {
-                                    $('#addFailed').modal('hide')
-                                }, 1000)
-                            }
-                        }
+        $scope.openDetail = function(userdetail) {
+            var modalInstance = $uibModal.open({
+                animation: true,
+                ariaLabelledBy: 'modal-title',
+                ariaDescribedBy: 'modal-body',
+                templateUrl: 'detail_department.html',
+                controller: 'detail_departmentCtrl',
+                resolve: {
+                    userdetail: function() {
+                        return userdetail
                     }
                 }
-            }
+            })
+            modalInstance.result.then(function(con) {
+                if (con == '修改信息') {
+                    console.log(userdetail);
+                    // 修改用户信息方法的输入
+                    // $('#changeInfo').formValidation({
+                    //         framework: 'bootstrap',
+                    //         excluded: ':disabled',
+                    //         icon: {
+                    //             valid: 'glyphicon glyphicon-ok',
+                    //             invalid: 'glyphicon glyphicon-remove',
+                    //             validating: 'glyphicon glyphicon-refresh'
+                    //         }
+                    //     })
+                    //     .on('success.form.fv', function(e) {
+                    //         // Prevent form submission
+                    //         e.preventDefault();
+                    //     });
+                    //     $scope.changeInfo={}
+                    // $scope.changeInfo.newdepartment=userdetail.department
+
+                    // $('#newdepartLeader').tagEditor({
+                    //     autocomplete: { delay: 0, position: { collision: 'flip' }, source: ['ActionScript', 'AppleScript', 'Asp', 'BASIC', 'C', 'C++', 'CSS', 'Clojure', 'COBOL', 'ColdFusion', 'Erlang', 'Fortran', 'Groovy', 'Haskell', 'HTML', 'Java', 'JavaScript', 'Lisp', 'Perl', 'PHP', 'Python', 'Ruby', 'Scala', 'Scheme', "我是书", ] },
+                    //     forceLowercase: false,
+                    //     placeholder: '请输入新的科室负责人'
+                    // });
+
+                    // $scope.changeInfo.token = token
+                    // console.log($scope.changeInfo)
+                    var mylabel = document.getElementById("editdepartment")
+                    mylabel.innerHTML = userdetail.department
+                    var mylabel = document.getElementById("editdepartleader")
+                    mylabel.innerHTML = ""
+                    for (i = 0; i < userdetail.departLeader.length; i++) {
+                        mylabel.innerHTML = mylabel.innerHTML + userdetail.departLeader[i].name + ' ';
+                    }
+                    var mylabel = document.getElementById("editdoctor")
+                    mylabel.innerHTML = ""
+                    for (i = 0; i < userdetail.doctor.length; i++) {
+                        mylabel.innerHTML = mylabel.innerHTML + userdetail.doctor[i].name + ' ';
+                    }
+
+                    _changeInfo.new = {}
+                    _changeInfo.new.newdepartLeader = []
+                    _changeInfo.new.newdoctors = []
+                    // 打开修改科室信息modal
+                    $scope.changeInfo = {}
+                    angular.copy(userdetail, $scope.changeInfo);
+                    $('#changeInfo').modal('show')
+                }
+            }, function() {})
         }
 
-        $scope.change = function() {
-            console.log(_changeInfo);
-            console.log(_changeInfo.new.newportleader);
-            _changeInfo.token = token;
-            if (_changeInfo.new.newportleader == []) {
-                for (i = 0; i < district.portleader.length; i++) {
-                    _changeInfo.new.newportleader[i] = district.portleader[i]._id
+        // 修改科室，增加确认标签
+        $scope.addeditlabel = function(inputlabel) {
+            console.log(inputlabel)
+            console.log($scope.changeInfo)
+            // console.log($scope.editdepartleader._id)
+            // console.log($scope.editdoctor._id)
+
+            var editdepartleader_id = ""
+            if (!($scope.editdepartleader == undefined)) { editdepartleader_id = $scope.editdepartleader._id }
+            if (editdepartleader_id == inputlabel) {
+                for (i = 0; i < $scope.userlist.userlist_search.length; i++) {
+                    if ($scope.userlist.userlist_search[i]._id == inputlabel) {
+                        newuserID.newdepartleader = $scope.userlist.userlist_search[i].userId
+                        var thisname = $scope.userlist.userlist_search[i].name
+                        var thisID = $scope.userlist.userlist_search[i]._id
+                        break;
+                    }
+                }
+                var ifnewdepartleaderexist = false;
+                if (_changeInfo.new.newdepartLeader.length == 0) {
+                    var mylabel = document.getElementById("editdepartleader");
+                    mylabel.innerHTML = thisname;
+                    _changeInfo.new.newdepartLeader.push(thisID);
+                } else {
+                    console.log(_changeInfo.new.newdepartLeader)
+                    console.log(thisID)
+                    for (i = 0; i < _changeInfo.new.newdepartLeader.length; i++) {
+                        if (_changeInfo.new.newdepartLeader[i] == thisID) {
+                            ifnewdepartleaderexist = true;
+                        }
+                    }
+                    console.log(ifnewdepartleaderexist)
+                    if (ifnewdepartleaderexist == false) {
+                        _changeInfo.new.newdepartLeader.push(thisID)
+                        var mylabel = document.getElementById("editdepartleader");
+                        mylabel.innerHTML = mylabel.innerHTML + " " + thisname;
+                    } else {
+                        $('#addFailed').modal('show')
+                        $timeout(function() {
+                            $('#addFailed').modal('hide')
+                        }, 1000)
+                    }
+                    $scope.newflagleader = false
+                    $scope.userlist.departleader = ""
+                }
+            } else if ($scope.editdoctor._id == inputlabel) {
+                for (i = 0; i < $scope.userlist.userlist_search.length; i++) {
+                    if ($scope.userlist.userlist_search[i]._id == inputlabel) {
+                        newuserID.newdoctor = $scope.userlist.userlist_search[i].userId
+                        var thisname = $scope.userlist.userlist_search[i].name
+                        var thisID = $scope.userlist.userlist_search[i]._id
+                        break;
+                    }
+                }
+                var ifnewdoctorexist = false;
+                if (_changeInfo.new.newdoctors.length == 0) {
+                    var mylabel = document.getElementById("editdoctor");
+                    mylabel.innerHTML = thisname;
+                    _changeInfo.new.newdoctors.push(thisID);
+                } else {
+                    for (i = 0; i < _changeInfo.new.newdoctors.length; i++) {
+                        if (_changeInfo.new.newdoctors[i] == thisID) {
+                            ifnewdoctorexist = true;
+                        }
+                    }
+                    if (ifnewdoctorexist == false) {
+                        _changeInfo.new.newdoctors.push($scope.thisID)
+                        var mylabel = document.getElementById("editdoctor");
+                        mylabel.innerHTML = mylabel.innerHTML + " " + thisname;
+                    } else {
+                        $('#addFailed').modal('show')
+                        $timeout(function() {
+                            $('#addFailed').modal('hide')
+                        }, 1000)
+                    }
+                    $scope.newflagdoctor = false
+                    $scope.userlist.doctor = ""
                 }
             }
-            var promise = Department.UpdateDistrict(_changeInfo)
+            // }
+        }
+
+        var _changeInfo = {}
+        $scope.change = function() {
+            _changeInfo.new.newdepartment = $scope.changeInfo.newdepartment
+            _changeInfo.district = $scope.changeInfo.district
+            _changeInfo.department = $scope.changeInfo.department
+            _changeInfo.hospital = $scope.changeInfo.hospital
+            _changeInfo.token = token;
+            var promise = Department.UpdateDepartment(_changeInfo)
             promise.then(function(data) {
                 // console.log(data.msg);
                 if (data[0] == "更") {
@@ -5004,17 +5118,33 @@ angular.module('controllers', ['ngResource', 'services'])
         }
     }])
 
-    // 科室--修改信息modal
-    .controller('edit_departmentCtrl', ['$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', '$uibModalInstance', 'userdetail',
-        function($scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, $uibModalInstance, userdetail) {
-            // console.log(userdetail);
-            $scope.insuranceInfo = userdetail
+    // 科室--详细信息modal
+    .controller('detail_departmentCtrl', ['$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', '$uibModalInstance', 'userdetail', 'Department',
+        function($scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, $uibModalInstance, userdetail, Department) {
+            var token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTY3Mjk2MTYxMWFlMGUyNmM2MWNjNzciLCJ1c2VySWQiOiJVMjAxNzA3MTMwMDAzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNTAwOTczMjA5MTcyLCJpYXQiOjE1MDA5Njk2MDl9.VU5zbpSp-qJroE_Fp4U6gianwY_-c6d8Ga0YkgG763M'
+
+            $scope.departmentInfo = userdetail
+            Department.GetDoctorList({
+                district: userdetail.district,
+                hospital: userdetail.hospital,
+                department: userdetail.department,
+                token: token
+            }).then(
+                function(data) {
+                    console.log(data);
+                    $scope.departmentInfo.doctor = data.results
+                },
+                function(err) {
+                    console.log(err)
+                }
+            )
+
             // 关闭modal
             $scope.close = function() {
                 $uibModalInstance.dismiss()
             }
             // 修改信息
-            $scope.change = function() {
+            $scope.changeInfo = function() {
                 $uibModalInstance.close('修改信息')
             }
         }
@@ -5032,7 +5162,7 @@ angular.module('controllers', ['ngResource', 'services'])
         }
     ])
 
-    // 数据监控管理
+    // 数据监控
     .controller('datamanageCtrl', ['$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function($scope, $state, Review, Storage, $timeout, NgTableParams) {
         $scope.tocharge = function() {
             $state.go('main.datamanage.charge')
@@ -5066,11 +5196,8 @@ angular.module('controllers', ['ngResource', 'services'])
         }
     }])
 
-    // 数据监控——医生地区
+    // 数据监控——医生地区分布
     .controller('regionCtrl', ['Dict', 'Monitor1', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Dict, Monitor1, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
-
-        //医生地区分布--饼图
-
         // datetimepicker插件属性设置
         $('.datetimepicker').datetimepicker({
             language: 'zh-CN',
@@ -5420,7 +5547,7 @@ angular.module('controllers', ['ngResource', 'services'])
         }
     }])
 
-    // 数据监控——医生超时咨询
+    // 数据监控——医生超时咨询统计
     .controller('overtimeCtrl', ['Dict', 'Monitor1', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Dict, Monitor1, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
         $('.datetimepicker').datetimepicker({
             language: 'zh-CN',
@@ -5470,68 +5597,41 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.City = ''
         }
 
-        $scope.$on('$viewContentLoaded', function() {
-            showOvertime()
-        });
-
         // 获取当前日期
         var myDate = new Date();
         var now = myDate.toLocaleDateString();
-        $scope.Province = {}
         var isClick = false
-        $scope.viewOvertime = function() {
-            if (($scope.Province.province == undefined) || ($scope.starttime == undefined) || ($scope.endtime == undefined) || ($scope.starttime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null) || ($scope.endtime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null)) {
-                $('#inputerror').modal('show')
-                $timeout(function() {
-                    $('#inputerror').modal('hide')
-                }, 1000)
-            } else {
-                var selectprovince = $scope.Province.province.name
-                var selectcity = $scope.City.city
-                var starttime = $scope.starttime + ' 00:00:00'
-                var endtime = $scope.endtime + ' 00:00:00'
-                isClick = true
-            }
-            if (selectcity == undefined) {
-                OvertimeInfo = {
-                    province: selectprovince,
-                    startTime: starttime,
-                    endTime: endtime,
-                    limit: '3000',
-                    skip: '0',
-                    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTY3Mjk2MTYxMWFlMGUyNmM2MWNjNzciLCJ1c2VySWQiOiJVMjAxNzA3MTMwMDAzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNTAwOTczMjA5MTcyLCJpYXQiOjE1MDA5Njk2MDl9.VU5zbpSp-qJroE_Fp4U6gianwY_-c6d8Ga0YkgG763M'
-                }
-            } else {
-                OvertimeInfo = {
-                    province: selectprovince,
-                    city: selectcity.name,
-                    startTime: starttime,
-                    endTime: endtime,
-                    limit: '3000',
-                    skip: '0',
-                    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTY3Mjk2MTYxMWFlMGUyNmM2MWNjNzciLCJ1c2VySWQiOiJVMjAxNzA3MTMwMDAzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNTAwOTczMjA5MTcyLCJpYXQiOjE1MDA5Njk2MDl9.VU5zbpSp-qJroE_Fp4U6gianwY_-c6d8Ga0YkgG763M'
-                }
-            }
-            showOvertime()
-        }
+        var token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTY3Mjk2MTYxMWFlMGUyNmM2MWNjNzciLCJ1c2VySWQiOiJVMjAxNzA3MTMwMDAzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNTAwOTczMjA5MTcyLCJpYXQiOjE1MDA5Njk2MDl9.VU5zbpSp-qJroE_Fp4U6gianwY_-c6d8Ga0YkgG763M'
+        var countInfo = {}
+        var Info = {}
+        Storage.set('Tab', 1)
 
-        var showOvertime = function() {
+        // ---------------获取搜索(或未搜索)列表及列表数------------------------
+        var getLists = function(currentPage, itemsPerPage, countInfo) {
+            countInfo.token = token,
+                Info = Object.assign({}, countInfo)
+            Info.limit = itemsPerPage,
+                Info.skip = (currentPage - 1) * itemsPerPage
             if (isClick == false) {
-                OvertimeInfo = {
+                countInfo = {
                     province: '浙江省',
                     city: '',
                     startTime: '2017-01-01',
                     endTime: now,
-                    limit: '3000',
-                    skip: '0',
-                    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTY3Mjk2MTYxMWFlMGUyNmM2MWNjNzciLCJ1c2VySWQiOiJVMjAxNzA3MTMwMDAzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNTAwOTczMjA5MTcyLCJpYXQiOjE1MDA5Njk2MDl9.VU5zbpSp-qJroE_Fp4U6gianwY_-c6d8Ga0YkgG763M'
+                    token: token
                 }
+                Info = Object.assign({}, countInfo),
+                    Info.limit = itemsPerPage,
+                    Info.skip = (currentPage - 1) * itemsPerPage
             }
-            var promise = Monitor1.GetOvertime(OvertimeInfo)
+            console.log(Info);
+            //获取搜索列表
+            var promise = Monitor1.GetOvertime(Info)
             promise.then(function(data) {
                 $scope.overtimetableParams = new NgTableParams({
-                    count: 10
+                    count: 10000
                 }, {
+                    counts: [],
                     dataset: data.results
                 })
                 if (data.results.length == 0) {
@@ -5541,12 +5641,54 @@ angular.module('controllers', ['ngResource', 'services'])
                     }, 1000)
                 }
             }, function(err) {})
+            // 获取总条目数
+            var promise = Monitor1.GetOvertime(countInfo)
+            promise.then(function(data) {
+                $scope.totalItems = data.results.length
+                console.log($scope.totalItems)
+            }, function() {})
+        }
+        // ---------------------------------------------------------------------
+        //初始化列表
+        $scope.currentPage = 1
+        $scope.itemsPerPage = 50
+        getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
+        // 页面改变
+        $scope.pageChanged = function() {
+            console.log($scope.currentPage)
+            getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
+        }
+        // 当前页面的总条目数改变
+        $scope.changeLimit = function(num) {
+            $scope.itemsPerPage = num
+            $scope.currentPage = 1
+            getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
+        }
+
+        $scope.searchList = function() {
+            if (($scope.Province.province == undefined) || ($scope.starttime == undefined) || ($scope.endtime == undefined) || ($scope.starttime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null) || ($scope.endtime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null)) {
+                $('#inputerror').modal('show')
+                $timeout(function() {
+                    $('#inputerror').modal('hide')
+                }, 1000)
+            } else {
+                isClick = true
+                countInfo.province = $scope.Province.province.name
+                countInfo.startTime = $scope.starttime
+                countInfo.endTime = $scope.endtime
+                if ($scope.City.city == undefined) {
+                    countInfo.city = ''
+                } else {
+                    countInfo.city = $scope.City.city.name
+                }
+            }
+            $scope.currentPage = 1
+            getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         }
     }])
 
-    // 数据监控——医生评价
+    // 数据监控——医生评分统计
     .controller('evaluationCtrl', ['Dict', 'Monitor1', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Dict, Monitor1, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
-        // 医生评分统计--图表
         // 关闭modal控制
         $scope.modal_close = function(target) {
             $(target).modal('hide')
@@ -5600,62 +5742,41 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.City = ''
         }
 
-        $scope.$on('$viewContentLoaded', function() {
-            showScore()
-        });
-
         // 获取当前日期
         var myDate = new Date();
         var now = myDate.toLocaleDateString();
-        $scope.Province = {}
         var isClick = false
-        $scope.viewScore = function() {
-            if (($scope.Province.province == undefined) || ($scope.starttime == undefined) || ($scope.endtime == undefined) || ($scope.starttime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null) || ($scope.endtime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null)) {
-                $('#inputerror').modal('show')
-                $timeout(function() {
-                    $('#inputerror').modal('hide')
-                }, 1000)
-            } else {
-                var selectprovince = $scope.Province.province.name
-                var selectcity = $scope.City.city
-                var starttime = $scope.starttime + ' 00:00:00'
-                var endtime = $scope.endtime + ' 00:00:00'
-                isClick = true
-            }
-            if (selectcity == undefined) {
-                ScoreInfo = {
-                    province: selectprovince,
-                    startTime: starttime,
-                    endTime: endtime,
-                    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTY3Mjk2MTYxMWFlMGUyNmM2MWNjNzciLCJ1c2VySWQiOiJVMjAxNzA3MTMwMDAzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNTAwOTczMjA5MTcyLCJpYXQiOjE1MDA5Njk2MDl9.VU5zbpSp-qJroE_Fp4U6gianwY_-c6d8Ga0YkgG763M'
-                }
-            } else {
-                ScoreInfo = {
-                    province: selectprovince,
-                    city: selectcity.name,
-                    startTime: starttime,
-                    endTime: endtime,
-                    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTY3Mjk2MTYxMWFlMGUyNmM2MWNjNzciLCJ1c2VySWQiOiJVMjAxNzA3MTMwMDAzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNTAwOTczMjA5MTcyLCJpYXQiOjE1MDA5Njk2MDl9.VU5zbpSp-qJroE_Fp4U6gianwY_-c6d8Ga0YkgG763M'
-                }
-            }
-            showScore()
-        }
+        var token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTY3Mjk2MTYxMWFlMGUyNmM2MWNjNzciLCJ1c2VySWQiOiJVMjAxNzA3MTMwMDAzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNTAwOTczMjA5MTcyLCJpYXQiOjE1MDA5Njk2MDl9.VU5zbpSp-qJroE_Fp4U6gianwY_-c6d8Ga0YkgG763M'
+        var countInfo = {}
+        var Info = {}
+        Storage.set('Tab', 1)
 
-        var showScore = function() {
+        // ---------------获取搜索(或未搜索)列表及列表数------------------------
+        var getLists = function(currentPage, itemsPerPage, countInfo) {
+            countInfo.token = token,
+                Info = Object.assign({}, countInfo)
+            Info.limit = itemsPerPage,
+                Info.skip = (currentPage - 1) * itemsPerPage
             if (isClick == false) {
-                ScoreInfo = {
+                countInfo = {
                     province: '浙江省',
                     city: '',
                     startTime: '2017-01-01',
                     endTime: now,
-                    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTY3Mjk2MTYxMWFlMGUyNmM2MWNjNzciLCJ1c2VySWQiOiJVMjAxNzA3MTMwMDAzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNTAwOTczMjA5MTcyLCJpYXQiOjE1MDA5Njk2MDl9.VU5zbpSp-qJroE_Fp4U6gianwY_-c6d8Ga0YkgG763M'
+                    token: token
                 }
+                Info = Object.assign({}, countInfo),
+                    Info.limit = itemsPerPage,
+                    Info.skip = (currentPage - 1) * itemsPerPage
             }
-            var promise = Monitor1.GetEvaluation(ScoreInfo)
+            console.log(Info);
+            //获取搜索列表
+            var promise = Monitor1.GetEvaluation(Info)
             promise.then(function(data) {
                 $scope.scoretableParams = new NgTableParams({
-                    count: 10
+                    count: 10000
                 }, {
+                    counts: [],
                     dataset: data.results
                 })
                 if (data.results.length == 0) {
@@ -5665,25 +5786,67 @@ angular.module('controllers', ['ngResource', 'services'])
                     }, 1000)
                 }
             }, function(err) {})
+            // 获取总条目数
+            var promise = Monitor1.GetEvaluation(countInfo)
+            promise.then(function(data) {
+                $scope.totalItems = data.results.length
+                console.log($scope.totalItems)
+            }, function() {})
+        }
+        // ---------------------------------------------------------------------
+        //初始化列表
+        $scope.currentPage = 1
+        $scope.itemsPerPage = 50
+        getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
+        // 页面改变
+        $scope.pageChanged = function() {
+            console.log($scope.currentPage)
+            getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
+        }
+        // 当前页面的总条目数改变
+        $scope.changeLimit = function(num) {
+            $scope.itemsPerPage = num
+            $scope.currentPage = 1
+            getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         }
 
+        $scope.searchList = function() {
+            if (($scope.Province.province == undefined) || ($scope.starttime == undefined) || ($scope.endtime == undefined) || ($scope.starttime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null) || ($scope.endtime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null)) {
+                $('#inputerror').modal('show')
+                $timeout(function() {
+                    $('#inputerror').modal('hide')
+                }, 1000)
+            } else {
+                isClick = true
+                countInfo.province = $scope.Province.province.name
+                countInfo.startTime = $scope.starttime
+                countInfo.endTime = $scope.endtime
+                if ($scope.City.city == undefined) {
+                    countInfo.city = ''
+                } else {
+                    countInfo.city = $scope.City.city.name
+                }
+            }
+            $scope.currentPage = 1
+            getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
+        }
         $scope.toscoredetail = function(Id, starttime, endtime) {
             if (isClick == false) {
-                Info = {
+                DetailInfo = {
                     doctoruserId: Id,
                     startTime: '2017-01-01',
                     endTime: now,
                     token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTY3Mjk2MTYxMWFlMGUyNmM2MWNjNzciLCJ1c2VySWQiOiJVMjAxNzA3MTMwMDAzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNTAwOTczMjA5MTcyLCJpYXQiOjE1MDA5Njk2MDl9.VU5zbpSp-qJroE_Fp4U6gianwY_-c6d8Ga0YkgG763M'
                 }
             } else {
-                Info = {
+                DetailInfo = {
                     doctoruserId: Id,
                     startTime: starttime,
                     endTime: endtime,
                     token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTY3Mjk2MTYxMWFlMGUyNmM2MWNjNzciLCJ1c2VySWQiOiJVMjAxNzA3MTMwMDAzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNTAwOTczMjA5MTcyLCJpYXQiOjE1MDA5Njk2MDl9.VU5zbpSp-qJroE_Fp4U6gianwY_-c6d8Ga0YkgG763M'
                 }
             }
-            Monitor1.GetEvaDetail(Info).then(function(data) {
+            Monitor1.GetEvaDetail(DetailInfo).then(function(data) {
                 $scope.comments = data.results
                 if (data.results.length == 0) {
                     $('#nodata').modal('show')
@@ -5698,10 +5861,8 @@ angular.module('controllers', ['ngResource', 'services'])
         }
     }])
 
-    // 数据监控——医生收费
+    // 数据监控——医生收费统计
     .controller('chargeCtrl', ['Dict', 'Monitor1', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Dict, Monitor1, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
-        // 医生收费统计
-
         // 关闭modal控制
         $scope.modal_close = function(target) {
             $(target).modal('hide')
@@ -5754,63 +5915,41 @@ angular.module('controllers', ['ngResource', 'services'])
             }
             $scope.City = ''
         }
-
-        $scope.$on('$viewContentLoaded', function() {
-            showCharge()
-        });
-
         // 获取当前日期
         var myDate = new Date();
         var now = myDate.toLocaleDateString();
-        $scope.Province = {}
         var isClick = false
-        $scope.viewCharge = function() {
-            if (($scope.Province.province == undefined) || ($scope.starttime == undefined) || ($scope.endtime == undefined) || ($scope.starttime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null) || ($scope.endtime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null)) {
-                $('#inputerror').modal('show')
-                $timeout(function() {
-                    $('#inputerror').modal('hide')
-                }, 1000)
-            } else {
-                var selectprovince = $scope.Province.province.name
-                var selectcity = $scope.City.city
-                var starttime = $scope.starttime + ' 00:00:00'
-                var endtime = $scope.endtime + ' 00:00:00'
-                isClick = true
-            }
-            if (selectcity == undefined) {
-                ChargeInfo = {
-                    province: selectprovince,
-                    startTime: starttime,
-                    endTime: endtime,
-                    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTY3Mjk2MTYxMWFlMGUyNmM2MWNjNzciLCJ1c2VySWQiOiJVMjAxNzA3MTMwMDAzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNTAwOTczMjA5MTcyLCJpYXQiOjE1MDA5Njk2MDl9.VU5zbpSp-qJroE_Fp4U6gianwY_-c6d8Ga0YkgG763M'
-                }
-            } else {
-                ChargeInfo = {
-                    province: selectprovince,
-                    city: selectcity.name,
-                    startTime: starttime,
-                    endTime: endtime,
-                    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTY3Mjk2MTYxMWFlMGUyNmM2MWNjNzciLCJ1c2VySWQiOiJVMjAxNzA3MTMwMDAzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNTAwOTczMjA5MTcyLCJpYXQiOjE1MDA5Njk2MDl9.VU5zbpSp-qJroE_Fp4U6gianwY_-c6d8Ga0YkgG763M'
-                }
-            }
-            showCharge()
-        }
+        var token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTY3Mjk2MTYxMWFlMGUyNmM2MWNjNzciLCJ1c2VySWQiOiJVMjAxNzA3MTMwMDAzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNTAwOTczMjA5MTcyLCJpYXQiOjE1MDA5Njk2MDl9.VU5zbpSp-qJroE_Fp4U6gianwY_-c6d8Ga0YkgG763M'
+        var countInfo = {}
+        var Info = {}
+        Storage.set('Tab', 1)
 
-        var showCharge = function() {
+        // ---------------获取搜索(或未搜索)列表及列表数------------------------
+        var getLists = function(currentPage, itemsPerPage, countInfo) {
+            countInfo.token = token,
+                Info = Object.assign({}, countInfo)
+            Info.limit = itemsPerPage,
+                Info.skip = (currentPage - 1) * itemsPerPage
             if (isClick == false) {
-                ChargeInfo = {
+                countInfo = {
                     province: '浙江省',
                     city: '',
                     startTime: '2017-01-01',
                     endTime: now,
-                    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTY3Mjk2MTYxMWFlMGUyNmM2MWNjNzciLCJ1c2VySWQiOiJVMjAxNzA3MTMwMDAzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNTAwOTczMjA5MTcyLCJpYXQiOjE1MDA5Njk2MDl9.VU5zbpSp-qJroE_Fp4U6gianwY_-c6d8Ga0YkgG763M'
+                    token: token
                 }
+                Info = Object.assign({}, countInfo),
+                    Info.limit = itemsPerPage,
+                    Info.skip = (currentPage - 1) * itemsPerPage
             }
-            var promise = Monitor1.GetCharge(ChargeInfo)
+            console.log(Info);
+            //获取搜索列表
+            var promise = Monitor1.GetCharge(Info)
             promise.then(function(data) {
                 $scope.chargetableParams = new NgTableParams({
-                    count: 10
+                    count: 10000
                 }, {
+                    counts: [],
                     dataset: data.results
                 })
                 if (data.results.length == 0) {
@@ -5820,6 +5959,49 @@ angular.module('controllers', ['ngResource', 'services'])
                     }, 1000)
                 }
             }, function(err) {})
+            // 获取总条目数
+            var promise = Monitor1.GetCharge(countInfo)
+            promise.then(function(data) {
+                $scope.totalItems = data.results.length
+                console.log($scope.totalItems)
+            }, function() {})
+        }
+        // ---------------------------------------------------------------------
+        //初始化列表
+        $scope.currentPage = 1
+        $scope.itemsPerPage = 50
+        getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
+        // 页面改变
+        $scope.pageChanged = function() {
+            console.log($scope.currentPage)
+            getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
+        }
+        // 当前页面的总条目数改变
+        $scope.changeLimit = function(num) {
+            $scope.itemsPerPage = num
+            $scope.currentPage = 1
+            getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
+        }
+
+        $scope.searchList = function() {
+            if (($scope.Province.province == undefined) || ($scope.starttime == undefined) || ($scope.endtime == undefined) || ($scope.starttime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null) || ($scope.endtime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null)) {
+                $('#inputerror').modal('show')
+                $timeout(function() {
+                    $('#inputerror').modal('hide')
+                }, 1000)
+            } else {
+                isClick = true
+                countInfo.province = $scope.Province.province.name
+                countInfo.startTime = $scope.starttime
+                countInfo.endTime = $scope.endtime
+                if ($scope.City.city == undefined) {
+                    countInfo.city = ''
+                } else {
+                    countInfo.city = $scope.City.city.name
+                }
+            }
+            $scope.currentPage = 1
+            getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         }
 
         $scope.tochargedetail = function(detail) {
@@ -5828,9 +6010,8 @@ angular.module('controllers', ['ngResource', 'services'])
         }
     }])
 
-    // 数据监控——医生工作量
+    // 数据监控——医生工作量统计
     .controller('workloadCtrl', ['Dict', 'Monitor1', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Dict, Monitor1, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
-        // 医生工作量统计--图表
         $('.datetimepicker').datetimepicker({
             language: 'zh-CN',
             format: 'yyyy-mm-dd',
@@ -5879,70 +6060,41 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.City = ''
         }
 
-        $scope.$on('$viewContentLoaded', function() {
-            showworkload()
-        });
-
         // 获取当前日期
         var myDate = new Date();
         var now = myDate.toLocaleDateString();
-        $scope.Province = {}
         var isClick = false
-        $scope.viewWorkload = function() {
-            // if (($scope.Province.province == undefined) || ($scope.starttime == undefined) || ($scope.endtime == undefined)) {
-            if (($scope.Province.province == undefined) || ($scope.starttime == undefined) || ($scope.starttime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null)) {
-                $('#inputerror').modal('show')
-                $timeout(function() {
-                    $('#inputerror').modal('hide')
-                }, 1000)
-            } else {
-                var selectprovince = $scope.Province.province.name
-                var selectcity = $scope.City.city
-                var starttime = $scope.starttime + ' 00:00:00'
-                isClick = true
-                var endtime = $scope.endtime + ' 00:00:00'
-            }
-            if (selectcity == undefined) {
-                Info = {
-                    province: selectprovince,
-                    startTime: starttime,
-                    endTime: endtime,
-                    limit: '3000',
-                    skip: '0',
-                    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTY3Mjk2MTYxMWFlMGUyNmM2MWNjNzciLCJ1c2VySWQiOiJVMjAxNzA3MTMwMDAzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNTAwOTczMjA5MTcyLCJpYXQiOjE1MDA5Njk2MDl9.VU5zbpSp-qJroE_Fp4U6gianwY_-c6d8Ga0YkgG763M'
-                }
-            } else {
-                Info = {
-                    province: selectprovince,
-                    city: selectcity.name,
-                    startTime: starttime,
-                    endTime: endtime,
-                    limit: '3000',
-                    skip: '0',
-                    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTY3Mjk2MTYxMWFlMGUyNmM2MWNjNzciLCJ1c2VySWQiOiJVMjAxNzA3MTMwMDAzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNTAwOTczMjA5MTcyLCJpYXQiOjE1MDA5Njk2MDl9.VU5zbpSp-qJroE_Fp4U6gianwY_-c6d8Ga0YkgG763M'
-                }
-            }
-            showworkload()
-        }
+        var token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTY3Mjk2MTYxMWFlMGUyNmM2MWNjNzciLCJ1c2VySWQiOiJVMjAxNzA3MTMwMDAzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNTAwOTczMjA5MTcyLCJpYXQiOjE1MDA5Njk2MDl9.VU5zbpSp-qJroE_Fp4U6gianwY_-c6d8Ga0YkgG763M'
+        var countInfo = {}
+        var Info = {}
+        Storage.set('Tab', 1)
 
-        var showworkload = function() {
+        // ---------------获取搜索(或未搜索)列表及列表数------------------------
+        var getLists = function(currentPage, itemsPerPage, countInfo) {
+            countInfo.token = token,
+                Info = Object.assign({}, countInfo)
+            Info.limit = itemsPerPage,
+                Info.skip = (currentPage - 1) * itemsPerPage
             if (isClick == false) {
-                Info = {
+                countInfo = {
                     province: '浙江省',
                     city: '',
                     startTime: now,
                     endTime: now,
-                    limit: '3000',
-                    skip: '0',
-                    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTY3Mjk2MTYxMWFlMGUyNmM2MWNjNzciLCJ1c2VySWQiOiJVMjAxNzA3MTMwMDAzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNTAwOTczMjA5MTcyLCJpYXQiOjE1MDA5Njk2MDl9.VU5zbpSp-qJroE_Fp4U6gianwY_-c6d8Ga0YkgG763M'
-
+                    token: token
                 }
+                Info = Object.assign({}, countInfo),
+                    Info.limit = itemsPerPage,
+                    Info.skip = (currentPage - 1) * itemsPerPage
             }
+            console.log(Info);
+            //获取搜索列表
             var promise = Monitor1.GetWorkload(Info)
             promise.then(function(data) {
                 $scope.workloadtableParams = new NgTableParams({
-                    count: 10
+                    count: 10000
                 }, {
+                    counts: [],
                     dataset: data.results
                 })
                 if (data.results.length == 0) {
@@ -5952,12 +6104,54 @@ angular.module('controllers', ['ngResource', 'services'])
                     }, 1000)
                 }
             }, function(err) {})
+            // 获取总条目数
+            var promise = Monitor1.GetWorkload(countInfo)
+            promise.then(function(data) {
+                $scope.totalItems = data.results.length
+                console.log($scope.totalItems)
+            }, function() {})
+        }
+        // ---------------------------------------------------------------------
+        //初始化列表
+        $scope.currentPage = 1
+        $scope.itemsPerPage = 50
+        getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
+        // 页面改变
+        $scope.pageChanged = function() {
+            console.log($scope.currentPage)
+            getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
+        }
+        // 当前页面的总条目数改变
+        $scope.changeLimit = function(num) {
+            $scope.itemsPerPage = num
+            $scope.currentPage = 1
+            getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
+        }
+
+        $scope.searchList = function() {
+            if (($scope.Province.province == undefined) || ($scope.starttime == undefined) || ($scope.endtime == undefined) || ($scope.starttime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null) || ($scope.endtime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null)) {
+                $('#inputerror').modal('show')
+                $timeout(function() {
+                    $('#inputerror').modal('hide')
+                }, 1000)
+            } else {
+                isClick = true
+                countInfo.province = $scope.Province.province.name
+                countInfo.startTime = $scope.starttime
+                countInfo.endTime = $scope.endtime
+                if ($scope.City.city == undefined) {
+                    countInfo.city = ''
+                } else {
+                    countInfo.city = $scope.City.city.name
+                }
+            }
+            $scope.currentPage = 1
+            getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         }
     }])
 
-    // 数据监控——患者地区
+    // 数据监控——患者地区分布
     .controller('PatregionCtrl', ['Dict', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Dict, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
-        // 患者地区分布--饼图
         $('.datetimepicker').datetimepicker({
             language: 'zh-CN',
             format: 'yyyy-mm-dd',
@@ -6114,7 +6308,6 @@ angular.module('controllers', ['ngResource', 'services'])
 
     // 数据监控——患者变化趋势
     .controller('PattrendCtrl', ['Dict', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Dict, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
-        // 患者变化趋势--折线图
         $('.datetimepicker').datetimepicker({
             language: 'zh-CN',
             format: 'yyyy-mm-dd',
@@ -6291,9 +6484,8 @@ angular.module('controllers', ['ngResource', 'services'])
         }
     }])
 
-    // 数据监控——患者保险
+    // 数据监控——患者保险统计
     .controller('PatinsuranceCtrl', ['Dict', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Dict, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
-        // 患者保险统计--图表
         $('.datetimepicker').datetimepicker({
             language: 'zh-CN',
             format: 'yyyy-mm-dd',
@@ -6341,70 +6533,96 @@ angular.module('controllers', ['ngResource', 'services'])
             }
             $scope.City = ''
         }
-
-        $scope.$on('$viewContentLoaded', function() {
-            showinsurance()
-        });
-
         // 获取当前日期
         var myDate = new Date();
         var now = myDate.toLocaleDateString();
-        $scope.Province = {}
         var isClick = false
-        $scope.viewinsurance = function() {
+
+        var token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTY3Mjk2MTYxMWFlMGUyNmM2MWNjNzciLCJ1c2VySWQiOiJVMjAxNzA3MTMwMDAzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNTAwOTczMjA5MTcyLCJpYXQiOjE1MDA5Njk2MDl9.VU5zbpSp-qJroE_Fp4U6gianwY_-c6d8Ga0YkgG763M'
+        var countInfo = {}
+        var Info = {}
+        Storage.set('Tab', 1)
+
+        // ---------------获取搜索(或未搜索)列表及列表数------------------------
+        var getLists = function(currentPage, itemsPerPage, countInfo) {
+            countInfo.token = token,
+                Info = Object.assign({}, countInfo)
+            Info.limit = itemsPerPage,
+                Info.skip = (currentPage - 1) * itemsPerPage
+            if (isClick == false) {
+                countInfo = {
+                    province: '浙江省',
+                    city: '',
+                    startTime: '2017-01-01',
+                    endTime: now,
+                    token: token
+                }
+                Info = Object.assign({}, countInfo),
+                    Info.limit = itemsPerPage,
+                    Info.skip = (currentPage - 1) * itemsPerPage
+            }
+            console.log(Info);
+            //获取搜索列表
+            var promise = Monitor2.GetPatInsurance(Info)
+            promise.then(function(data) {
+                $scope.insurancetableParams = new NgTableParams({
+                    count: 10000
+                }, {
+                    counts: [],
+                    dataset: data.results
+                })
+                if (data.results.length == 0) {
+                    $('#nodata').modal('show')
+                    $timeout(function() {
+                        $('#nodata').modal('hide')
+                    }, 1000)
+                }
+            }, function(err) {})
+            // 获取总条目数
+            var promise = Monitor2.GetPatInsurance(countInfo)
+            promise.then(function(data) {
+                $scope.totalItems = data.results.length
+                console.log($scope.totalItems)
+            }, function() {})
+        }
+        // ---------------------------------------------------------------------
+        //初始化列表
+        $scope.currentPage = 1
+        $scope.itemsPerPage = 50
+        getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
+        // 页面改变
+        $scope.pageChanged = function() {
+            console.log($scope.currentPage)
+            getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
+        }
+        // 当前页面的总条目数改变
+        $scope.changeLimit = function(num) {
+            $scope.itemsPerPage = num
+            $scope.currentPage = 1
+            getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
+        }
+
+        $scope.searchList = function() {
             if (($scope.Province.province == undefined) || ($scope.starttime == undefined) || ($scope.endtime == undefined) || ($scope.starttime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null) || ($scope.endtime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null)) {
                 $('#inputerror').modal('show')
                 $timeout(function() {
                     $('#inputerror').modal('hide')
                 }, 1000)
             } else {
-                var selectprovince = $scope.Province.province.name
-                var selectcity = $scope.City.city
-                var starttime = $scope.starttime + ' 00:00:00'
-                var endtime = $scope.endtime + ' 00:00:00'
                 isClick = true
-            }
-            if (selectcity == undefined) {
-                Info = {
-                    province: selectprovince,
-                    startTime: starttime,
-                    endTime: endtime,
-                    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTY3Mjk2MTYxMWFlMGUyNmM2MWNjNzciLCJ1c2VySWQiOiJVMjAxNzA3MTMwMDAzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNTAwOTczMjA5MTcyLCJpYXQiOjE1MDA5Njk2MDl9.VU5zbpSp-qJroE_Fp4U6gianwY_-c6d8Ga0YkgG763M'
-                }
-            } else {
-                Info = {
-                    province: selectprovince,
-                    city: selectcity.name,
-                    startTime: starttime,
-                    endTime: endtime,
-                    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTY3Mjk2MTYxMWFlMGUyNmM2MWNjNzciLCJ1c2VySWQiOiJVMjAxNzA3MTMwMDAzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNTAwOTczMjA5MTcyLCJpYXQiOjE1MDA5Njk2MDl9.VU5zbpSp-qJroE_Fp4U6gianwY_-c6d8Ga0YkgG763M'
+                countInfo.province = $scope.Province.province.name
+                countInfo.startTime = $scope.starttime
+                countInfo.endTime = $scope.endtime
+                if ($scope.City.city == undefined) {
+                    countInfo.city = ''
+                } else {
+                    countInfo.city = $scope.City.city.name
                 }
             }
-            showinsurance()
-        }
-
-        var showinsurance = function() {
-            if (isClick == false) {
-                Info = {
-                    province: '浙江省',
-                    city: '',
-                    startTime: '2017-01-01',
-                    endTime: now,
-                    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTY3Mjk2MTYxMWFlMGUyNmM2MWNjNzciLCJ1c2VySWQiOiJVMjAxNzA3MTMwMDAzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNTAwOTczMjA5MTcyLCJpYXQiOjE1MDA5Njk2MDl9.VU5zbpSp-qJroE_Fp4U6gianwY_-c6d8Ga0YkgG763M'
-                }
-            }
-            var promise = Monitor2.GetPatInsurance(Info)
-            promise.then(function(data) {
-                $scope.insurancetableParams = new NgTableParams({
-                    count: 10
-                }, {
-                    dataset: data.results
-                })
-            }, function(err) {})
         }
     }])
 
-    // 数据监控——患者分组
+    // 数据监控——患者分组统计
     .controller('PatgroupCtrl', ['Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
         // 患者分组显示--图表
         var isClick = false
@@ -6442,4 +6660,5 @@ angular.module('controllers', ['ngResource', 'services'])
             type = 'class_' + value
             showlist()
         }
+
     }])

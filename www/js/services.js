@@ -36,6 +36,18 @@ angular.module('services', ['ngResource'])
                 }
             })
         }
+        var Mywechat = function() {
+            return $resource(CONFIG.dictbaseUrl + ':path/:route', { path: 'wechat' }, {
+                createTDCticket: { method: 'POST', params: { route: 'createTDCticket' }, timeout: 100000 }
+            })
+        }
+
+        var Doctor = function() {
+            return $resource(CONFIG.dictbaseUrl + ':path/:route', { path: 'doctor' }, {
+                getDoctorInfo: { method: 'GET', params: { route: 'detail' }, timeout: 100000 },
+            })
+        }
+
         var User = function() {
             return $resource(CONFIG.baseUrl + ':path/:route', {
                 path: 'alluser'
@@ -479,6 +491,7 @@ angular.module('services', ['ngResource'])
             $interval(function() {
                 abort = $q.defer()
                 serve.Dict = Dict()
+                serve.Doctor = Doctor()
                 serve.User = User()
                 serve.Review = Review()
                 serve.LabtestImport = LabtestImport()
@@ -487,9 +500,11 @@ angular.module('services', ['ngResource'])
                 serve.Monitor1 = Monitor1()
                 serve.Monitor2 = Monitor2()
                 serve.Department = Department()
+                serve.Mywechat = Mywechat()
             }, 0, 1)
         }
         serve.Dict = Dict()
+        serve.Doctor = Doctor()
         serve.User = User()
         serve.Review = Review()
         serve.LabtestImport = LabtestImport()
@@ -498,467 +513,503 @@ angular.module('services', ['ngResource'])
         serve.Monitor1 = Monitor1()
         serve.Monitor2 = Monitor2()
         serve.Department = Department()
+        serve.Mywechat = Mywechat()
+
         return serve
     }])
 
-.factory('Dict', ['$q', 'Data', function($q, Data) {
-    var self = this
+    .factory('Dict', ['$q', 'Data', function($q, Data) {
+        var self = this
         // params->{
         //  level:'3',//1获取省份，2获取城市，3获取区县
         //  province:"33", //定位到某个具体省份时需要输入
         //  city:'01',  //定位到某个具体城市时需要输入
         //  district:'02' //定位到某个具体区县时需要输入
         // }
-    self.getDistrict = function(params) {
-        var deferred = $q.defer()
-        Data.Dict.getDistrict(
+        self.getDistrict = function(params) {
+            var deferred = $q.defer()
+            Data.Dict.getDistrict(
+                params,
+                function(data, headers) {
+                    deferred.resolve(data)
+                },
+                function(err) {
+                    deferred.reject(err)
+                })
+            return deferred.promise
+        }
+        return self
+    }])
+
+    .factory('Mywechat', ['$q', 'Data', function ($q, Data) {
+  var self = this
+
+  self.createTDCticket = function (params) {
+    var deferred = $q.defer()
+    Data.Mywechat.createTDCticket(
             params,
-            function(data, headers) {
-                deferred.resolve(data)
+            function (data, headers) {
+              deferred.resolve(data)
             },
-            function(err) {
+            function (err) {
+              deferred.reject(err)
+            })
+    return deferred.promise
+  }
+
+  return self
+}])
+
+    .factory('Doctor', ['$q', 'Data', function($q, Data) {
+        var self = this
+        self.getDoctorInfo = function(params) {
+            var deferred = $q.defer()
+            Data.Doctor.getDoctorInfo(
+                params,
+                function(data, headers) {
+                    deferred.resolve(data)
+                },
+                function(err) {
+                    deferred.reject(err)
+                })
+            return deferred.promise
+        }
+        return self
+    }])
+
+    .factory('User', ['$q', '$http', 'Data', function($q, $http, Data) {
+        var self = this
+        self.logIn = function(params) {
+            var deferred = $q.defer()
+            Data.User.logIn(params, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
                 deferred.reject(err)
             })
-        return deferred.promise
-    }
-    return self
-}])
+            return deferred.promise
+        }
+        return self
+    }])
 
+    .factory('Review', ['$q', '$http', 'Data', function($q, $http, Data) {
+        var self = this
+        self.GetReviewInfo = function(params) {
+            var deferred = $q.defer()
+            Data.Review.GetReviewInfo(params, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
+                deferred.reject(err)
+            })
+            return deferred.promise
+        }
+        self.GetCertificate = function(params) {
+            var deferred = $q.defer()
+            Data.Review.GetCertificate(params, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
+                deferred.reject(err)
+            })
+            return deferred.promise
+        }
+        self.PostReviewInfo = function(params) {
+            var deferred = $q.defer()
+            Data.Review.PostReviewInfo(params, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
+                deferred.reject(err)
+            })
+            return deferred.promise
+        }
+        self.GetCount = function(params) {
+            var deferred = $q.defer()
+            Data.Review.GetCount(params, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
+                deferred.reject(err)
+            })
+            return deferred.promise
+        }
+        return self
+    }])
 
+    .factory('LabtestImport', ['$q', '$http', 'Data', function($q, $http, Data) {
+        var self = this
+        self.GetLabtestInfo = function(params) {
+            var deferred = $q.defer()
+            Data.LabtestImport.GetLabtestInfo(params, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
+                deferred.reject(err)
+            })
+            return deferred.promise
+        }
+        self.GetPhotoList = function(params) {
+            var deferred = $q.defer()
+            Data.LabtestImport.GetPhotoList(params, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
+                deferred.reject(err)
+            })
+            return deferred.promise
+        }
+        self.GetPatientLabTest = function(params) {
+            var deferred = $q.defer()
+            Data.LabtestImport.GetPatientLabTest(params, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
+                deferred.reject(err)
+            })
+            return deferred.promise
+        }
+        self.GetPhotobyLabtest = function(params) {
+            var deferred = $q.defer()
+            Data.LabtestImport.GetPhotobyLabtest(params, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
+                deferred.reject(err)
+            })
+            return deferred.promise
+        }
+        self.PostLabTestInfo = function(params) {
+            var deferred = $q.defer()
+            Data.LabtestImport.PostLabTestInfo(params, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
+                deferred.reject(err)
+            })
+            return deferred.promise
+        }
+        self.LabelPhoto = function(params) {
+            var deferred = $q.defer()
+            Data.LabtestImport.LabelPhoto(params, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
+                deferred.reject(err)
+            })
+            return deferred.promise
+        }
+        self.EditResult = function(params) {
+            var deferred = $q.defer()
+            Data.LabtestImport.EditResult(params, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
+                deferred.reject(err)
+            })
+            return deferred.promise
+        }
+        self.GetCount = function(params) {
+            var deferred = $q.defer()
+            Data.LabtestImport.GetCount(params, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
+                deferred.reject(err)
+            })
+            return deferred.promise
+        }
+        return self
+    }])
 
-.factory('User', ['$q', '$http', 'Data', function($q, $http, Data) {
-    var self = this
-    self.logIn = function(params) {
-        var deferred = $q.defer()
-        Data.User.logIn(params, function(data, headers) {
-            deferred.resolve(data)
-        }, function(err) {
-            deferred.reject(err)
-        })
-        return deferred.promise
-    }
-    return self
-}])
+    .factory('Alluser', ['$q', '$http', 'Data', function($q, $http, Data) {
+        var self = this
+        self.getUserList = function(obj) {
+            var deferred = $q.defer()
+            Data.Alluser.getUserList(obj, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
+                deferred.reject(err)
+            })
+            return deferred.promise
+        }
+        self.getDoctorList = function(obj) {
+            var deferred = $q.defer()
+            Data.Alluser.getDoctorList(obj, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
+                deferred.reject(err)
+            })
+            return deferred.promise
+        }
+        self.getPatientList = function(obj) {
+            var deferred = $q.defer()
+            Data.Alluser.getPatientList(obj, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
+                deferred.reject(err)
+            })
+            return deferred.promise
+        }
+        self.getNurseList = function(obj) {
+            var deferred = $q.defer()
+            Data.Alluser.getNurseList(obj, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
+                deferred.reject(err)
+            })
+            return deferred.promise
+        }
+        self.getInsuranceList = function(obj) {
+            var deferred = $q.defer()
+            Data.Alluser.getInsuranceList(obj, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
+                deferred.reject(err)
+            })
+            return deferred.promise
+        }
+        self.getHealthList = function(obj) {
+            var deferred = $q.defer()
+            Data.Alluser.getHealthList(obj, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
+                deferred.reject(err)
+            })
+            return deferred.promise
+        }
+        self.getAdminList = function(obj) {
+            var deferred = $q.defer()
+            Data.Alluser.getAdminList(obj, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
+                deferred.reject(err)
+            })
+            return deferred.promise
+        }
+        self.cancelUser = function(obj) {
+            var deferred = $q.defer()
+            Data.Alluser.cancelUser(obj, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
+                deferred.reject(err)
+            })
+            return deferred.promise
+        }
+        self.register = function(obj) {
+            var deferred = $q.defer()
+            Data.Alluser.register(obj, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
+                deferred.reject(err)
+            })
+            return deferred.promise
+        }
+        self.modify = function(obj) {
+            var deferred = $q.defer()
+            Data.Alluser.modify(obj, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
+                deferred.reject(err)
+            })
+            return deferred.promise
+        }
+        self.getCount = function(obj) {
+            var deferred = $q.defer()
+            Data.Alluser.getCount(obj, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
+                deferred.reject(err)
+            })
+            return deferred.promise
+        }
+        self.sms = function(obj) {
+            var deferred = $q.defer()
+            Data.Alluser.sms(obj, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
+                deferred.reject(err)
+            })
+            return deferred.promise
+        }
+        return self
+    }])
 
-.factory('Review', ['$q', '$http', 'Data', function($q, $http, Data) {
-    var self = this
-    self.GetReviewInfo = function(params) {
-        var deferred = $q.defer()
-        Data.Review.GetReviewInfo(params, function(data, headers) {
-            deferred.resolve(data)
-        }, function(err) {
-            deferred.reject(err)
-        })
-        return deferred.promise
-    }
-    self.GetCertificate = function(params) {
-        var deferred = $q.defer()
-        Data.Review.GetCertificate(params, function(data, headers) {
-            deferred.resolve(data)
-        }, function(err) {
-            deferred.reject(err)
-        })
-        return deferred.promise
-    }
-    self.PostReviewInfo = function(params) {
-        var deferred = $q.defer()
-        Data.Review.PostReviewInfo(params, function(data, headers) {
-            deferred.resolve(data)
-        }, function(err) {
-            deferred.reject(err)
-        })
-        return deferred.promise
-    }
-    self.GetCount = function(params) {
-        var deferred = $q.defer()
-        Data.Review.GetCount(params, function(data, headers) {
-            deferred.resolve(data)
-        }, function(err) {
-            deferred.reject(err)
-        })
-        return deferred.promise
-    }
-    return self
-}])
+    .factory('Roles', ['$q', '$http', 'Data', function($q, $http, Data) {
+        var self = this
+        self.addRoles = function(obj) {
+            var deferred = $q.defer()
+            Data.Roles.addRoles(obj, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
+                deferred.reject(err)
+            })
+            return deferred.promise
+        }
+        self.removeRoles = function(obj) {
+            var deferred = $q.defer()
+            Data.Roles.removeRoles(obj, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
+                deferred.reject(err)
+            })
+            return deferred.promise
+        }
+        return self
+    }])
 
-.factory('LabtestImport', ['$q', '$http', 'Data', function($q, $http, Data) {
-    var self = this
-    self.GetLabtestInfo = function(params) {
-        var deferred = $q.defer()
-        Data.LabtestImport.GetLabtestInfo(params, function(data, headers) {
-            deferred.resolve(data)
-        }, function(err) {
-            deferred.reject(err)
-        })
-        return deferred.promise
-    }
-    self.GetPhotoList = function(params) {
-        var deferred = $q.defer()
-        Data.LabtestImport.GetPhotoList(params, function(data, headers) {
-            deferred.resolve(data)
-        }, function(err) {
-            deferred.reject(err)
-        })
-        return deferred.promise
-    }
-    self.GetPatientLabTest = function(params) {
-        var deferred = $q.defer()
-        Data.LabtestImport.GetPatientLabTest(params, function(data, headers) {
-            deferred.resolve(data)
-        }, function(err) {
-            deferred.reject(err)
-        })
-        return deferred.promise
-    }
-    self.GetPhotobyLabtest = function(params) {
-        var deferred = $q.defer()
-        Data.LabtestImport.GetPhotobyLabtest(params, function(data, headers) {
-            deferred.resolve(data)
-        }, function(err) {
-            deferred.reject(err)
-        })
-        return deferred.promise
-    }
-    self.PostLabTestInfo = function(params) {
-        var deferred = $q.defer()
-        Data.LabtestImport.PostLabTestInfo(params, function(data, headers) {
-            deferred.resolve(data)
-        }, function(err) {
-            deferred.reject(err)
-        })
-        return deferred.promise
-    }
-    self.LabelPhoto = function(params) {
-        var deferred = $q.defer()
-        Data.LabtestImport.LabelPhoto(params, function(data, headers) {
-            deferred.resolve(data)
-        }, function(err) {
-            deferred.reject(err)
-        })
-        return deferred.promise
-    }
-    self.EditResult = function(params) {
-        var deferred = $q.defer()
-        Data.LabtestImport.EditResult(params, function(data, headers) {
-            deferred.resolve(data)
-        }, function(err) {
-            deferred.reject(err)
-        })
-        return deferred.promise
-    }
-    self.GetCount = function(params) {
-        var deferred = $q.defer()
-        Data.LabtestImport.GetCount(params, function(data, headers) {
-            deferred.resolve(data)
-        }, function(err) {
-            deferred.reject(err)
-        })
-        return deferred.promise
-    }
-    return self
-}])
+    .factory('Monitor1', ['$q', '$http', 'Data', function($q, $http, Data) {
+        var self = this
+        self.GetRegion = function(params) {
+            var deferred = $q.defer()
+            Data.Monitor1.GetRegion(params, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
+                deferred.reject(err)
+            })
+            return deferred.promise
+        }
+        self.GetTrend = function(params) {
+            var deferred = $q.defer()
+            Data.Monitor1.GetTrend(params, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
+                deferred.reject(err)
+            })
+            return deferred.promise
+        }
+        self.GetWorkload = function(params) {
+            var deferred = $q.defer()
+            Data.Monitor1.GetWorkload(params, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
+                deferred.reject(err)
+            })
+            return deferred.promise
+        }
+        self.GetOvertime = function(params) {
+            var deferred = $q.defer()
+            Data.Monitor1.GetOvertime(params, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
+                deferred.reject(err)
+            })
+            return deferred.promise
+        }
+        self.GetEvaluation = function(params) {
+            var deferred = $q.defer()
+            Data.Monitor1.GetEvaluation(params, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
+                deferred.reject(err)
+            })
+            return deferred.promise
+        }
+        self.GetCharge = function(params) {
+            var deferred = $q.defer()
+            Data.Monitor1.GetCharge(params, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
+                deferred.reject(err)
+            })
+            return deferred.promise
+        }
+        self.GetEvaDetail = function(params) {
+            var deferred = $q.defer()
+            Data.Monitor1.GetEvaDetail(params, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
+                deferred.reject(err)
+            })
+            return deferred.promise
+        }
+        return self
+    }])
 
-.factory('Alluser', ['$q', '$http', 'Data', function($q, $http, Data) {
-    var self = this
-    self.getUserList = function(obj) {
-        var deferred = $q.defer()
-        Data.Alluser.getUserList(obj, function(data, headers) {
-            deferred.resolve(data)
-        }, function(err) {
-            deferred.reject(err)
-        })
-        return deferred.promise
-    }
-    self.getDoctorList = function(obj) {
-        var deferred = $q.defer()
-        Data.Alluser.getDoctorList(obj, function(data, headers) {
-            deferred.resolve(data)
-        }, function(err) {
-            deferred.reject(err)
-        })
-        return deferred.promise
-    }
-    self.getPatientList = function(obj) {
-        var deferred = $q.defer()
-        Data.Alluser.getPatientList(obj, function(data, headers) {
-            deferred.resolve(data)
-        }, function(err) {
-            deferred.reject(err)
-        })
-        return deferred.promise
-    }
-    self.getNurseList = function(obj) {
-        var deferred = $q.defer()
-        Data.Alluser.getNurseList(obj, function(data, headers) {
-            deferred.resolve(data)
-        }, function(err) {
-            deferred.reject(err)
-        })
-        return deferred.promise
-    }
-    self.getInsuranceList = function(obj) {
-        var deferred = $q.defer()
-        Data.Alluser.getInsuranceList(obj, function(data, headers) {
-            deferred.resolve(data)
-        }, function(err) {
-            deferred.reject(err)
-        })
-        return deferred.promise
-    }
-    self.getHealthList = function(obj) {
-        var deferred = $q.defer()
-        Data.Alluser.getHealthList(obj, function(data, headers) {
-            deferred.resolve(data)
-        }, function(err) {
-            deferred.reject(err)
-        })
-        return deferred.promise
-    }
-    self.getAdminList = function(obj) {
-        var deferred = $q.defer()
-        Data.Alluser.getAdminList(obj, function(data, headers) {
-            deferred.resolve(data)
-        }, function(err) {
-            deferred.reject(err)
-        })
-        return deferred.promise
-    }
-    self.cancelUser = function(obj) {
-        var deferred = $q.defer()
-        Data.Alluser.cancelUser(obj, function(data, headers) {
-            deferred.resolve(data)
-        }, function(err) {
-            deferred.reject(err)
-        })
-        return deferred.promise
-    }
-    self.register = function(obj) {
-        var deferred = $q.defer()
-        Data.Alluser.register(obj, function(data, headers) {
-            deferred.resolve(data)
-        }, function(err) {
-            deferred.reject(err)
-        })
-        return deferred.promise
-    }
-    self.modify = function(obj) {
-        var deferred = $q.defer()
-        Data.Alluser.modify(obj, function(data, headers) {
-            deferred.resolve(data)
-        }, function(err) {
-            deferred.reject(err)
-        })
-        return deferred.promise
-    }
-    self.getCount = function(obj) {
-        var deferred = $q.defer()
-        Data.Alluser.getCount(obj, function(data, headers) {
-            deferred.resolve(data)
-        }, function(err) {
-            deferred.reject(err)
-        })
-        return deferred.promise
-    }
-    self.sms = function(obj) {
-        var deferred = $q.defer()
-        Data.Alluser.sms(obj, function(data, headers) {
-            deferred.resolve(data)
-        }, function(err) {
-            deferred.reject(err)
-        })
-        return deferred.promise
-    }
-    return self
-}])
+    .factory('Monitor2', ['$q', '$http', 'Data', function($q, $http, Data) {
+        var self = this
+        self.GetPatRegion = function(params) {
+            var deferred = $q.defer()
+            Data.Monitor2.GetPatRegion(params, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
+                deferred.reject(err)
+            })
+            return deferred.promise
+        }
+        self.GetPatTrend = function(params) {
+            var deferred = $q.defer()
+            Data.Monitor2.GetPatTrend(params, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
+                deferred.reject(err)
+            })
+            return deferred.promise
+        }
+        self.GetPatInsurance = function(params) {
+            var deferred = $q.defer()
+            Data.Monitor2.GetPatInsurance(params, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
+                deferred.reject(err)
+            })
+            return deferred.promise
+        }
+        self.GetPatGroup = function(params) {
+            var deferred = $q.defer()
+            Data.Monitor2.GetPatGroup(params, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
+                deferred.reject(err)
+            })
+            return deferred.promise
+        }
 
-.factory('Roles', ['$q', '$http', 'Data', function($q, $http, Data) {
-    var self = this
-    self.addRoles = function(obj) {
-        var deferred = $q.defer()
-        Data.Roles.addRoles(obj, function(data, headers) {
-            deferred.resolve(data)
-        }, function(err) {
-            deferred.reject(err)
-        })
-        return deferred.promise
-    }
-    self.removeRoles = function(obj) {
-        var deferred = $q.defer()
-        Data.Roles.removeRoles(obj, function(data, headers) {
-            deferred.resolve(data)
-        }, function(err) {
-            deferred.reject(err)
-        })
-        return deferred.promise
-    }
-    return self
-}])
+        return self
+    }])
 
-.factory('Monitor1', ['$q', '$http', 'Data', function($q, $http, Data) {
-    var self = this
-    self.GetRegion = function(params) {
-        var deferred = $q.defer()
-        Data.Monitor1.GetRegion(params, function(data, headers) {
-            deferred.resolve(data)
-        }, function(err) {
-            deferred.reject(err)
-        })
-        return deferred.promise
-    }
-    self.GetTrend = function(params) {
-        var deferred = $q.defer()
-        Data.Monitor1.GetTrend(params, function(data, headers) {
-            deferred.resolve(data)
-        }, function(err) {
-            deferred.reject(err)
-        })
-        return deferred.promise
-    }
-    self.GetWorkload = function(params) {
-        var deferred = $q.defer()
-        Data.Monitor1.GetWorkload(params, function(data, headers) {
-            deferred.resolve(data)
-        }, function(err) {
-            deferred.reject(err)
-        })
-        return deferred.promise
-    }
-    self.GetOvertime = function(params) {
-        var deferred = $q.defer()
-        Data.Monitor1.GetOvertime(params, function(data, headers) {
-            deferred.resolve(data)
-        }, function(err) {
-            deferred.reject(err)
-        })
-        return deferred.promise
-    }
-    self.GetEvaluation = function(params) {
-        var deferred = $q.defer()
-        Data.Monitor1.GetEvaluation(params, function(data, headers) {
-            deferred.resolve(data)
-        }, function(err) {
-            deferred.reject(err)
-        })
-        return deferred.promise
-    }
-    self.GetCharge = function(params) {
-        var deferred = $q.defer()
-        Data.Monitor1.GetCharge(params, function(data, headers) {
-            deferred.resolve(data)
-        }, function(err) {
-            deferred.reject(err)
-        })
-        return deferred.promise
-    }
-    self.GetEvaDetail = function(params) {
-        var deferred = $q.defer()
-        Data.Monitor1.GetEvaDetail(params, function(data, headers) {
-            deferred.resolve(data)
-        }, function(err) {
-            deferred.reject(err)
-        })
-        return deferred.promise
-    }
-    return self
-}])
-
-.factory('Monitor2', ['$q', '$http', 'Data', function($q, $http, Data) {
-    var self = this
-    self.GetPatRegion = function(params) {
-        var deferred = $q.defer()
-        Data.Monitor2.GetPatRegion(params, function(data, headers) {
-            deferred.resolve(data)
-        }, function(err) {
-            deferred.reject(err)
-        })
-        return deferred.promise
-    }
-    self.GetPatTrend = function(params) {
-        var deferred = $q.defer()
-        Data.Monitor2.GetPatTrend(params, function(data, headers) {
-            deferred.resolve(data)
-        }, function(err) {
-            deferred.reject(err)
-        })
-        return deferred.promise
-    }
-    self.GetPatInsurance = function(params) {
-        var deferred = $q.defer()
-        Data.Monitor2.GetPatInsurance(params, function(data, headers) {
-            deferred.resolve(data)
-        }, function(err) {
-            deferred.reject(err)
-        })
-        return deferred.promise
-    }
-    self.GetPatGroup = function(params) {
-        var deferred = $q.defer()
-        Data.Monitor2.GetPatGroup(params, function(data, headers) {
-            deferred.resolve(data)
-        }, function(err) {
-            deferred.reject(err)
-        })
-        return deferred.promise
-    }
-
-    return self
-}])
-
-.factory('Department', ['$q', '$http', 'Data', function($q, $http, Data) {
-    var self = this
-    self.GetDistrictInfo = function(params) {
-        var deferred = $q.defer()
-        Data.Department.GetDistrictInfo(params, function(data, headers) {
-            deferred.resolve(data)
-        }, function(err) {
-            deferred.reject(err)
-        })
-        return deferred.promise
-    }
-    self.GetDepartmentInfo = function(params) {
-        var deferred = $q.defer()
-        Data.Department.GetDepartmentInfo(params, function(data, headers) {
-            deferred.resolve(data)
-        }, function(err) {
-            deferred.reject(err)
-        })
-        return deferred.promise
-    }
-    self.GetDoctorList = function(params) {
-        var deferred = $q.defer()
-        Data.Department.GetDoctorList(params, function(data, headers) {
-            deferred.resolve(data)
-        }, function(err) {
-            deferred.reject(err)
-        })
-        return deferred.promise
-    }
-    self.DeleteRecord = function(params) {
-        var deferred = $q.defer()
-        Data.Department.DeleteRecord(params, function(data, headers) {
-            deferred.resolve(data)
-        }, function(err) {
-            deferred.reject(err)
-        })
-        return deferred.promise
-    }
-    self.UpdateDistrict = function(params) {
-        var deferred = $q.defer()
-        Data.Department.UpdateDistrict(params, function(data, headers) {
-            deferred.resolve(data)
-        }, function(err) {
-            deferred.reject(err)
-        })
-        return deferred.promise
-    }
-    self.UpdateDepartment = function(params) {
-        var deferred = $q.defer()
-        Data.Department.UpdateDepartment(params, function(data, headers) {
-            deferred.resolve(data)
-        }, function(err) {
-            deferred.reject(err)
-        })
-        return deferred.promise
-    }
-    return self
-}])
+    .factory('Department', ['$q', '$http', 'Data', function($q, $http, Data) {
+        var self = this
+        self.GetDistrictInfo = function(params) {
+            var deferred = $q.defer()
+            Data.Department.GetDistrictInfo(params, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
+                deferred.reject(err)
+            })
+            return deferred.promise
+        }
+        self.GetDepartmentInfo = function(params) {
+            var deferred = $q.defer()
+            Data.Department.GetDepartmentInfo(params, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
+                deferred.reject(err)
+            })
+            return deferred.promise
+        }
+        self.GetDoctorList = function(params) {
+            var deferred = $q.defer()
+            Data.Department.GetDoctorList(params, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
+                deferred.reject(err)
+            })
+            return deferred.promise
+        }
+        self.DeleteRecord = function(params) {
+            var deferred = $q.defer()
+            Data.Department.DeleteRecord(params, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
+                deferred.reject(err)
+            })
+            return deferred.promise
+        }
+        self.UpdateDistrict = function(params) {
+            var deferred = $q.defer()
+            Data.Department.UpdateDistrict(params, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
+                deferred.reject(err)
+            })
+            return deferred.promise
+        }
+        self.UpdateDepartment = function(params) {
+            var deferred = $q.defer()
+            Data.Department.UpdateDepartment(params, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
+                deferred.reject(err)
+            })
+            return deferred.promise
+        }
+        return self
+    }])

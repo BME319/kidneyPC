@@ -24,7 +24,7 @@
                 <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
             </div>
         </div>
-        <button type="submit" class="btn btn-default" ng-click="viewinsurance()" style="background:#347ab6;color:white;width: 60px">确 定</button>
+        <button type="submit" class="btn btn-default" ng-click="searchList()" style="background:#347ab6;color:white;width: 60px">确 定</button>
     </form>
 <table ng-table="insurancetableParams" class="table table-condensed table-bordered table-striped" style="margin-top: 10px;">
     <tr ng-repeat="i in $data" style="text-align: center;">
@@ -60,3 +60,29 @@
         </div>
     </div>
 </div>
+<!-- 每页数量 -->
+<div class="btn-group  btn-group-sm pull-right" style="margin-top: 18px">
+    <button type="button" class="btn btn-default" ng-click="changeLimit(20)">20</button>
+    <button type="button" class="btn btn-default" ng-click="changeLimit(30)">30</button>
+    <button type="button" class="btn btn-default" ng-click="changeLimit(50)">50</button>
+    <button type="button" class="btn btn-default" ng-click="changeLimit(100)">100</button>
+</div>
+<!-- 分页条 -->
+<ul uib-pagination  
+    max-size="10" 
+    class="pagination" 
+    boundary-links="true" 
+    boundary-link-numbers="true"
+    direction-links="true"
+    first-text="首页"
+    last-text="末页"
+    previous-text="上一页"
+    next-text="下一页"
+    force-ellipses="true"
+    rotate="true" 
+    total-items="totalItems"
+    items-per-page="itemsPerPage"
+    ng-change="pageChanged()"
+    ng-model="currentPage"
+    >
+</ul>

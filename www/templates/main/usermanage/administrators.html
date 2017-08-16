@@ -1,8 +1,10 @@
 <h4 style="font-size: 15px;margin-top: -10px;font-weight: bold;">管理员总数：{{totalNums}}位</h4>
+<form class="form-inline">
 <!-- 新建用户-张桠童 -->
-<div class="dropdown" style="margin-bottom: 10px">
+  <div class="form-group">
+<div class="dropdown">
 	<button type="button" class="btn btn-default dropdown-toggle" id="dropdownMenu1" 
-			data-toggle="dropdown">新建<span class="caret"></span>
+			data-toggle="dropdown" style="background:#347ab6;color:white">新建<span class="caret"></span>
 	</button>
 	<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
 		<li role="presentation">
@@ -13,8 +15,8 @@
 		</li>
 	</ul>
 </div>
+</div>
 <!-- 搜索 -->
-<form class="form-inline">
   <div class="form-group">
     <label class="sr-only">用户ID</label>
     <input type="text" class="form-control" ng-model="userlist.userId" placeholder="请输入用户ID">
@@ -191,43 +193,6 @@
 	    </div>
     </div>
 </div>
-<!-- 完善保险人员表单验证 -->
-<script>
-	$(document).ready(function() {
-	    $('#perfectForm').formValidation({
-	        framework: 'bootstrap',
-	        excluded: ':disabled',
-	        icon: {
-	            valid: 'glyphicon glyphicon-ok',
-	            invalid: 'glyphicon glyphicon-remove',
-	            validating: 'glyphicon glyphicon-refresh'
-	        }
-	    })
-	    .on('success.form.fv',function(e){
-	        // Prevent form submission
-	        e.preventDefault();
-	    });
-
-	    $('#datetimePicker')
-	    .datetimepicker({
-	        format: 'yyyy-mm-dd',
-	        // format: 'yyyy-mm-dd hh:ii',
-	        language:  'zh-CN',
-	        pickerPosition: "bottom-left",
-	        minView: 3,
-	        todayBtn:  true,
-	        autoclose: true,
-	        todayHighlight: true,
-	        forceParse: 0,
-	        // minuteStep:1,
-	        initialDate:new Date()
-	    })
-	    .on('changeDate',function(e){
-	        // Revalidate the date field
-	        $('#perfectForm').formValidation('revalidateField', 'SamplingTime');
-	    });
-	});
-</script>
 <!-- 提示完善成功modal -->
 <div class="modal fade" id="perfectSuccess">
   <div class="modal-dialog modal-sm" role="document">

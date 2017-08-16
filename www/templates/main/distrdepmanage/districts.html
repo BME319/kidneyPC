@@ -22,7 +22,7 @@
     <tr ng-repeat="district in $data">
         <td title="'地区名称'" sortable="'district'">{{district.district}}
         </td>
-        <td title="'地区负责人'" sortable="'portleader'">{{district.portleader|portleadername}}
+        <td title="'地区负责人'" sortable="'portleader'">{{district.portleader|leadername}}
         </td>
         <td title="'地区下设科室列表'">
             <button class="btn btn-link" style="text-decoration:none; outline:none; padding:0px; border:0px; font-size:10px;" ng-click="showdepartment(district.district)">查看科室列表</button>

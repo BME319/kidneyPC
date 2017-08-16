@@ -36,20 +36,15 @@ angular.module('filters', [])
             return name
         }
     }])
-    .filter('portleadername', [function() {
+    .filter('leadername', [function() {
         return function(type) {
             var name = ''
-            for (i = 0; i < type.length; i++) {
-                name = name + type[i].name + ' ';
-            }
-            return name
-        }
-    }])
-    .filter('departleadername', [function() {
-        return function(type) {
-            var name = ''
-            for (i = 0; i < type.length; i++) {
-                name = name + type[i].name + ' ';
+            if (type == null) {
+                name == null
+            } else {
+                for (i = 0; i < type.length; i++) {
+                    name = name + type[i].name + ' ';
+                }
             }
             return name
         }
@@ -207,7 +202,7 @@ angular.module('filters', [])
             return name
         }
     }])
-            .filter('diseasetype', [function() {
+    .filter('diseasetype', [function() {
         return function(type) {
             var name
             switch (type) {
