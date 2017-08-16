@@ -6,7 +6,7 @@
       <button class="btn btn-primary" style="margin-left:15px" ng-click="search()">查找</button>
 
     </div>
-  <table ng-table="tableParams" class="table table-condensed table-bordered table-striped" style="text-align:center">
+  <table ng-table="tableParams" class="table table-condensed table-bordered table-striped" style="text-align:center;font-size: 10px">
     <tr ng-repeat="doctorinfo in $data">
       <td title="'姓名'" sortable="'name'">
           {{doctorinfo.name}}

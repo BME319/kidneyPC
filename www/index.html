@@ -1,19 +1,29 @@
 <!DOCTYPE html>
 <html ng-app="Kidney_Web">
-  <head>
+
+<head>
     <meta charset="utf-8">
     <title></title>
-    
     <link href="lib/bootstrap-3.3.7-dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="lib/angular-material-icons/angular-material-icons.css" rel="stylesheet">
     <link href="lib/ngtable/css/ng-table.css" rel="stylesheet">
     <!-- <link href="lib/bootstrap-3.3.6-dist/css/bootstrap-theme.min.css" rel="stylesheet"> -->
-    <link rel="stylesheet" href="lib/formValidation/css/formValidation.css"/>
+    <link rel="stylesheet" href="lib/formValidation/css/formValidation.css" />
     <link href="lib/bootstrap-datetimepicker/css/bootstrap-datetimepicker.css" rel="stylesheet" media="screen">
     <!-- 自定义css -->
     <link href="css/mystyle.css" rel="stylesheet">
-    <!--angularjs js -->
+
+    <!-- jquery引用 -->
     <script src="lib/jquery.min.js"></script>
+    <link rel="stylesheet" href="lib/tag-editor/css/jquery.tag-editor.css">
+    <link rel="stylesheet" href="lib/tag-editor/css/jquery-ui.css">
+    <script src='lib/tag-editor/js/jquery.tag-editor.min.js'></script>
+    <script src='lib/tag-editor/js/jquery.caret.min.js'></script>
+    <!-- <script src='lib/tag-editor/js/jquery.tag-editor.js'></script> -->
+    <script src="lib/tag-editor/js/jquery.ui.datepicker-zh-CN.min.js"></script>
+    <script src="lib/tag-editor/js/jquery-ui.js"></script>
+    <!-- <script src="lib/tag-editor/js/jquery-1.10.2.js"></script> -->
+    <!--angularjs js -->
     <script src="lib/angular/angular.js"></script>
     <script src="lib/angular/angular-ui-router.min.js"></script>
     <script src="lib/ngtable/js/ng-table.js"></script>
@@ -21,7 +31,6 @@
     <script src="lib/angular-material-icons/angular-material-icons.js"></script>
     <script src="lib/bootstrap-3.3.7-dist/js/ui-bootstrap-tpls-2.5.0.js"></script>
     <script src='lib/echarts.js'></script>
-
     <!-- 第三方js -->
     <script src="lib/angular-resource/angular-resource.min.js"></script>
     <script src="lib/angular-locale_zh-cn.js"></script>
@@ -36,9 +45,10 @@
     <script src="js/controllers.js"></script>
     <script src="js/filters.js"></script>
     <script src="js/directives.js"></script>
+</head>
 
-  </head>
-  <body>    
-    <div ui-view></div>    
-  </body>
+<body>
+    <div ui-view></div>
+</body>
+
 </html>

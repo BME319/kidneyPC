@@ -14,9 +14,9 @@
       </div>
     </div> -->
 
-    <div uib-carousel active="active" style="height:600px" interval="myInterval" no-wrap="noWrapSlides">
+    <div uib-carousel active="active" style="height:300px" interval="myInterval" no-wrap="noWrapSlides">
 		<div uib-slide ng-repeat="slide in slides" index="$index">
-			<img ng-src="{{slide.photo}}" style="height:600px">
+			<img ng-src="{{slide.photo}}" style="height:300px">
 			<div class="row">
 				<button type="button" class="btn btn-danger" ng-click="getphoto($index)">选定当前图片</button>
 				<button class="btn btn-primary" ng-click="skipphoto($index)">跳过当前图片
