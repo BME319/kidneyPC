@@ -73,11 +73,11 @@
                     </div>
                     <div class="form-group">
                         <label>
-                            <br>科室名：</label>
+                            <br>科室名：</label><span><label id="newdepartment"> </label></span>
                     </div>
                     <div class="input-group">
                         <input type="text" class="form-control" ng-model="registerInfo.department" data-fv-notempty="true" placeholder="请输入科室名称" data-fv-notempty-message="该项为必填项" />
-                                <span class="input-group-btn"><button type="button" class="btn btn-primary" ng-click="addnewlabel(registerInfo.department)" >确认</button></span>
+                                <span class="input-group-btn"><button type="button" class="btn btn-primary" ng-click="addnewlabel(registerInfo.department,'department')" >确认</button></span>
                     </div>
                     <div class="form-group">
                         <label>
@@ -96,7 +96,7 @@
                         <div class="input-group">
                             <select class="form-control" ng-model="newdepartleader._id" ng-options="user._id as ('用户名：'+user.name+'，'+'userId：'+user.userId) for user in userlist.userlist_search">
                                 <option value="">请选择用户</option>
-                            </select><span class="input-group-btn"><button type="button" class="btn btn-primary" ng-click="addnewlabel(newdepartleader._id);addRole(newdepartleader._id);" >添加</button></span>
+                            </select><span class="input-group-btn"><button type="button" class="btn btn-primary" ng-click="addnewlabel(newdepartleader._id,'master');addRole(newdepartleader._id,'master');" >添加</button></span>
                         </div>
                     </div>
                     <div class="form-group">
@@ -115,7 +115,7 @@
                         <div class="input-group">
                             <select class="form-control" ng-model="newdoctor._id" ng-options="user._id as ('用户名：'+user.name+'，'+'userId：'+user.userId) for user in userlist.userlist_search">
                                 <option value="">请选择用户</option>
-                            </select><span class="input-group-btn"><button type="button" class="btn btn-primary" ng-click="addnewlabel(newdoctor._id);addRole(newdoctor._id);"" >添加</button></span>
+                            </select><span class="input-group-btn"><button type="button" class="btn btn-primary" ng-click="addnewlabel(newdoctor._id,'doctor');addRole(newdoctor._id,'doctor');"" >添加</button></span>
                         </div>
                     </div>
                     <br>
@@ -194,12 +194,12 @@
                     <div class="form-group">
                         <label>科室名称：</label><span><label id="editdepartment"> </label></span>
                     </div>
-                    <div class="form-group">
-                            <input type="text" class="form-control" name="newdepartment" ng-model="changeInfo.newdepartment" placeholder="请输入新科室名"  data-fv-notempty="true" data-fv-notempty-message="该项为必填项" />
+                    <div class="input-group">
+                            <input type="text" class="form-control" ng-model="changeInfo.newdepartment" placeholder="请输入新科室名"  data-fv-notempty="true" data-fv-notempty-message="该项为必填项" /><span class="input-group-btn"><button type="button" class="btn btn-primary" ng-click="addeditlabel(changeInfo.newdepartment,'department');" >添加</button></span>
                     </div>
                     <div class="form-group">
                         <label >
-                          修改负责人：</label><span><label id="editdepartleader"> </label></span>
+                          <br>修改负责人：</label><span><label id="editdepartleader"> </label></span>
                     </div>
                     <div class="input-group">
                         <input type="text" class="form-control" ng-model="userlist.departleader" placeholder="请输入姓名进行搜索" data-fv-notempty="true" data-fv-notempty-message="该项为必填项" />
@@ -214,7 +214,7 @@
                         <div class="input-group">
                             <select class="form-control" ng-model="editdepartleader._id" ng-options="user._id as ('用户名：'+user.name+'，'+'userId：'+user.userId) for user in userlist.userlist_search">
                                 <option value="">请选择用户</option>
-                            </select><span class="input-group-btn"><button type="button" class="btn btn-primary" ng-click="addeditlabel(editdepartleader._id);addRole(editdepartleader._id);" >添加</button></span>
+                            </select><span class="input-group-btn"><button type="button" class="btn btn-primary" ng-click="addeditlabel(editdepartleader._id,'master');addRole(editdepartleader._id,'master');" >添加</button></span>
                         </div>
                     </div>
                     <div class="form-group">
@@ -233,7 +233,7 @@
                         <div class="input-group">
                             <select class="form-control" ng-model="editdoctor._id" ng-options="user._id as ('用户名：'+user.name+'，'+'userId：'+user.userId) for user in userlist.userlist_search">
                                 <option value="">请选择用户</option>
-                            </select><span class="input-group-btn"><button type="button" class="btn btn-primary" ng-click="addeditlabel(editdoctor._id);addRole(editdoctor._id);"" >添加</button></span>
+                            </select><span class="input-group-btn"><button type="button" class="btn btn-primary" ng-click="addeditlabel(editdoctor._id,'doctor');addRole(editdoctor._id,'doctor');"" >添加</button></span>
                         </div>
                     </div>
                     <br>
@@ -323,7 +323,7 @@
 <div class="modal fade" id="addFailed">
     <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content" style="text-align: center; font-size: 15px">
-            角色已经存在！
+            添加失败！
         </div>
     </div>
 </div>

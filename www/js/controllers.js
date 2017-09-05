@@ -3223,6 +3223,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     $('#new_add').modal('hide')
                     // 增加角色
                     $scope.addInfo.token = token
+                    console.log($scope.addInfo)
                     var promise = Roles.addRoles($scope.addInfo)
                     promise.then(function(data) {
                         console.log(data.mesg)
@@ -4284,7 +4285,7 @@ angular.module('controllers', ['ngResource', 'services'])
 
     // 地区
     .controller('districtsCtrl', ['$scope', '$state', 'Review', '$uibModal', 'Storage', '$timeout', 'Alluser', 'NgTableParams', 'Department', 'Roles', function($scope, $state, Review, $uibModal, Storage, $timeout, Alluser, NgTableParams, Department, Roles) {
-        var token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWUwZGFiOGIwZDRlZDVlYjRjODMiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDA0IiwibmFtZSI6IumYruWNk-asoyIsInJvbGUiOiJpbnN1cmFuY2VDIiwiZXhwIjoxNTAyOTgwNDI3ODU2LCJpYXQiOjE1MDI5NzY4Mjd9.M27GqxS4eQ1MoliZgD7zaBKtevPrRJIJSNSNePnJaus'
+        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNDYxNDEzMjEwMCwiaWF0IjoxNTA0NjEwNTMyfQ.oBgWWRjXstubb5fe67zU9n5lrj9LlHjwLlCJ4gTqb_o"
 
         var ifcontain = function(arrayname, item) {
             if ((arrayname == undefined) || (arrayname == [])) { return false }
@@ -4699,7 +4700,7 @@ angular.module('controllers', ['ngResource', 'services'])
 
     // 科室
     .controller('departmentsCtrl', ['$scope', '$state', 'Review', '$uibModal', 'Storage', '$timeout', 'Alluser', 'NgTableParams', 'Department', 'Roles', function($scope, $state, Review, $uibModal, Storage, $timeout, Alluser, NgTableParams, Department, Roles) {
-        var token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwMzQ3OTg1NjczMiwiaWF0IjoxNTAzNDc2MjU2fQ.e5OhZEOc8Rfe8vr4gaPCcbO-2LD-ij8e9znerHjgHhs'
+        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNDYxNDEzMjEwMCwiaWF0IjoxNTA0NjEwNTMyfQ.oBgWWRjXstubb5fe67zU9n5lrj9LlHjwLlCJ4gTqb_o"
 
         // 科室列表
         var district = {}
@@ -4780,17 +4781,12 @@ angular.module('controllers', ['ngResource', 'services'])
         }
 
         // 新建科室，增加确认标签
-        $scope.addnewlabel = function(inputlabel) {
+        $scope.addnewlabel = function(inputlabel, type) {
 
-            // if ($scope.registerInfo.newdistrict == inputlabel) {
-            //     var mylabel = document.getElementById("newdistrict")
-            //     mylabel.innerHTML = inputlabel
-            //     console.log($scope.registerInfo)
-            //     districtInfo.district = $scope.registerInfo.newdistrict
-            // } else {
-            var newdepartleader_id = ""
-            if (!($scope.newdepartleader == undefined)) { newdepartleader_id = $scope.newdepartleader._id }
-            if (newdepartleader_id == inputlabel) {
+            if (type == "department") {
+                var mylabel = document.getElementById("newdepartment");
+                mylabel.innerHTML = inputlabel;
+            } else if (type == "master") {
                 var ifnewdepartleaderexist = false;
                 for (i = 0; i < $scope.userlist.userlist_search.length; i++) {
                     if ($scope.userlist.userlist_search[i]._id == inputlabel) {
@@ -4816,8 +4812,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 }
                 $scope.newflagleader = false
                 $scope.userlist.departleader = ""
-
-            } else if ($scope.newdoctor._id == inputlabel) {
+            } else if (type == "doctor") {
                 var ifnewdoctorexist = false;
                 for (i = 0; i < $scope.userlist.userlist_search.length; i++) {
                     if ($scope.userlist.userlist_search[i]._id == inputlabel) {
@@ -4843,49 +4838,45 @@ angular.module('controllers', ['ngResource', 'services'])
                 }
                 $scope.newflagdoctor = false
                 $scope.userlist.doctor = ""
-
             }
-            // }
         }
 
         // 添加角色
         $scope.addInfo = {}
         var newuserID = {}
-        $scope.addRole = function(addRole) {
+        $scope.addRole = function(addRole, rolenow) {
+
             if (addRole == undefined) {
                 $('#userIdUndefined').modal('show')
                 $timeout(function() {
                     $('#userIdUndefined').modal('hide')
                 }, 1000)
             } else {
-                if ((!($scope.newdepartleader == undefined)) && ($scope.newdepartleader == addRole)) {
-                    $scope.addInfo.userID = newuserID.newdepartleader
-                    $scope.addInfo.roles = 'master'
-                } else if ((!($scope.newdoctor == undefined)) && ($scope.newdoctor._id == addRole)) {
-                    $scope.addInfo.userID = newuserID.newdoctor
-                    $scope.addInfo.roles = 'doctor'
-                } else if ((!($scope.editdepartleader_id == undefined)) && (editdepartleader_id == addRole)) {
-                    $scope.addInfo.userID = newuserID.editdepartleader
-                    $scope.addInfo.roles = 'master'
-                } else if ((!($scope.editdoctor == undefined)) && ($scope.editdoctor._id == addRole)) {
-                    $scope.addInfo.userID = newuserID.editdoctor
-                    $scope.addInfo.roles = 'doctor'
+                if (rolenow == "master") {
+                    if ((!($scope.newdepartleader == undefined)) && ($scope.newdepartleader._id == addRole)) {
+                        $scope.addInfo.userId = newuserID.newdepartleader
+                    } else if ((!($scope.editdepartleader == undefined)) && ($scope.editdepartleader._id == addRole)) {
+                        $scope.addInfo.userId = newuserID.newdepartleader
+                    }
+                } else if (rolenow == "doctor") {
+                    if ((!($scope.newdoctor == undefined)) && ($scope.newdoctor._id == addRole)) {
+                        $scope.addInfo.userId = newuserID.newdoctor
+                    } else if ((!($scope.editdoctor == undefined)) && ($scope.editdoctor._id == addRole)) {
+                        $scope.addInfo.userId = newuserID.newdoctor
+                    }
                 }
                 $scope.addInfo.token = token
+                $scope.addInfo.roles = rolenow
                 $scope.newflagdoctor = false
                 $scope.newflagleader = false
                 $scope.userlist.departleader = ""
                 $scope.userlist.doctor = ""
-                $('#addSuccess').modal('show')
-                $timeout(function() {
-                    // 提示完毕，刷新列表
-                    $('#addSuccess').modal('hide')
-                }, 1000)
+                
                 console.log($scope.addInfo)
 
                 var promise = Roles.addRoles($scope.addInfo)
                 promise.then(function(data) {
-                    console.log(data)
+                    // console.log(data)
                     // $scope.newflagdoctor = false
                     // $scope.newflagleader = false
                     // $scope.userlist.departleader=""
@@ -5035,15 +5026,18 @@ angular.module('controllers', ['ngResource', 'services'])
         }
 
         // 修改科室，增加确认标签
-        $scope.addeditlabel = function(inputlabel) {
+        $scope.addeditlabel = function(inputlabel, type) {
+
             console.log(inputlabel)
+            console.log(type)
             console.log($scope.changeInfo)
             // console.log($scope.editdepartleader._id)
             // console.log($scope.editdoctor._id)
 
-            var editdepartleader_id = ""
-            if (!($scope.editdepartleader == undefined)) { editdepartleader_id = $scope.editdepartleader._id }
-            if (editdepartleader_id == inputlabel) {
+            if (type == "department") {
+                var mylabel = document.getElementById("editdepartment");
+                mylabel.innerHTML = inputlabel;
+            } else if (type == "master") {
                 for (i = 0; i < $scope.userlist.userlist_search.length; i++) {
                     if ($scope.userlist.userlist_search[i]._id == inputlabel) {
                         newuserID.newdepartleader = $scope.userlist.userlist_search[i].userId
@@ -5079,7 +5073,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     $scope.newflagleader = false
                     $scope.userlist.departleader = ""
                 }
-            } else if ($scope.editdoctor._id == inputlabel) {
+            } else if (type == "doctor") {
                 for (i = 0; i < $scope.userlist.userlist_search.length; i++) {
                     if ($scope.userlist.userlist_search[i]._id == inputlabel) {
                         newuserID.newdoctor = $scope.userlist.userlist_search[i].userId
@@ -5113,7 +5107,6 @@ angular.module('controllers', ['ngResource', 'services'])
                     $scope.userlist.doctor = ""
                 }
             }
-            // }
         }
 
         var _changeInfo = {}
@@ -5228,7 +5221,7 @@ angular.module('controllers', ['ngResource', 'services'])
     // 科室--详细信息modal
     .controller('detail_departmentCtrl', ['$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', '$uibModalInstance', 'userdetail', 'Department',
         function($scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, $uibModalInstance, userdetail, Department) {
-            var token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwMzQ3OTg1NjczMiwiaWF0IjoxNTAzNDc2MjU2fQ.e5OhZEOc8Rfe8vr4gaPCcbO-2LD-ij8e9znerHjgHhs'
+            var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNDYxNDEzMjEwMCwiaWF0IjoxNTA0NjEwNTMyfQ.oBgWWRjXstubb5fe67zU9n5lrj9LlHjwLlCJ4gTqb_o"
 
             $scope.departmentInfo = userdetail
             Department.GetDoctorList({
@@ -5305,6 +5298,8 @@ angular.module('controllers', ['ngResource', 'services'])
 
     // 数据监控——医生地区分布
     .controller('regionCtrl', ['Dict', 'Monitor1', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Dict, Monitor1, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
+        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNDYxNDEzMjEwMCwiaWF0IjoxNTA0NjEwNTMyfQ.oBgWWRjXstubb5fe67zU9n5lrj9LlHjwLlCJ4gTqb_o"
+
         // datetimepicker插件属性设置
         $('.datetimepicker').datetimepicker({
             language: 'zh-CN',
@@ -5397,7 +5392,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     province: selectprovince,
                     startTime: starttime,
                     endTime: endtime,
-                    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTY3Mjk2MTYxMWFlMGUyNmM2MWNjNzciLCJ1c2VySWQiOiJVMjAxNzA3MTMwMDAzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNTAwOTczMjA5MTcyLCJpYXQiOjE1MDA5Njk2MDl9.VU5zbpSp-qJroE_Fp4U6gianwY_-c6d8Ga0YkgG763M'
+                    token: token
                 }
                 textInfo = selectprovince + '医生地区分布'
             } else {
@@ -5406,7 +5401,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     city: selectcity.name,
                     startTime: starttime,
                     endTime: endtime,
-                    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTY3Mjk2MTYxMWFlMGUyNmM2MWNjNzciLCJ1c2VySWQiOiJVMjAxNzA3MTMwMDAzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNTAwOTczMjA5MTcyLCJpYXQiOjE1MDA5Njk2MDl9.VU5zbpSp-qJroE_Fp4U6gianwY_-c6d8Ga0YkgG763M'
+                    token: token
 
                 }
                 textInfo = selectprovince + selectcity.name + '医生地区分布'
@@ -5422,11 +5417,18 @@ angular.module('controllers', ['ngResource', 'services'])
                     city: '',
                     startTime: '2017-01-01 00:00:00',
                     endTime: now,
-                    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTY3Mjk2MTYxMWFlMGUyNmM2MWNjNzciLCJ1c2VySWQiOiJVMjAxNzA3MTMwMDAzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNTAwOTczMjA5MTcyLCJpYXQiOjE1MDA5Njk2MDl9.VU5zbpSp-qJroE_Fp4U6gianwY_-c6d8Ga0YkgG763M'
+                    token: token
                 }
                 textInfo = '浙江省医生地区分布'
             }
             Monitor1.GetRegion(RegionInfo).then(function(data) {
+                    if (data.results.length == 0) {
+                        $('#nodata').modal('show')
+                        $timeout(function() {
+                            $('#nodata').modal('hide')
+                        }, 1000)
+                    }
+
                     var array = data.results
                     var arr = new Array()
                     var sum = 0
@@ -5474,6 +5476,8 @@ angular.module('controllers', ['ngResource', 'services'])
 
     // 数据监控——医生变化趋势
     .controller('trendCtrl', ['Dict', 'Monitor1', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Dict, Monitor1, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
+        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNDYxNDEzMjEwMCwiaWF0IjoxNTA0NjEwNTMyfQ.oBgWWRjXstubb5fe67zU9n5lrj9LlHjwLlCJ4gTqb_o"
+
         // 医生变化趋势--折线图
         $('.datetimepicker').datetimepicker({
             language: 'zh-CN',
@@ -5556,7 +5560,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     province: selectprovince,
                     startTime: starttime,
                     endTime: endtime,
-                    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTY3Mjk2MTYxMWFlMGUyNmM2MWNjNzciLCJ1c2VySWQiOiJVMjAxNzA3MTMwMDAzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNTAwOTczMjA5MTcyLCJpYXQiOjE1MDA5Njk2MDl9.VU5zbpSp-qJroE_Fp4U6gianwY_-c6d8Ga0YkgG763M'
+                    token: token
                 }
                 textInfo = selectprovince + '医生注册变化趋势折线图'
             } else {
@@ -5565,7 +5569,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     city: selectcity.name,
                     startTime: starttime,
                     endTime: endtime,
-                    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTY3Mjk2MTYxMWFlMGUyNmM2MWNjNzciLCJ1c2VySWQiOiJVMjAxNzA3MTMwMDAzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNTAwOTczMjA5MTcyLCJpYXQiOjE1MDA5Njk2MDl9.VU5zbpSp-qJroE_Fp4U6gianwY_-c6d8Ga0YkgG763M'
+                    token: token
                 }
                 textInfo = selectprovince + selectcity.name + '医生注册变化趋势折线图'
             }
@@ -5580,11 +5584,17 @@ angular.module('controllers', ['ngResource', 'services'])
                     city: '',
                     startTime: '2017-01-01 00:00:00',
                     endTime: now,
-                    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTY3Mjk2MTYxMWFlMGUyNmM2MWNjNzciLCJ1c2VySWQiOiJVMjAxNzA3MTMwMDAzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNTAwOTczMjA5MTcyLCJpYXQiOjE1MDA5Njk2MDl9.VU5zbpSp-qJroE_Fp4U6gianwY_-c6d8Ga0YkgG763M'
+                    token: token
                 }
                 textInfo = '浙江省医生注册变化趋势折线图'
             }
             Monitor1.GetTrend(TrendInfo).then(function(data) {
+                    if (data.results.length == 0) {
+                        $('#nodata').modal('show')
+                        $timeout(function() {
+                            $('#nodata').modal('hide')
+                        }, 1000)
+                    }
                     var count = new Array()
                     var time = new Array()
                     var sum = 0
@@ -5656,6 +5666,8 @@ angular.module('controllers', ['ngResource', 'services'])
 
     // 数据监控——医生超时咨询统计
     .controller('overtimeCtrl', ['Dict', 'Monitor1', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Dict, Monitor1, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
+        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNDYxNDEzMjEwMCwiaWF0IjoxNTA0NjEwNTMyfQ.oBgWWRjXstubb5fe67zU9n5lrj9LlHjwLlCJ4gTqb_o"
+
         $('.datetimepicker').datetimepicker({
             language: 'zh-CN',
             format: 'yyyy-mm-dd',
@@ -5708,7 +5720,6 @@ angular.module('controllers', ['ngResource', 'services'])
         var myDate = new Date();
         var now = myDate.toLocaleDateString();
         var isClick = false
-        var token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTY3Mjk2MTYxMWFlMGUyNmM2MWNjNzciLCJ1c2VySWQiOiJVMjAxNzA3MTMwMDAzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNTAwOTczMjA5MTcyLCJpYXQiOjE1MDA5Njk2MDl9.VU5zbpSp-qJroE_Fp4U6gianwY_-c6d8Ga0YkgG763M'
         var countInfo = {}
         var Info = {}
         Storage.set('Tab', 1)
@@ -5796,6 +5807,8 @@ angular.module('controllers', ['ngResource', 'services'])
 
     // 数据监控——医生评分统计
     .controller('evaluationCtrl', ['Dict', 'Monitor1', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Dict, Monitor1, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
+        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNDYxNDEzMjEwMCwiaWF0IjoxNTA0NjEwNTMyfQ.oBgWWRjXstubb5fe67zU9n5lrj9LlHjwLlCJ4gTqb_o"
+
         // 关闭modal控制
         $scope.modal_close = function(target) {
             $(target).modal('hide')
@@ -5853,7 +5866,6 @@ angular.module('controllers', ['ngResource', 'services'])
         var myDate = new Date();
         var now = myDate.toLocaleDateString();
         var isClick = false
-        var token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTY3Mjk2MTYxMWFlMGUyNmM2MWNjNzciLCJ1c2VySWQiOiJVMjAxNzA3MTMwMDAzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNTAwOTczMjA5MTcyLCJpYXQiOjE1MDA5Njk2MDl9.VU5zbpSp-qJroE_Fp4U6gianwY_-c6d8Ga0YkgG763M'
         var countInfo = {}
         var Info = {}
         Storage.set('Tab', 1)
@@ -5943,14 +5955,14 @@ angular.module('controllers', ['ngResource', 'services'])
                     doctoruserId: Id,
                     startTime: '2017-01-01',
                     endTime: now,
-                    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTY3Mjk2MTYxMWFlMGUyNmM2MWNjNzciLCJ1c2VySWQiOiJVMjAxNzA3MTMwMDAzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNTAwOTczMjA5MTcyLCJpYXQiOjE1MDA5Njk2MDl9.VU5zbpSp-qJroE_Fp4U6gianwY_-c6d8Ga0YkgG763M'
+                    token: token
                 }
             } else {
                 DetailInfo = {
                     doctoruserId: Id,
                     startTime: starttime,
                     endTime: endtime,
-                    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTY3Mjk2MTYxMWFlMGUyNmM2MWNjNzciLCJ1c2VySWQiOiJVMjAxNzA3MTMwMDAzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNTAwOTczMjA5MTcyLCJpYXQiOjE1MDA5Njk2MDl9.VU5zbpSp-qJroE_Fp4U6gianwY_-c6d8Ga0YkgG763M'
+                    token: token
                 }
             }
             Monitor1.GetEvaDetail(DetailInfo).then(function(data) {
@@ -5970,6 +5982,8 @@ angular.module('controllers', ['ngResource', 'services'])
 
     // 数据监控——医生收费统计
     .controller('chargeCtrl', ['Dict', 'Monitor1', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Dict, Monitor1, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
+        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNDYxNDEzMjEwMCwiaWF0IjoxNTA0NjEwNTMyfQ.oBgWWRjXstubb5fe67zU9n5lrj9LlHjwLlCJ4gTqb_o"
+
         // 关闭modal控制
         $scope.modal_close = function(target) {
             $(target).modal('hide')
@@ -6026,7 +6040,6 @@ angular.module('controllers', ['ngResource', 'services'])
         var myDate = new Date();
         var now = myDate.toLocaleDateString();
         var isClick = false
-        var token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTY3Mjk2MTYxMWFlMGUyNmM2MWNjNzciLCJ1c2VySWQiOiJVMjAxNzA3MTMwMDAzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNTAwOTczMjA5MTcyLCJpYXQiOjE1MDA5Njk2MDl9.VU5zbpSp-qJroE_Fp4U6gianwY_-c6d8Ga0YkgG763M'
         var countInfo = {}
         var Info = {}
         Storage.set('Tab', 1)
@@ -6119,6 +6132,8 @@ angular.module('controllers', ['ngResource', 'services'])
 
     // 数据监控——医生工作量统计
     .controller('workloadCtrl', ['Dict', 'Monitor1', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Dict, Monitor1, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
+        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNDYxNDEzMjEwMCwiaWF0IjoxNTA0NjEwNTMyfQ.oBgWWRjXstubb5fe67zU9n5lrj9LlHjwLlCJ4gTqb_o"
+
         $('.datetimepicker').datetimepicker({
             language: 'zh-CN',
             format: 'yyyy-mm-dd',
@@ -6171,7 +6186,6 @@ angular.module('controllers', ['ngResource', 'services'])
         var myDate = new Date();
         var now = myDate.toLocaleDateString();
         var isClick = false
-        var token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTY3Mjk2MTYxMWFlMGUyNmM2MWNjNzciLCJ1c2VySWQiOiJVMjAxNzA3MTMwMDAzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNTAwOTczMjA5MTcyLCJpYXQiOjE1MDA5Njk2MDl9.VU5zbpSp-qJroE_Fp4U6gianwY_-c6d8Ga0YkgG763M'
         var countInfo = {}
         var Info = {}
         Storage.set('Tab', 1)
@@ -6259,6 +6273,8 @@ angular.module('controllers', ['ngResource', 'services'])
 
     // 数据监控——患者地区分布
     .controller('PatregionCtrl', ['Dict', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Dict, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
+        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNDYxNDEzMjEwMCwiaWF0IjoxNTA0NjEwNTMyfQ.oBgWWRjXstubb5fe67zU9n5lrj9LlHjwLlCJ4gTqb_o"
+
         $('.datetimepicker').datetimepicker({
             language: 'zh-CN',
             format: 'yyyy-mm-dd',
@@ -6340,7 +6356,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     province: selectprovince,
                     startTime: starttime,
                     endTime: endtime,
-                    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTY3Mjk2MTYxMWFlMGUyNmM2MWNjNzciLCJ1c2VySWQiOiJVMjAxNzA3MTMwMDAzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNTAwOTczMjA5MTcyLCJpYXQiOjE1MDA5Njk2MDl9.VU5zbpSp-qJroE_Fp4U6gianwY_-c6d8Ga0YkgG763M'
+                    token: token
                 }
                 textInfo = selectprovince + '患者地区分布'
             } else {
@@ -6349,7 +6365,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     city: selectcity.name,
                     startTime: starttime,
                     endTime: endtime,
-                    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTY3Mjk2MTYxMWFlMGUyNmM2MWNjNzciLCJ1c2VySWQiOiJVMjAxNzA3MTMwMDAzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNTAwOTczMjA5MTcyLCJpYXQiOjE1MDA5Njk2MDl9.VU5zbpSp-qJroE_Fp4U6gianwY_-c6d8Ga0YkgG763M'
+                    token: token
                 }
                 textInfo = selectprovince + selectcity.name + '患者地区分布'
             }
@@ -6363,11 +6379,17 @@ angular.module('controllers', ['ngResource', 'services'])
                     city: '',
                     startTime: '2017-01-01 00:00:00',
                     endTime: now,
-                    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTY3Mjk2MTYxMWFlMGUyNmM2MWNjNzciLCJ1c2VySWQiOiJVMjAxNzA3MTMwMDAzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNTAwOTczMjA5MTcyLCJpYXQiOjE1MDA5Njk2MDl9.VU5zbpSp-qJroE_Fp4U6gianwY_-c6d8Ga0YkgG763M'
+                    token: token
                 }
                 textInfo = '浙江省患者地区分布'
             }
             Monitor2.GetPatRegion(RegionInfo).then(function(data) {
+                    if (data.results.length == 0) {
+                        $('#nodata').modal('show')
+                        $timeout(function() {
+                            $('#nodata').modal('hide')
+                        }, 1000)
+                    }
                     var array = data.results
                     var arr = new Array()
                     var sum = 0
@@ -6415,6 +6437,8 @@ angular.module('controllers', ['ngResource', 'services'])
 
     // 数据监控——患者变化趋势
     .controller('PattrendCtrl', ['Dict', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Dict, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
+        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNDYxNDEzMjEwMCwiaWF0IjoxNTA0NjEwNTMyfQ.oBgWWRjXstubb5fe67zU9n5lrj9LlHjwLlCJ4gTqb_o"
+
         $('.datetimepicker').datetimepicker({
             language: 'zh-CN',
             format: 'yyyy-mm-dd',
@@ -6497,7 +6521,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     province: selectprovince,
                     startTime: starttime,
                     endTime: endtime,
-                    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTY3Mjk2MTYxMWFlMGUyNmM2MWNjNzciLCJ1c2VySWQiOiJVMjAxNzA3MTMwMDAzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNTAwOTczMjA5MTcyLCJpYXQiOjE1MDA5Njk2MDl9.VU5zbpSp-qJroE_Fp4U6gianwY_-c6d8Ga0YkgG763M'
+                    token: token
                 }
                 textInfo = selectprovince + '患者注册变化趋势折线图'
             } else {
@@ -6506,7 +6530,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     city: selectcity.name,
                     startTime: starttime,
                     endTime: endtime,
-                    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTY3Mjk2MTYxMWFlMGUyNmM2MWNjNzciLCJ1c2VySWQiOiJVMjAxNzA3MTMwMDAzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNTAwOTczMjA5MTcyLCJpYXQiOjE1MDA5Njk2MDl9.VU5zbpSp-qJroE_Fp4U6gianwY_-c6d8Ga0YkgG763M'
+                    token: token
                 }
                 textInfo = selectprovince + selectcity.name + '患者注册变化趋势折线图'
             }
@@ -6520,11 +6544,17 @@ angular.module('controllers', ['ngResource', 'services'])
                     city: '',
                     startTime: '2017-01-01 00:00:00',
                     endTime: now,
-                    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTY3Mjk2MTYxMWFlMGUyNmM2MWNjNzciLCJ1c2VySWQiOiJVMjAxNzA3MTMwMDAzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNTAwOTczMjA5MTcyLCJpYXQiOjE1MDA5Njk2MDl9.VU5zbpSp-qJroE_Fp4U6gianwY_-c6d8Ga0YkgG763M'
+                    token: token
                 }
                 textInfo = '浙江省患者注册变化趋势折线图'
             }
             Monitor2.GetPatTrend(Info).then(function(data) {
+                    if (data.results.length == 0) {
+                        $('#nodata').modal('show')
+                        $timeout(function() {
+                            $('#nodata').modal('hide')
+                        }, 1000)
+                    }
                     var count = new Array()
                     var time = new Array()
                     var sum = 0
@@ -6593,6 +6623,8 @@ angular.module('controllers', ['ngResource', 'services'])
 
     // 数据监控——患者保险统计
     .controller('PatinsuranceCtrl', ['Dict', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Dict, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
+        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNDYxNDEzMjEwMCwiaWF0IjoxNTA0NjEwNTMyfQ.oBgWWRjXstubb5fe67zU9n5lrj9LlHjwLlCJ4gTqb_o"
+
         $('.datetimepicker').datetimepicker({
             language: 'zh-CN',
             format: 'yyyy-mm-dd',
@@ -6644,8 +6676,6 @@ angular.module('controllers', ['ngResource', 'services'])
         var myDate = new Date();
         var now = myDate.toLocaleDateString();
         var isClick = false
-
-        var token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTY3Mjk2MTYxMWFlMGUyNmM2MWNjNzciLCJ1c2VySWQiOiJVMjAxNzA3MTMwMDAzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNTAwOTczMjA5MTcyLCJpYXQiOjE1MDA5Njk2MDl9.VU5zbpSp-qJroE_Fp4U6gianwY_-c6d8Ga0YkgG763M'
         var countInfo = {}
         var Info = {}
         Storage.set('Tab', 1)
@@ -6731,6 +6761,8 @@ angular.module('controllers', ['ngResource', 'services'])
 
     // 数据监控——患者分组统计
     .controller('PatgroupCtrl', ['Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
+        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNDYxNDEzMjEwMCwiaWF0IjoxNTA0NjEwNTMyfQ.oBgWWRjXstubb5fe67zU9n5lrj9LlHjwLlCJ4gTqb_o"
+
         // 患者分组显示--图表
         var isClick = false
         var type = {}
@@ -6743,16 +6775,22 @@ angular.module('controllers', ['ngResource', 'services'])
                 // statemen{
                 Info = {
                     classNo: 'class_1',
-                    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTY3Mjk2MTYxMWFlMGUyNmM2MWNjNzciLCJ1c2VySWQiOiJVMjAxNzA3MTMwMDAzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNTAwOTczMjA5MTcyLCJpYXQiOjE1MDA5Njk2MDl9.VU5zbpSp-qJroE_Fp4U6gianwY_-c6d8Ga0YkgG763M'
+                    token: token
                 }
             } else {
                 Info = {
                     classNo: type,
-                    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTY3Mjk2MTYxMWFlMGUyNmM2MWNjNzciLCJ1c2VySWQiOiJVMjAxNzA3MTMwMDAzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNTAwOTczMjA5MTcyLCJpYXQiOjE1MDA5Njk2MDl9.VU5zbpSp-qJroE_Fp4U6gianwY_-c6d8Ga0YkgG763M'
+                    token: token
                 }
             }
             var promise = Monitor2.GetPatGroup(Info)
             promise.then(function(data) {
+                if (data.results.length == 0) {
+                    $('#nodata').modal('show')
+                    $timeout(function() {
+                        $('#nodata').modal('hide')
+                    }, 1000)
+                }
                 $scope.grouptableParams = new NgTableParams({
                     count: 10
                 }, {
@@ -6923,12 +6961,12 @@ angular.module('controllers', ['ngResource', 'services'])
             // $('#Followuppost').modal('show')
 
 
-        $('#Followuppost').modal('show').css({  
-                        height: 'auto',  
-                        // 'margin-left': function () {  
-                        //     return -($(this).width() / 2);  
-                        // }  
-                    }); 
+            $('#Followuppost').modal('show').css({
+                height: 'auto',
+                // 'margin-left': function () {  
+                //     return -($(this).width() / 2);  
+                // }  
+            });
 
             // function initFileInput(ctrlName, uploadUrl) {
             //     var control = $('#' + ctrlName);
@@ -7205,15 +7243,16 @@ angular.module('controllers', ['ngResource', 'services'])
             }
             Policy.getPolicy(getpolicyInfo).then(function(data) {
                 $scope.review.content = data.data.content
-                if (data.data.photos.length==0) {
-                    $scope.review.ifpicexist=false
-                    $scope.review.picreview="该保单暂无图片"
-                } else{
-                for (i = 0; i < data.data.photos.length; i++) {
-                    $scope.review.ifpicexist=true
-                    $scope.review.picreview="保单图片:"
-                    $scope.review.pic = data.data.photos[i]
-                }}
+                if (data.data.photos.length == 0) {
+                    $scope.review.ifpicexist = false
+                    $scope.review.picreview = "该保单暂无图片"
+                } else {
+                    for (i = 0; i < data.data.photos.length; i++) {
+                        $scope.review.ifpicexist = true
+                        $scope.review.picreview = "保单图片:"
+                        $scope.review.pic = data.data.photos[i]
+                    }
+                }
             }, function(err) {})
         }
         $scope.passreview = function() {
