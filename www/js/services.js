@@ -16,9 +16,12 @@ angular.module('services', ['ngResource'])
         }
     }])
     .constant('CONFIG', {
-        baseUrl: 'http://121.43.107.106:4060/Api/v2/',
-        dictbaseUrl: 'http://121.43.107.106:4060/api/v1/'
+        baseUrl: 'http://docker2.haihonghospitalmanagement.com/api/v2/',
+        dictbaseUrl: 'http://docker2.haihonghospitalmanagement.com/api/v2/',
+        imgThumbUrl: 'http://df2.haihonghospitalmanagement.com/api/v2/uploads/photos/resize',
+        imgLargeUrl: 'http://df2.haihonghospitalmanagement.com/api/v2/uploads/photos/',
     })
+
     .factory('Data', ['$resource', '$q', '$interval', 'CONFIG', 'Storage', function($resource, $q, $interval, CONFIG, Storage) {
         var serve = {}
         var abort = $q.defer
@@ -44,7 +47,27 @@ angular.module('services', ['ngResource'])
 
         var Doctor = function() {
             return $resource(CONFIG.dictbaseUrl + ':path/:route', { path: 'doctor' }, {
-                getDoctorInfo: { method: 'GET', params: { route: 'detail' }, timeout: 100000 },
+                getDoctorInfo: { method: 'GET', params: { route: 'detail'}, timeout: 100000 },
+            })
+        }
+
+        var Upload = function() {
+            return $resource(CONFIG.baseUrl + ':path', { path: 'upload' }, {
+                uploadImg: { method: 'POST', params: { token:'@token' }, timeout: 100000 },
+            })
+        }
+
+        var Policy = function() {
+            return $resource(CONFIG.dictbaseUrl + ':path/:route', { path: 'policy' }, {
+                getPatientList: { method: 'GET', params: { route: 'patients',token:'@token'}, timeout: 100000 },
+                getAgentList: { method: 'GET', params: { route: 'agents',token:'@token' }, timeout: 100000 },
+                getFollowupHis: { method: 'GET', params: { route: 'history',patientId:'@patientId',token:'@token' }, timeout: 100000 },
+                setinsuranceA: { method: 'POST', params: { route: 'agent',patientId:'@patientId',insuranceAId:'@insuranceAId',reason:'@reason',token:'@token'  }, timeout: 100000 },
+                postFollowUp: { method: 'POST', params: { route: 'followUp',patientId:'@patientId',content:'@content',photoUrls:'@photoUrls',token:'@token' }, timeout: 100000 },
+                postPolicy: { method: 'POST', params: { route: 'policy',patientId:'@patientId',content:'@content',photoUrls:'@photoUrls',token:'@token' }, timeout: 100000 },
+                getPolicy: { method: 'GET', params: { route: 'policy',patientId:'@patientId',token:'@token' }, timeout: 100000 },
+                reviewPolicy: { method: 'POST', params: { route: 'policyReview',patientId:'@patientId',reviewResult:'@reviewResult',rejectReason:'@rejectReason',startTime:'@startTime',endTime:'@endTime',token:'@token' }, timeout: 100000 },
+                removeAgent: { method: 'POST', params: { route: 'agentOff',insuranceAId:'@insuranceAId',token:'@token' }, timeout: 100000 }
             })
         }
 
@@ -58,7 +81,14 @@ angular.module('services', ['ngResource'])
                         route: 'login'
                     },
                     timeout: 100000
-                }
+                },
+                logOut: {
+                    method: 'POST',
+                    params: {
+                        route: 'logout'
+                    },
+                    timeout: 100000
+                }                
             })
         }
 
@@ -100,6 +130,20 @@ angular.module('services', ['ngResource'])
                         route: 'countByStatus',
                         reviewStatus: '@reviewStatus',
                         token: '@token'
+                    },
+                    timeout: 100000
+                }
+            })
+        }
+
+        var Dict = function() {
+            return $resource(CONFIG.dictbaseUrl + ':path/:route', {
+                path: 'dict'
+            }, {
+                getDistrict: {
+                    method: 'GET',
+                    params: {
+                        route: 'district'
                     },
                     timeout: 100000
                 }
@@ -501,6 +545,8 @@ angular.module('services', ['ngResource'])
                 serve.Monitor2 = Monitor2()
                 serve.Department = Department()
                 serve.Mywechat = Mywechat()
+                serve.Policy = Policy()
+                serve.Upload = Upload()
             }, 0, 1)
         }
         serve.Dict = Dict()
@@ -514,7 +560,8 @@ angular.module('services', ['ngResource'])
         serve.Monitor2 = Monitor2()
         serve.Department = Department()
         serve.Mywechat = Mywechat()
-
+        serve.Policy = Policy()
+        serve.Upload = Upload()
         return serve
     }])
 
@@ -542,29 +589,159 @@ angular.module('services', ['ngResource'])
     }])
 
     .factory('Mywechat', ['$q', 'Data', function ($q, Data) {
-  var self = this
+          var self = this
 
-  self.createTDCticket = function (params) {
-    var deferred = $q.defer()
-    Data.Mywechat.createTDCticket(
-            params,
-            function (data, headers) {
-              deferred.resolve(data)
-            },
-            function (err) {
-              deferred.reject(err)
-            })
-    return deferred.promise
-  }
+          self.createTDCticket = function (params) {
+            var deferred = $q.defer()
+            Data.Mywechat.createTDCticket(
+                    params,
+                    function (data, headers) {
+                      deferred.resolve(data)
+                    },
+                    function (err) {
+                      deferred.reject(err)
+                    })
+            return deferred.promise
+          }
+          return self
+    }])
 
-  return self
-}])
+    .factory('Upload', ['$q', 'Data', function ($q, Data) {
+          var self = this
+
+          self.uploadImg = function (params) {
+            var deferred = $q.defer()
+            Data.Upload.uploadImg(
+                    params,
+                    function (data, headers) {
+                      deferred.resolve(data)
+                    },
+                    function (err) {
+                      deferred.reject(err)
+                    })
+            return deferred.promise
+          }
+          return self
+    }])
 
     .factory('Doctor', ['$q', 'Data', function($q, Data) {
         var self = this
-        self.getDoctorInfo = function(params) {
+        self.getPatientList = function(params) {
             var deferred = $q.defer()
-            Data.Doctor.getDoctorInfo(
+            Data.Doctor.getPatientList(
+                params,
+                function(data, headers) {
+                    deferred.resolve(data)
+                },
+                function(err) {
+                    deferred.reject(err)
+                })
+            return deferred.promise
+        }
+        return self
+    }])
+
+    .factory('Policy', ['$q', 'Data', function($q, Data) {
+        var self = this
+        self.getAgentList = function(params) {
+            var deferred = $q.defer()
+            Data.Policy.getAgentList(
+                params,
+                function(data, headers) {
+                    deferred.resolve(data)
+                },
+                function(err) {
+                    deferred.reject(err)
+                })
+            return deferred.promise
+        }
+        self.getFollowupHis = function(params) {
+            var deferred = $q.defer()
+            Data.Policy.getFollowupHis(
+                params,
+                function(data, headers) {
+                    deferred.resolve(data)
+                },
+                function(err) {
+                    deferred.reject(err)
+                })
+            return deferred.promise
+        }        
+        self.setinsuranceA = function(params) {
+            var deferred = $q.defer()
+            Data.Policy.setinsuranceA(
+                params,
+                function(data, headers) {
+                    deferred.resolve(data)
+                },
+                function(err) {
+                    deferred.reject(err)
+                })
+            return deferred.promise
+        }
+        self.postFollowUp = function(params) {
+            var deferred = $q.defer()
+            Data.Policy.postFollowUp(
+                params,
+                function(data, headers) {
+                    deferred.resolve(data)
+                },
+                function(err) {
+                    deferred.reject(err)
+                })
+            return deferred.promise
+        }
+        self.postPolicy = function(params) {
+            var deferred = $q.defer()
+            Data.Policy.postPolicy(
+                params,
+                function(data, headers) {
+                    deferred.resolve(data)
+                },
+                function(err) {
+                    deferred.reject(err)
+                })
+            return deferred.promise
+        }
+        self.getPolicy = function(params) {
+            var deferred = $q.defer()
+            Data.Policy.getPolicy(
+                params,
+                function(data, headers) {
+                    deferred.resolve(data)
+                },
+                function(err) {
+                    deferred.reject(err)
+                })
+            return deferred.promise
+        }
+        self.reviewPolicy = function(params) {
+            var deferred = $q.defer()
+            Data.Policy.reviewPolicy(
+                params,
+                function(data, headers) {
+                    deferred.resolve(data)
+                },
+                function(err) {
+                    deferred.reject(err)
+                })
+            return deferred.promise
+        }
+        self.removeAgent = function(params) {
+            var deferred = $q.defer()
+            Data.Policy.removeAgent(
+                params,
+                function(data, headers) {
+                    deferred.resolve(data)
+                },
+                function(err) {
+                    deferred.reject(err)
+                })
+            return deferred.promise
+        }
+        self.getPatientList = function(params) {
+            var deferred = $q.defer()
+            Data.Policy.getPatientList(
                 params,
                 function(data, headers) {
                     deferred.resolve(data)
@@ -582,6 +759,15 @@ angular.module('services', ['ngResource'])
         self.logIn = function(params) {
             var deferred = $q.defer()
             Data.User.logIn(params, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
+                deferred.reject(err)
+            })
+            return deferred.promise
+        }
+        self.logOut = function(params) {
+            var deferred = $q.defer()
+            Data.User.logOut(params, function(data, headers) {
                 deferred.resolve(data)
             }, function(err) {
                 deferred.reject(err)
