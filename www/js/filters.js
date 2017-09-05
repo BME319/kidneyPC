@@ -36,6 +36,23 @@ angular.module('filters', [])
             return name
         }
     }])
+    .filter('checkornotType', [function() {
+        return function(type) {
+            var name
+            switch (type) {
+                case 0:
+                    name = '未审核'
+                    break
+                case 1:
+                    name = '已通过'
+                    break
+                case 2:
+                    name = '已拒绝'
+                    break
+            }
+            return name
+        }
+    }])
     .filter('leadername', [function() {
         return function(type) {
             var name = ''
@@ -49,19 +66,19 @@ angular.module('filters', [])
             return name
         }
     }])
-    .filter('Patgroupfilter', [function() {
-        return function(type) {
-            var name = ''
-            if (type == null) {
-                name == null
+
+    .filter('filterAge', [function() {
+        return function(date) {
+            if (date == null) {
+                return ""
             } else {
-                for (i = 0; i < type.length; i++) {
-                    name = name + type[i] + ' ';
-                }
+                var d = new Date(date)
+                var dateNow = new Date()
+                return dateNow.getFullYear() - d.getFullYear()
             }
-            return name
         }
     }])
+
     .filter('hypertension', [function() {
         return function(type) {
             var name = '--'
@@ -76,6 +93,53 @@ angular.module('filters', [])
             return name
         }
     }])
+    .filter('followuptype', [function() {
+        return function(type) {
+            var name = '--'
+            switch (type) {
+                case 0:
+                    name = '新建跟踪'
+                    break
+                case 1:
+                    name = '沟通记录'
+                    break
+                case 2:
+                    name = '专员更换'
+                    break
+                case 3:
+                    name = '保单相关'
+                    break
+            }
+            return name
+        }
+    }])
+        .filter('Policytype', [function() {
+        return function(type) {
+            var name = '--'
+            switch (type) {
+                case 0:
+                    name = '有意向，未安排专员'
+                    break
+                case 1:
+                    name = '有意向，已安排专员'
+                    break
+                case 2:
+                    name = '保单待审核'
+                    break
+                case 3:
+                    name = '保单审核已通过'
+                    break
+                case 4:
+                    name = '保单审核未通过'
+                    break
+                case 5:
+                    name = '保单过期'
+                    break     
+            }
+            return name
+        }
+    }])
+    
     .filter('classname', [function() {
         return function(type) {
             var name

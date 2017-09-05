@@ -15,17 +15,17 @@
         </div>
         <div>
             <h3 style="padding-left:30px">简介</h3>
-            <textarea style="width:100%;font-size:20px" row="3" disabled="disabled"></textarea>
+            <textarea style="width:100%;font-size:20px;resize:none;" row="3" disabled="disabled"></textarea>
             <!-- 			<h3 style="padding-left:30px">擅长</h3>
 			<textarea style="width:100%;font-size:20px" row="3" disabled="disabled"></textarea> -->
         </div>
         <!-- 轮播插件 -->
-        <div uib-carousel active="active" style="height:100px;background-color:white;margin-top:30px">
+        <div uib-carousel active="active" style="height:100px;background-color:white;margin-top:10px">
             <div uib-slide>
                 证书图片
             </div>
         </div>
-        <div style="margin-top:20px;">
+        <div style="margin-top:10px;">
             <!-- 			<p>
 				<span>审核状态:</span>
 				<span style="margin-left:50px">{{review.reviewStatus}}</span>
@@ -37,7 +37,7 @@
             <table style="width:80%;font-size:18px;">
                 <tr>
                     <td style="font-weight: bold;">审核状态:</td>
-                    <td>{{review.reviewStatus}}</td>
+                    <td>{{review.reviewStatus|checkornotType}}</td>
                     <td style="font-weight: bold;">审核人:</td>
                     <td>{{review.adminId.name}}</td>
                     <td style="font-weight: bold;">审核日期:</td>
@@ -50,12 +50,12 @@
             </p>
             </div>
            <div>
-            <textarea style="width:100%;font-size:20px;margin-bottom:40px" row="3" disabled="disabled" ng-model="review.reviewContent"></textarea>
-            <div ng-hide="status == 1">
-                <button class="btn btn-primary" style="margin-left:30%;margin-top:40px;margin-bottom:40px;height:60px;width:100px;font-size:20px" ng-click="accept()">
+            <textarea style="width:100%;font-size:20px;margin-bottom:5px;resize:none;" row="3" disabled="disabled" ng-model="review.reviewContent"></textarea>
+            <div ng-hide="(status == 1)||(status == 2)">
+                <button class="btn btn-primary" style="margin-left:30%;margin-top:5px;margin-bottom:40px;width:70px;" ng-click="accept()">
                     通过
                 </button>
-                <button class="btn btn-primary" style="margin-left:20%;margin-top:40px;margin-bottom:40px;height:60px;width:100px;font-size:20px" data-toggle="modal" data-target="#reject">
+                <button class="btn btn-primary" style="margin-left:10%;margin-top:5px;margin-bottom:40px;width:70px;" data-toggle="modal" data-target="#reject">
                     拒绝
                 </button>
                 <div class="modal fade" id="accepted">
@@ -84,7 +84,7 @@
 	                  			</h3>
                             </div>
                             <div class="modal-body">
-                                <textarea rows="10" cols="49" ng-model="RejectReason.reason" style="font-size:20px"></textarea>
+                                <textarea rows="10" cols="49" ng-model="RejectReason.reason" style="font-size:20px;resize:none;"></textarea>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-primary col-xs-2 col-xs-offset-3" style="height:50px;font-size:18px" ng-click="reject()">
