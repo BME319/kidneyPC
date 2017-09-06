@@ -201,6 +201,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 "reviewStatus": 1,
                 "token": token
             }
+            console.log($scope.doctorinfos[index].phoneNo)
             Review.PostReviewInfo(postreview).then(
                 function(data) {
                     console.log(data.results);
@@ -211,7 +212,7 @@ angular.module('controllers', ['ngResource', 'services'])
                         }, 1000);
                         $('#accepted').on('hidden.bs.modal', function() {
                             var sms = {
-                                "mobile": "18626860001",
+                                "mobile":$scope.doctorinfos[index].phoneNo,
                                 "smsType": 3,
                                 "token": token
                             }
@@ -249,8 +250,14 @@ angular.module('controllers', ['ngResource', 'services'])
         }
         $scope.RejectReason = {};
         // 拒绝
-        $scope.reject = function() {
+        $scope.reject = function(index) {
             console.log($scope.RejectReason.reason);
+            if($scope.RejectReason.reason == undefined){
+                $('#reasonerror').modal('show')
+                $timeout(function() {
+                    $('#reasonerror').modal('hide')
+                }, 1000)
+            }else{
             var postreview = {
                 "doctorId": $scope.docId,
                 "reviewStatus": 2,
@@ -271,7 +278,7 @@ angular.module('controllers', ['ngResource', 'services'])
                             }, 1000);
                             $('#rejected').on('hidden.bs.modal', function() {
                                 var sms = {
-                                    "mobile": "18626860001",
+                                    "mobile": $scope.doctorinfos[index].phoneNo,
                                     "smsType": 4,
                                     "token": token,
                                     "reason": $scope.RejectReason.reason
@@ -295,6 +302,7 @@ angular.module('controllers', ['ngResource', 'services'])
 
                 })
         }
+    }
         // 搜索
         $scope.search = function() {
             $scope.review = {
@@ -327,6 +335,9 @@ angular.module('controllers', ['ngResource', 'services'])
                 function(e) {
 
                 })
+        }
+        $scope.modal_close = function(target) {
+            $(target).modal('hide')
         }
     }])
     // 查看医生资质证书-LZN
@@ -368,6 +379,7 @@ angular.module('controllers', ['ngResource', 'services'])
                             $scope.review.reviewDate = stdate.getFullYear() + '-' + (stdate.getMonth() + 1) + '-' + stdate.getDate();
                         }
                         console.log($scope.review);
+                        console.log($scope.doctorinfos.phoneNo)
                     },
                     function(e) {
 
@@ -393,7 +405,7 @@ angular.module('controllers', ['ngResource', 'services'])
                         }, 1000);
                         $('#accepted').on('hidden.bs.modal', function() {
                             var sms = {
-                                "mobile": "18626860001",
+                                "mobile": $scope.doctorinfos.phoneNo,
                                 "smsType": 3,
                                 "token": token
                             }
@@ -414,8 +426,14 @@ angular.module('controllers', ['ngResource', 'services'])
         }
         $scope.RejectReason = {};
         // 拒绝
-        $scope.reject = function() {
+        $scope.reject = function(docphoneNo) {
             console.log($scope.RejectReason.reason);
+            if($scope.RejectReason.reason == undefined){
+                $('#reasonerror').modal('show')
+                $timeout(function() {
+                    $('#reasonerror').modal('hide')
+                }, 1000)
+            }else{
             var postreview = {
                 "doctorId": Storage.get('docId'),
                 "reviewStatus": 2,
@@ -437,7 +455,7 @@ angular.module('controllers', ['ngResource', 'services'])
                         })
                         $('#rejected').on('hidden.bs.modal', function() {
                             var sms = {
-                                "mobile": "18626860001",
+                                "mobile": $scope.doctorinfos.phoneNo,
                                 "smsType": 4,
                                 "token": token,
                                 "reason": $scope.RejectReason.reason
@@ -456,6 +474,9 @@ angular.module('controllers', ['ngResource', 'services'])
                 function(e) {
 
                 })
+        }}
+        $scope.modal_close = function(target) {
+            $(target).modal('hide')
         }
     }])
     // 已审核-LZN
