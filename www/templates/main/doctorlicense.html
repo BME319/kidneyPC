@@ -14,26 +14,60 @@
             </p>
         </div>
         <div>
-            <h3 style="padding-left:30px">简介</h3>
+            <!--         <h3 style="padding-left:30px">简介</h3>
             <textarea style="width:100%;font-size:20px;resize:none;" row="3" disabled="disabled"></textarea>
-            <!-- 			<h3 style="padding-left:30px">擅长</h3>
-			<textarea style="width:100%;font-size:20px" row="3" disabled="disabled"></textarea> -->
+        <h3 style="padding-left:30px">擅长</h3>
+            <textarea style="width:100%;font-size:20px" row="3" disabled="disabled"></textarea> -->
+            <h3 style="padding-left:30px">有关证书</h3>
+            <!-- <textarea style="width:100%;font-size:20px;resize:none;" row="3" disabled="disabled"></textarea> -->
+            <!--            <h3 style="padding-left:30px">擅长</h3>
+            <textarea style="width:100%;font-size:20px" row="3" disabled="disabled"></textarea> -->
         </div>
+        <div style="text-align:center;">
+            <input type="button" class="btn slide-one" value="资质证书">
+            <input type="button" class="btn slide-two" value="执业证书">
+        </div>
+        <br>
         <!-- 轮播插件 -->
-        <div uib-carousel active="active" style="height:100px;background-color:white;margin-top:10px">
+        <div id="myCarousel" class="carousel slide" style="height: 400px;">
+            <!-- 轮播（Carousel）指标 -->
+            <ol class="carousel-indicators">
+                <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+                <li data-target="#myCarousel" data-slide-to="1"></li>
+            </ol>
+            <!-- 轮播（Carousel）项目 -->
+            <div class="carousel-inner" style="">
+                <div class="item active">
+                    <img ng-src="{{certificatephoto}}" class="center-block" style="max-height: 400px;">
+                    <div class="carousel-caption">
+                        <h3>资质证书</h3>
+                    </div>
+                </div>
+                <div class="item">
+                    <img ng-src="{{practisingphoto}}" class="center-block" style="max-height: 400px;">
+                    <div class="carousel-caption">
+                        <h3>执业证书</h3>
+                    </div>
+                </div>
+            </div>
+            <!-- 轮播（Carousel）导航 -->
+                        <a class="carousel-control left" id="prev">&lsaquo;</a>
+            <a class="carousel-control right" id="next">&rsaquo;</a>
+        </div>
+        <!--         <div uib-carousel active="active" style="height:100px;background-color:white;margin-top:10px">
             <div uib-slide>
                 证书图片
             </div>
-        </div>
+        </div> -->
         <div style="margin-top:10px;">
-            <!-- 			<p>
-				<span>审核状态:</span>
-				<span style="margin-left:50px">{{review.reviewStatus}}</span>
-				<span style="margin-left:200px">审核人:</span>
-				<span style="margin-left:50px">{{review.adminId.name}}</span>
-				<span style="margin-left:200px">审核日期:</span>
-				<span style="margin-left:50px">{{review.reviewDate}}</span>
-			</p> -->
+            <!--            <p>
+                <span>审核状态:</span>
+                <span style="margin-left:50px">{{review.reviewStatus}}</span>
+                <span style="margin-left:200px">审核人:</span>
+                <span style="margin-left:50px">{{review.adminId.name}}</span>
+                <span style="margin-left:200px">审核日期:</span>
+                <span style="margin-left:50px">{{review.reviewDate}}</span>
+            </p> -->
             <table style="width:80%;font-size:18px;">
                 <tr>
                     <td style="font-weight: bold;">审核状态:</td>
@@ -48,8 +82,8 @@
             <p style="font-weight: bold;font-size:18px">
                 审核内容
             </p>
-            </div>
-           <div>
+        </div>
+        <div>
             <textarea style="width:100%;font-size:20px;margin-bottom:5px;resize:none;" row="3" disabled="disabled" ng-model="review.reviewContent"></textarea>
             <div ng-hide="(status == 1)||(status == 2)">
                 <button class="btn btn-primary" style="margin-left:30%;margin-top:5px;margin-bottom:40px;width:70px;" ng-click="accept()">
@@ -80,8 +114,8 @@
                                     &times;
                                 </button>
                                 <h3 class="modal-title" id="rejectLabel">
-	                    			拒绝原因
-	                  			</h3>
+                                    拒绝原因
+                                </h3>
                             </div>
                             <div class="modal-body">
                                 <textarea rows="10" cols="49" ng-model="RejectReason.reason" style="font-size:20px;resize:none;"></textarea>

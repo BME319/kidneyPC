@@ -35,7 +35,7 @@ angular.module('controllers', ['ngResource', 'services'])
                             $scope.logStatus = '请确认账号密码无误且角色选择正确！'
                         } else if (data.results.mesg == 'login success!') {
                             $scope.logStatus = '登录成功！'
-                            $state.go('main.usermanage.allUsers')
+                            $state.go('homepage')
                             Storage.set('PASSWORD', logOn.password)
                             Storage.set('TOKEN', data.results.token)
                             Storage.set('isSignIN', 'Yes')
@@ -344,21 +344,37 @@ angular.module('controllers', ['ngResource', 'services'])
     .controller('DoctorLicenseCtrl', ['$scope', '$state', 'Review', 'Alluser', 'Storage', '$timeout', function($scope, $state, Review, Alluser, Storage, $timeout) {
         var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwMzQ3OTg1NjczMiwiaWF0IjoxNTAzNDc2MjU2fQ.e5OhZEOc8Rfe8vr4gaPCcbO-2LD-ij8e9znerHjgHhs"
         var id = Storage.get('docId');
+
+        // 循环轮播到某个特定的帧 
+        $(".slide-one").click(function(){
+            $("#myCarousel").carousel(0);
+        });
+        $(".slide-two").click(function(){
+            $("#myCarousel").carousel(1);
+        });
+
+        // 轮播到前后帧 
+        $("#prev").click(function(){
+            $('#myCarousel').carousel('prev')
+        });
+        $("#next").click(function(){
+            $('#myCarousel').carousel('next')
+        });
+
         $scope.status = Storage.get('reviewstatus');
-        console.log(id);
-        console.log($scope.status);
         $scope.doctorinfos = {};
         $scope.review = {};
         var params = {
             "doctorId": id,
-
             "token": token
         }
         Review.GetCertificate(params).then(
             function(data) {
+                console.log(data)
                 $scope.doctorinfos = data.results;
+                $scope.certificatephoto=data.results.certificatePhotoUrl.replace("resized", "");
+                $scope.practisingphoto=data.results.practisingPhotoUrl.replace("resized", "");
                 if ($scope.doctorinfos.province == $scope.doctorinfos.city) $scope.doctorinfos.province = '';
-                console.log($scope.doctorinfos);
                 var review = {
                     "reviewStatus": $scope.status,
                     "limit": 15,
@@ -716,7 +732,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 "labtestImportStatus": 0,
                 "limit": itemsPerPage,
                 "skip": (currentPage - 1) * itemsPerPage,
-                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImhlYWx0aCIsImV4cCI6MTQ5OTY4Nzg2OTI5NSwiaWF0IjoxNDk5Njg0MjY5fQ.p87yOwwsumsi-G5uprWamdSH8_Ij1NgY3XAi1yFdv0U"
+                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJoZWFsdGgiLCJleHAiOjE1MDQ3OTc0MTY1NTUsImlhdCI6MTUwNDc5MzgxNn0.nwvH3C_f3HwzD8ZCGgaBrr2lwokQo9be5UMK3p3QlTc"
             }
             LabtestImport.GetLabtestInfo($scope.lab).then(
                 function(data) {
@@ -759,7 +775,7 @@ angular.module('controllers', ['ngResource', 'services'])
         //   "labtestImportStatus":0,
         //   "limit":10,
         //   "skip":0,
-        //   "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImhlYWx0aCIsImV4cCI6MTQ5OTY4Nzg2OTI5NSwiaWF0IjoxNDk5Njg0MjY5fQ.p87yOwwsumsi-G5uprWamdSH8_Ij1NgY3XAi1yFdv0U"
+        //   "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJoZWFsdGgiLCJleHAiOjE1MDQ3OTc0MTY1NTUsImlhdCI6MTUwNDc5MzgxNn0.nwvH3C_f3HwzD8ZCGgaBrr2lwokQo9be5UMK3p3QlTc"
         // }
         // LabtestImport.GetLabtestInfo($scope.lab).then(
         //   function (data) {
@@ -784,7 +800,7 @@ angular.module('controllers', ['ngResource', 'services'])
         $scope.count = '';
         var count = {
             "labtestImportStatus": 0,
-            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImhlYWx0aCIsImV4cCI6MTQ5OTY4Nzg2OTI5NSwiaWF0IjoxNDk5Njg0MjY5fQ.p87yOwwsumsi-G5uprWamdSH8_Ij1NgY3XAi1yFdv0U"
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJoZWFsdGgiLCJleHAiOjE1MDQ3OTc0MTY1NTUsImlhdCI6MTUwNDc5MzgxNn0.nwvH3C_f3HwzD8ZCGgaBrr2lwokQo9be5UMK3p3QlTc"
         }
         LabtestImport.GetCount(count).then(
             function(data) {
@@ -841,7 +857,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 "limit": $scope.itemsPerPage,
                 "skip": ($scope.currentPage - 1) * $scope.itemsPerPage,
                 "name": $scope.patientname,
-                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImhlYWx0aCIsImV4cCI6MTQ5OTY4Nzg2OTI5NSwiaWF0IjoxNDk5Njg0MjY5fQ.p87yOwwsumsi-G5uprWamdSH8_Ij1NgY3XAi1yFdv0U"
+                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJoZWFsdGgiLCJleHAiOjE1MDQ3OTc0MTY1NTUsImlhdCI6MTUwNDc5MzgxNn0.nwvH3C_f3HwzD8ZCGgaBrr2lwokQo9be5UMK3p3QlTc"
             }
             LabtestImport.GetLabtestInfo($scope.lab).then(
                 function(data) {
@@ -873,7 +889,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 "labtestImportStatus": 1,
                 "limit": itemsPerPage,
                 "skip": (currentPage - 1) * itemsPerPage,
-                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImhlYWx0aCIsImV4cCI6MTQ5OTY4Nzg2OTI5NSwiaWF0IjoxNDk5Njg0MjY5fQ.p87yOwwsumsi-G5uprWamdSH8_Ij1NgY3XAi1yFdv0U"
+                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJoZWFsdGgiLCJleHAiOjE1MDQ3OTc0MTY1NTUsImlhdCI6MTUwNDc5MzgxNn0.nwvH3C_f3HwzD8ZCGgaBrr2lwokQo9be5UMK3p3QlTc"
             }
             LabtestImport.GetLabtestInfo($scope.lab).then(
                 function(data) {
@@ -921,7 +937,7 @@ angular.module('controllers', ['ngResource', 'services'])
         //   "labtestImportStatus":1,
         //   "limit":10,
         //   "skip":0,
-        //   "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImhlYWx0aCIsImV4cCI6MTQ5OTY4Nzg2OTI5NSwiaWF0IjoxNDk5Njg0MjY5fQ.p87yOwwsumsi-G5uprWamdSH8_Ij1NgY3XAi1yFdv0U"
+        //   "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJoZWFsdGgiLCJleHAiOjE1MDQ3OTc0MTY1NTUsImlhdCI6MTUwNDc5MzgxNn0.nwvH3C_f3HwzD8ZCGgaBrr2lwokQo9be5UMK3p3QlTc"
         // }
         // LabtestImport.GetLabtestInfo($scope.lab).then(
         //   function (data) {
@@ -951,7 +967,7 @@ angular.module('controllers', ['ngResource', 'services'])
         $scope.count = '';
         var count = {
             "labtestImportStatus": 1,
-            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImhlYWx0aCIsImV4cCI6MTQ5OTY4Nzg2OTI5NSwiaWF0IjoxNDk5Njg0MjY5fQ.p87yOwwsumsi-G5uprWamdSH8_Ij1NgY3XAi1yFdv0U"
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJoZWFsdGgiLCJleHAiOjE1MDQ3OTc0MTY1NTUsImlhdCI6MTUwNDc5MzgxNn0.nwvH3C_f3HwzD8ZCGgaBrr2lwokQo9be5UMK3p3QlTc"
         }
         LabtestImport.GetCount(count).then(
             function(data) {
@@ -1008,7 +1024,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 "limit": $scope.itemsPerPage,
                 "skip": ($scope.currentPage - 1) * $scope.itemsPerPage,
                 "name": $scope.patientname,
-                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImhlYWx0aCIsImV4cCI6MTQ5OTY4Nzg2OTI5NSwiaWF0IjoxNDk5Njg0MjY5fQ.p87yOwwsumsi-G5uprWamdSH8_Ij1NgY3XAi1yFdv0U"
+                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJoZWFsdGgiLCJleHAiOjE1MDQ3OTc0MTY1NTUsImlhdCI6MTUwNDc5MzgxNn0.nwvH3C_f3HwzD8ZCGgaBrr2lwokQo9be5UMK3p3QlTc"
             }
             LabtestImport.GetLabtestInfo($scope.lab).then(
                 function(data) {
@@ -1217,10 +1233,15 @@ angular.module('controllers', ['ngResource', 'services'])
 
         var patient = {
             'patientId': Storage.get('patId'),
-            'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImhlYWx0aCIsImV4cCI6MTQ5OTY4Nzg2OTI5NSwiaWF0IjoxNDk5Njg0MjY5fQ.p87yOwwsumsi-G5uprWamdSH8_Ij1NgY3XAi1yFdv0U'
+            'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJoZWFsdGgiLCJleHAiOjE1MDQ3OTc0MTY1NTUsImlhdCI6MTUwNDc5MzgxNn0.nwvH3C_f3HwzD8ZCGgaBrr2lwokQo9be5UMK3p3QlTc'
         }
         LabtestImport.GetPhotoList(patient).then(
             function(data) {
+                // 对结果的去“resized”处理
+                for (var i=0;i<data.results.length;i++){
+                    data.results[i].photo=data.results[i].photo.replace("resized", "");
+                }
+
                 $scope.slides = data.results;
                 // var test=data.results;
                 // $scope.slides = test;
@@ -1390,7 +1411,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     "type": type,
                     "value": $scope.postBack[i].LabValue,
                     "unit": unit,
-                    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImhlYWx0aCIsImV4cCI6MTQ5OTY4Nzg2OTI5NSwiaWF0IjoxNDk5Njg0MjY5fQ.p87yOwwsumsi-G5uprWamdSH8_Ij1NgY3XAi1yFdv0U"
+                    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJoZWFsdGgiLCJleHAiOjE1MDQ3OTc0MTY1NTUsImlhdCI6MTUwNDc5MzgxNn0.nwvH3C_f3HwzD8ZCGgaBrr2lwokQo9be5UMK3p3QlTc"
                 }
                 console.log(params);
                 LabtestImport.PostLabTestInfo(params).then(
@@ -1404,7 +1425,7 @@ angular.module('controllers', ['ngResource', 'services'])
             var label = {
                 "photoType": $scope.phototype,
                 "photoId": $scope.photoId,
-                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImhlYWx0aCIsImV4cCI6MTQ5OTY4Nzg2OTI5NSwiaWF0IjoxNDk5Njg0MjY5fQ.p87yOwwsumsi-G5uprWamdSH8_Ij1NgY3XAi1yFdv0U"
+                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJoZWFsdGgiLCJleHAiOjE1MDQ3OTc0MTY1NTUsImlhdCI6MTUwNDc5MzgxNn0.nwvH3C_f3HwzD8ZCGgaBrr2lwokQo9be5UMK3p3QlTc"
             }
             LabtestImport.LabelPhoto(label).then(
                 function(data) {
@@ -1421,7 +1442,7 @@ angular.module('controllers', ['ngResource', 'services'])
                                 $scope.phototype = '';
                                 var patient = {
                                     'patientId': Storage.get('patId'),
-                                    'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImhlYWx0aCIsImV4cCI6MTQ5OTY4Nzg2OTI5NSwiaWF0IjoxNDk5Njg0MjY5fQ.p87yOwwsumsi-G5uprWamdSH8_Ij1NgY3XAi1yFdv0U'
+                                    'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJoZWFsdGgiLCJleHAiOjE1MDQ3OTc0MTY1NTUsImlhdCI6MTUwNDc5MzgxNn0.nwvH3C_f3HwzD8ZCGgaBrr2lwokQo9be5UMK3p3QlTc'
                                 }
                                 LabtestImport.GetPatientLabTest(patient).then(
                                     function(data) {
@@ -1515,7 +1536,7 @@ angular.module('controllers', ['ngResource', 'services'])
         $scope.skip = function() {
             var label = {
                 "photoId": $scope.photoId,
-                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImhlYWx0aCIsImV4cCI6MTQ5OTY4Nzg2OTI5NSwiaWF0IjoxNDk5Njg0MjY5fQ.p87yOwwsumsi-G5uprWamdSH8_Ij1NgY3XAi1yFdv0U"
+                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJoZWFsdGgiLCJleHAiOjE1MDQ3OTc0MTY1NTUsImlhdCI6MTUwNDc5MzgxNn0.nwvH3C_f3HwzD8ZCGgaBrr2lwokQo9be5UMK3p3QlTc"
             }
             LabtestImport.LabelPhoto(label).then(
                 function(data) {
@@ -1532,7 +1553,7 @@ angular.module('controllers', ['ngResource', 'services'])
                                 $scope.phototype = '';
                                 var patient = {
                                     'patientId': Storage.get('patId'),
-                                    'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImhlYWx0aCIsImV4cCI6MTQ5OTY4Nzg2OTI5NSwiaWF0IjoxNDk5Njg0MjY5fQ.p87yOwwsumsi-G5uprWamdSH8_Ij1NgY3XAi1yFdv0U'
+                                    'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJoZWFsdGgiLCJleHAiOjE1MDQ3OTc0MTY1NTUsImlhdCI6MTUwNDc5MzgxNn0.nwvH3C_f3HwzD8ZCGgaBrr2lwokQo9be5UMK3p3QlTc'
                                 }
                                 LabtestImport.GetPhotoList(patient).then(
                                     function(data) {
@@ -1596,7 +1617,7 @@ angular.module('controllers', ['ngResource', 'services'])
         $scope.patientlabtests = {};
         var patient = {
             "patientId": Storage.get('patId'),
-            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImhlYWx0aCIsImV4cCI6MTQ5OTY4Nzg2OTI5NSwiaWF0IjoxNDk5Njg0MjY5fQ.p87yOwwsumsi-G5uprWamdSH8_Ij1NgY3XAi1yFdv0U"
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJoZWFsdGgiLCJleHAiOjE1MDQ3OTc0MTY1NTUsImlhdCI6MTUwNDc5MzgxNn0.nwvH3C_f3HwzD8ZCGgaBrr2lwokQo9be5UMK3p3QlTc"
         }
         LabtestImport.GetPatientLabTest(patient).then(
             function(data) {
@@ -1744,7 +1765,7 @@ angular.module('controllers', ['ngResource', 'services'])
         $scope.photolist = {};
         var labtest = {
             'labtestId': Storage.get('labtestId'),
-            'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImhlYWx0aCIsImV4cCI6MTQ5OTY4Nzg2OTI5NSwiaWF0IjoxNDk5Njg0MjY5fQ.p87yOwwsumsi-G5uprWamdSH8_Ij1NgY3XAi1yFdv0U'
+            'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJoZWFsdGgiLCJleHAiOjE1MDQ3OTc0MTY1NTUsImlhdCI6MTUwNDc5MzgxNn0.nwvH3C_f3HwzD8ZCGgaBrr2lwokQo9be5UMK3p3QlTc'
         }
         LabtestImport.GetPhotobyLabtest(labtest).then(
             function(data) {
@@ -1789,7 +1810,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 "type": type,
                 "value": $scope.LabValue,
                 "unit": unit,
-                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImhlYWx0aCIsImV4cCI6MTQ5OTY4Nzg2OTI5NSwiaWF0IjoxNDk5Njg0MjY5fQ.p87yOwwsumsi-G5uprWamdSH8_Ij1NgY3XAi1yFdv0U"
+                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJoZWFsdGgiLCJleHAiOjE1MDQ3OTc0MTY1NTUsImlhdCI6MTUwNDc5MzgxNn0.nwvH3C_f3HwzD8ZCGgaBrr2lwokQo9be5UMK3p3QlTc"
             }
             console.log(params);
             LabtestImport.EditResult(params).then(
@@ -1817,7 +1838,7 @@ angular.module('controllers', ['ngResource', 'services'])
         $scope.patientlabtests = {}
         var patient = {
             'patientId': Storage.get('patId'),
-            'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImhlYWx0aCIsImV4cCI6MTQ5OTY4Nzg2OTI5NSwiaWF0IjoxNDk5Njg0MjY5fQ.p87yOwwsumsi-G5uprWamdSH8_Ij1NgY3XAi1yFdv0U'
+            'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJoZWFsdGgiLCJleHAiOjE1MDQ3OTc0MTY1NTUsImlhdCI6MTUwNDc5MzgxNn0.nwvH3C_f3HwzD8ZCGgaBrr2lwokQo9be5UMK3p3QlTc'
         }
         LabtestImport.GetPatientLabTest(patient).then(
             function(data) {
@@ -1958,10 +1979,12 @@ angular.module('controllers', ['ngResource', 'services'])
         $scope.photolist = {}
         var labtest = {
             'labtestId': Storage.get('labtestId'),
-            'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImhlYWx0aCIsImV4cCI6MTQ5OTY4Nzg2OTI5NSwiaWF0IjoxNDk5Njg0MjY5fQ.p87yOwwsumsi-G5uprWamdSH8_Ij1NgY3XAi1yFdv0U'
+            'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJoZWFsdGgiLCJleHAiOjE1MDQ3OTc0MTY1NTUsImlhdCI6MTUwNDc5MzgxNn0.nwvH3C_f3HwzD8ZCGgaBrr2lwokQo9be5UMK3p3QlTc'
         }
         LabtestImport.GetPhotobyLabtest(labtest).then(
             function(data) {
+                console.log(data.results)
+                data.results.photo=data.results.photo.replace("resized", "");
                 $scope.photolist = data.results
             },
             function(e) {
@@ -1998,7 +2021,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 'type': type,
                 'value': $scope.LabValue,
                 'unit': unit,
-                'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTIyZWJlNWI5NGRlMTM5Mjg1NzQ5ZjciLCJ1c2VySWQiOiJVMjAxNzA1MTEwMDAxIiwicm9sZSI6ImhlYWx0aCIsImV4cCI6MTQ5OTY4Nzg2OTI5NSwiaWF0IjoxNDk5Njg0MjY5fQ.p87yOwwsumsi-G5uprWamdSH8_Ij1NgY3XAi1yFdv0U'
+                'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJoZWFsdGgiLCJleHAiOjE1MDQ3OTc0MTY1NTUsImlhdCI6MTUwNDc5MzgxNn0.nwvH3C_f3HwzD8ZCGgaBrr2lwokQo9be5UMK3p3QlTc'
             }
             console.log(params)
             LabtestImport.EditResult(params).then(
@@ -2009,9 +2032,9 @@ angular.module('controllers', ['ngResource', 'services'])
                         $timeout(function() {
                             $('#modify').modal('hide')
                         }, 1000)
-                        $('#modify').on('hidden.bs.modal', function() {
-                            $state.go('main.patientlabinfo')
-                        })
+                        // $('#modify').on('hidden.bs.modal', function() {
+                        //     $state.go('main.patientlabinfo')
+                        // })
                     }
                 },
                 function(e) {
@@ -3048,19 +3071,16 @@ angular.module('controllers', ['ngResource', 'services'])
                     console.log(data.results)
                     // 首先处理一下要显示的roles
                     for (var i = 0; i < data.results.length; i++) {
-                        var roles = data.results[i].role
-                        for (var j = 0; j < roles.length; j++) {
-                            if (roles[j] == 'insuranceA') {
-                                data.results[i].role = 'insuranceA'
+                        var temproles = new Array()
+                        for (var j = 0; j < data.results[i].role.length; j++) {
+                            if ((data.results[i].role[j] == 'insuranceA')||(data.results[i].role[j] == 'insuranceR')||(data.results[i].role[j] == 'insuranceC')) {
+                               temproles.push(data.results[i].role[j])
                             }
-                            if (roles[j] == 'insuranceR') {
-                                data.results[i].role = 'insuranceR'
                             }
-                            if (roles[j] == 'insuranceC') {
-                                data.results[i].role = 'insuranceC'
-                            }
-                        }
+                        data.results[i].role=temproles
+    
                     }
+                    console.log(data.results)
                     $scope.tableParams = new NgTableParams({
                         count: 10000
                     }, {
@@ -6848,6 +6868,7 @@ angular.module('controllers', ['ngResource', 'services'])
             }
             var promise = Policy.getAgentList(AgentInfo)
             promise.then(function(data) {
+                console.log(data.data)
                 $scope.insuAtableParams = new NgTableParams({
                     count: 10000
                 }, {

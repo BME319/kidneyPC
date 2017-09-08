@@ -328,13 +328,13 @@
 		</td>
 		<td title="'姓名'" sortable="'name'">{{user.name}}
 		</td>
-		<td title="'性别'">{{user.gender|gender}}
+		<td title="'性别'" sortable="'gender'">{{user.gender|gender}}
 		</td>
 		<td title="'手机号码'" sortable="'phoneNo'">{{user.phoneNo}}
 		</td>
 		<td title="'入职时间'" sortable="'boardingTime'">{{user.boardingTime|timeFormat:'YYYY-MM-DD'}}
 		</td>
-		<td title="'保险角色'" sortable="'role'">{{user.role|role}}
+		<td title="'保险角色'" sortable="'role'"><span ng-repeat="ro in user.role">{{ro|role}}&nbsp;</span>
 		</td>
 		<td title="'工作量'" sortable="'workAmounts'">{{user.workAmounts}}
 		</td>
