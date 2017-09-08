@@ -1,0 +1,314 @@
+<h4 style="font-size: 15px;margin-top: -10px;">所有患者总数：{{totalItems}}位</h4>
+<form class="form-inline">
+    <!-- 保险搜索 -->
+    <div class="form-group">
+        <label class="sr-only">患者姓名</label>
+        <input type="text" class="form-control" ng-model="userlist.name" placeholder="请输入患者姓名" style="width: 130px">
+    </div>
+    <div class="form-group">
+        <label class="sr-only">保单状态</label>
+        <select class="form-control" ng-model="userlist.status" ng-options="status.id as status.name for status in search_status">
+            <option value=''>请选择保单状态</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-default" ng-click="searchList()">搜索</button>
+    <button type="button" class="btn btn-default" ng-click="searchClear()">清空搜索</button>
+</form>
+<table ng-table="insupattableParams" class="table table-condensed table-bordered table-striped" style="margin-top: 10px;text-align: center;">
+    <tr ng-repeat="pat in $data">
+        <td title="'专员'" sortable="'insuranceA'">{{pat.currentAgent.name}}
+        </td>
+        <td title="'专员联系方式'" sortable="'insuranceA'">{{pat.currentAgent.phoneNo}}
+        </td>
+        <td title="'患者姓名'" sortable="'name'">{{pat.patientId.name}}
+        </td>
+        <td title="'联系方式'" sortable="'phoneNo'">{{pat.patientId.phoneNo}}
+        </td>
+        <td title="'年龄'" sortable="'portleader'">{{pat.patientId.birthday|filterAge}}
+        </td>
+        <td title="'性别'" sortable="'gender'">{{pat.patientId.gender|gender}}
+        </td>
+        <td title="'VIP状态'" sortable="'VIP'">{{pat.patientId.VIP}}
+        </td>
+        <td title="'保单状态'" sortable="'status'">{{pat.status|Policytype}}
+        </td>
+        <!--             <td title="'最后一次跟踪内容'" sortable="'hospital'">{{pat.hospital}}
+            </td>
+            <td title="'最后一次跟踪时间'" sortable="'hospital'">{{pat.hospital}}
+            </td> -->
+        <td title="'操作'">
+            <button class="btn btn-link" style="text-decoration:none; outline:none; padding:0px; border:0px; font-size:10px;" ng-click="postfu(pat)">跟踪记录</button>
+            <button class="btn btn-link" style="text-decoration:none; outline:none; padding:0px; border:0px; font-size:10px;" ng-click="postp(pat)">保单录入</button>
+            <button class="btn btn-link" style="text-decoration:none; outline:none; padding:0px; border:0px; font-size:10px;" ng-click="review(pat.patientId.userId)">保单审核</button>
+            <button class="btn btn-link" style="text-decoration:none; outline:none; padding:0px; border:0px; font-size:10px;" ng-click="changeAgent(pat.patientId.userId)">更换专员</button>
+        </td>
+    </tr>
+</table>
+<!-- 跟踪记录modal -->
+<div class="modal fade" id="Followuppost" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" style="width: 1000px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" ng-click="modal_close('#Followuppost')" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h3 class="modal-title">跟踪记录</h3>
+                <br>
+                <h5 class="modal-title">患者姓名：{{history.name}}</h5>
+            </div>
+            <div class="modal-body" style="height: 680px">
+                <div class="form-group" style="margin-left: 6%;margin-right: 6%">
+                    <table ng-table="followuphistableParams" class="table table-condensed table-bordered table-striped" style="margin-top: 10px;text-align: center;">
+                        <tr ng-repeat="history in $data">
+                            <td title="'跟踪时间'">{{history.time|timeFormat:'YYYY-MM-DD h:m'}}
+                            </td>
+                            <td title="'跟踪类型'">{{history.type|followuptype}}
+                            </td>
+                            <td title="'跟踪人员'">{{history.agentId.name}}
+                            </td>
+                            <td title="'内容'">{{history.content}}
+                            </td>
+                            <td title="'记录图片'">
+                                <button class="btn btn-link" style="text-decoration:none; outline:none; padding:0px; border:0px; font-size:10px;" ng-click="showfollowuppic(history.photos)">查看记录图片</button>
+                                <!-- <span ng-show="history.ifpic">无记录图片</span> -->
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="form-group" style="margin-top: 0px;">
+                    <div class="col-md-6" style="padding-left: 70px;margin-top: -20px;">
+                        <label>上传图片：</label>
+                        <div>
+                            <!-- <img id="preview" width="200px"> -->
+                            <input type="file" id="fuimageupload" name="file" style="">
+                        </div>
+                    </div>
+                    <div class="col-md-6" style="padding-left:50px;margin-top: -20px;">
+                        <label>跟踪内容：</label>
+                        <textarea type="text" class="form-control ng-pristine ng-untouched ng-valid ng-empty" ng-model="followupInfo.content" placeholder="请输入跟踪内容" style="width: 330px;height: 76px;resize:none;"> </textarea>
+                    </div>
+                </div>
+                <div class="form-group" style="margin-left: 62.4%;margin-top: 24%;">
+                    <button type="submit" class="btn btn-primary" ng-click="followup(followupInfo)">确认上传跟踪记录</button>
+                    <button type="button" class="btn btn-default" ng-click="modal_close('#Followuppost')" style="margin-left: 20px">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 查看记录图片modal -->
+<div class="modal fade" id="followuppic" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" ng-click="modal_close('#followuppic')">&times;</button>
+                <h3 class="modal-title" id="modal-title">跟踪记录图片</h3>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <img style="width:250px;height:250px;margin-left: 20%;margin-right: 20%;" ng-src="{{followuppic}}">
+                <div class="modal-footer">
+                    <button class="btn btn-primary" type="button" ng-click="modal_close('#followuppic')">关闭</button>
+                    <!-- <button class="btn btn-primary" type="button" ng-click="removeUserRoles()">去除角色</button> -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 保单录入modal -->
+<div class="modal fade" id="Policypost" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" ng-click="modal_close('#Policypost')" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h3 class="modal-title">保单录入</h3>
+                <br>
+                <h5 class="modal-title">患者姓名：{{policy.name}}</h5>
+            </div>
+            <div class="modal-body" style="margin-left: 15%;margin-right: 15%">
+                <div class="form-group">
+                    <label>保单内容：</label>
+                    <textarea type="text" class="form-control" ng-model="policyInfo.content" placeholder="请输入内容" style="width: 336px;height: 56px;resize:none"> </textarea>
+                </div>
+                <div class="form-group">
+                    <label>上传图片：</label>
+                    <div>
+                        <!-- <img id="preview" width="200px"> -->
+                        <input type="file" id="poimageupload" name="file" style="padding-top: 15px;">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary" ng-click="postpolicy(policyInfo)">确认上传保单</button>
+                    <button type="button" class="btn btn-default" ng-click="modal_close('#Policypost')">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 更换专员modal -->
+<div class="modal fade" id="change_agent" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-title">专员列表</h3>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <table ng-table="tableagent" class="table table-condensed table-bordered table-striped" style="margin-top: 10px;">
+                    <tr ng-repeat="a in $data" style="text-align: center;">
+                        <td title="'专员姓名'" sortable="'name'">{{a.name}}
+                        </td>
+                        <td title="'性别'" sortable="'name'">{{a.gender|gender}}
+                        </td>
+                        <td title="'联系方式'" sortable="'phoneNo'">{{a.phoneNo}}
+                        </td>
+                        <td title="'已分配患者数量'" sortable="'sum'">{{a.currentPatientNo}}
+                        </td>
+                        <td title="'操作'">
+                            <button class="btn btn-link" style="text-decoration:none; outline:none; padding:0px; border:0px; font-size:10px;" ng-click="confirmagent(a.userId,a.name)">确定</button>
+                        </td>
+                    </tr>
+                </table>
+                <div class="form-group" ng-show="newflag">
+                    <h5>已选择专员：{{name}}</h5>
+                    <h5>原因：</h5>
+                    <textarea style="margin-left:5%;margin-bottom: 2%;resize:none;" name="reason" cols="70" rows="6" ng-model="reason"></textarea>
+                    <div class="form-actions" style="margin-left:90%">
+                        <button class="btn btn-default" ng-click="confirmreason()">确定</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-xs-offset-3">
+                        <button type="button" class="btn btn-default" style="margin-left:87%;margin-top: 3%" ng-click="modal_close('#change_agent')">关闭</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="changeSuccess">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content" style="width:400px;text-align: center; font-size: 20px">
+            专员更换成功！
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="changeFail">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content" style="width:400px;text-align: center; font-size: 20px">
+            专员无需更换！
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="noreason">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content" style="width:400px;text-align: center; font-size: 20px">
+            请输入理由！
+        </div>
+    </div>
+</div>
+<!-- 保单审核-->
+<div class="modal fade" id="review_policy" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" ng-click="modal_close('#review_policy')">&times;</button>
+                <h3 class="modal-title" id="modal-title">保单审核</h3>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <div><span style="font-size: 18px">保单内容：</span><span style="font-size: 15px">{{review.content}}</span></div>
+                <div><span style="font-size: 18px">{{review.picreview}}</span></div>
+                <div style="text-align: center;"><img ng-show="review.ifpicexist" style="width:200px;height:200px;" ng-src="{{review.pic}}"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" type="button" ng-click="passreview()">通过</button>
+                <button class="btn btn-warning" type="button" ng-click="rejectreview()">拒绝</button>
+                <button class="btn btn-default" type="button" ng-click="modal_close('#review_policy')">取消</button>
+            </div>
+            </br>
+            <div class="modal-body" id="modal-body" ng-show="pass">
+                <div class="form-inline" style="padding-left:12px;margin-top: -35px">
+                    <label for="start">开始日期:</label>
+                    <div class="input-group date datetimepicker" data-date="" data-link-field="dtp_input1">
+                        <input class="form-control" size="16" type="text" value="2017-01-01" style="width:170px;height: 34px;" ng-model="starttime">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                    </div>
+                    <input type="hidden" id="dtp_input1" value="" />
+                    <label for="end">结束日期:</label>
+                    <div class="input-group date datetimepicker" data-date="" data-link-field="dtp_input2">
+                        <input class="form-control" size="16" type="text" value=" " style="width:170px;height: 34px;" ng-model="endtime">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-default" ng-click="passpat()" style="margin-left: 90.5%;margin-top: 10px">确定</button>
+                </div>
+            </div>
+            <div class="modal-body" id="modal-body" ng-show="reject">
+                <div class="form-group">
+                    <h5>原因：</h5>
+                    <textarea style="margin-left:5%;margin-bottom: 2%;resize:none;" name="reason" cols="74" rows="6" ng-model="rejectreason"></textarea>
+                    <div class="form-actions" style="margin-left:90%">
+                        <button class="btn btn-default" ng-click="rejectpat()">确定</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="inputerror">
+                <div class="modal-dialog modal-sm" role="document">
+                    <div class="modal-content" style="width:400px;text-align: center; font-size: 20px">
+                        请确认时间选择正确！
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="reviewend">
+                <div class="modal-dialog modal-sm" role="document">
+                    <div class="modal-content" style="width:400px;text-align: center; font-size: 20px">
+                        保单审核成功！
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="reviewFail">
+                <div class="modal-dialog modal-sm" role="document">
+                    <div class="modal-content" style="width:400px;text-align: center; font-size: 20px">
+                        保单审核失败！
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="fupostsuccess">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content" style="width:400px;text-align: center; font-size: 20px">
+            跟踪录入成功！
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="fupostfailed">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content" style="width:400px;text-align: center; font-size: 20px">
+            跟踪录入失败！
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="popostsuccess">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content" style="width:400px;text-align: center; font-size: 20px">
+            保单录入成功！
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="popostfailed">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content" style="width:400px;text-align: center; font-size: 20px">
+            保单录入失败！
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="nopic">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content" style="width:400px;text-align: center; font-size: 20px">
+            该记录无图片！
+        </div>
+    </div>
+</div>

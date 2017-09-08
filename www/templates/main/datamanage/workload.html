@@ -1,0 +1,93 @@
+<div class="panel-body">
+    <form class="form-inline" style="margin-top: -30px">
+        <div class="form-group">
+            <select style="width:120px;height: 34px;font-size: 14px;border: 1px solid #ccc;border-radius: 4px;background-color: white;" ng-options="Province.name for Province in Provinces track by Province.province" style="width:40%" ng-change="getCity(Province.province)" ng-model="Province.province" >
+                <option selected value="">省份</option>
+            </select>
+            <select style="width:120px;height: 34px;font-size: 14px;border: 1px solid #ccc;border-radius: 4px;background-color: white;" ng-options="City.name for City in Cities track by City.city" style="width:40%"  ng-model="City.city">
+                <option selected value="">城市</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="start">开始日期</label>
+            <div class="input-group date datetimepicker" data-date="" data-link-field="dtp_input1">
+                <input class="form-control" size="16" type="text" value="2017-01-01" style="width:190px;height: 34px;" ng-model="starttime" placeholder="请选择开始日期">
+                <!--     <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span> -->
+                <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+            </div>
+            <input type="hidden" id="dtp_input1" value="" /> </div>
+        <div class="form-group">
+            <label for="end">结束日期</label>
+            <div class="input-group date datetimepicker" data-date="" data-link-field="dtp_input2">
+                <input class="form-control" size="16" type="text" value=" " style="width:190px;height: 34px;" ng-model="endtime" placeholder="请选择结束日期">
+                <!-- <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span> -->
+                <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-default" ng-click="searchList()" style="background:#347ab6;color:white;width: 60px">确 定</button>
+    </form>
+<table ng-table="workloadtableParams" class="table table-condensed table-bordered table-striped" style="margin-top: 10px;">
+    <tr ng-repeat="w in $data" style="text-align: center;">
+        <td title="'医生'"  sortable="'name'">{{w.name}}
+        </td>
+        <td title="'所属地区'" sortable="'province'">{{w.province}}{{w.city}}
+        </td>
+        <td title="'所属医院'" sortable="'hospital'">{{w.hospital}}
+        </td>
+        <td title="'关注数量'"  sortable="'count'">{{w.count}}
+        </td>
+        <td title="'扫码未关注数量'" sortable="'open'">{{w.open}}
+        </td>
+        <td title="'咨询量'" sortable="'consultation'">{{w.consultation}}
+        </td>
+        <td title="'加急咨询量'"  sortable="'urgentcon'">{{w.urgentcon}}
+        </td>
+        <td title="'问诊量'"  sortable="'communication'">{{w.communication}}
+        </td>
+        <td title="'面诊量'"  sortable="'personaldiag'">{{w.personaldiag}}
+        </td>
+        <td title="'主管患者量'"  sortable="'doctorsincharge'">{{w.doctorsincharge}}
+        </td>
+    </tr>
+</table>
+</div>
+<div class="modal fade" id="inputerror">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content" style="width:400px;text-align: center; font-size: 20px">
+            请确认地区、时间等信息选择正确！
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="nodata">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content" style="width:400px;text-align: center; font-size: 20px">
+            暂无数据！
+        </div>
+    </div>
+</div>
+<!-- 每页数量 -->
+<div class="btn-group  btn-group-sm pull-right" style="margin-top: 18px">
+    <button type="button" class="btn btn-default" ng-click="changeLimit(20)">20</button>
+    <button type="button" class="btn btn-default" ng-click="changeLimit(30)">30</button>
+    <button type="button" class="btn btn-default" ng-click="changeLimit(50)">50</button>
+    <button type="button" class="btn btn-default" ng-click="changeLimit(100)">100</button>
+</div>
+<!-- 分页条 -->
+<ul uib-pagination  
+    max-size="10" 
+    class="pagination" 
+    boundary-links="true" 
+    boundary-link-numbers="true"
+    direction-links="true"
+    first-text="首页"
+    last-text="末页"
+    previous-text="上一页"
+    next-text="下一页"
+    force-ellipses="true"
+    rotate="true" 
+    total-items="totalItems"
+    items-per-page="itemsPerPage"
+    ng-change="pageChanged()"
+    ng-model="currentPage"
+    >
+</ul>

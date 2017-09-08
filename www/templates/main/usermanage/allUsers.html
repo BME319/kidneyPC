@@ -1,4 +1,4 @@
-<h4>所有用户总数：{{totalNums}}位</h4>
+<h4 style="font-size: 15px;margin-top: -10px;font-weight: bold;">所有用户总数：{{totalNums}}位</h4>
 <!-- 搜索 -->
 <form class="form-inline">
   <div class="form-group">
@@ -35,7 +35,7 @@
 		</td>
 		<td title="'姓名'" sortable="'name'">{{user.name}}
 		</td>
-		<td title="'性别'">{{user.gender|gender}}
+		<td title="'性别'" sortable="'gender'">{{user.gender|gender}}
 		</td>
 		<td title="'手机号码'" sortable="'phoneNo'">{{user.phoneNo}}
 		</td>
@@ -107,10 +107,10 @@
 		    	<form id = "changeRolesForm">
 			    	<div class="form-group">
 			    		<label class="checkbox">
-						  	<input type="checkbox" ng-model="role_end.Leader" ng-disabled="ifDisabled.Leader" value="Leader"> 地区负责人
+						  	<input type="checkbox" ng-model="role_end.Leader" ng-disabled="ifDisabled.Leader" value="Leader" > 地区负责人
 						</label>
 						<label class="checkbox">
-						  	<input type="checkbox" ng-model="role_end.master" ng-disabled="ifDisabled.master" value="master"> 科主任
+						  	<input type="checkbox" ng-model="role_end.master" ng-disabled="ifDisabled.master" value="master" > 科主任
 						</label>
 						<label class="checkbox">
 						  	<input type="checkbox" ng-model="role_end.doctor" ng-disabled="ifDisabled.doctor" value="doctor"> 普通医生

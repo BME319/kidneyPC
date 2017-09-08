@@ -1,0 +1,111 @@
+<!-- <div style="display:none;position: fixed;left: 0;right: 0;z-index: 1;top:52px;" id="alert" class="alert alert-danger alert-dismissible" role="alert">
+    <button type="button" class="close" data-dismiss="alert">
+        <span aria-hidden="true">×</span>
+        <span class="sr-only">关闭</span>
+    </button>
+    <strong>警告!</strong>
+</div>
+<header class="navbar navbar-static-top navbar-default" role="banner">
+    <div class="container" style="background-color: #f8f8f8;">
+        <div class="navbar-header">
+            <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse"><span class="sr-only">菜单</span><span class="icon-bar"></span>
+                <span class="icon-bar"></span> <span class="icon-bar"></span></button>
+            <span class="navbar-brand"><span class="glyphicon glyphicon-cog"></span>&nbsp;后台管理</span>
+        </div>
+    </div>
+</header> -->
+<!-- <div class="container">
+    <div class="row">
+        <div class="col-md-4">
+            <a href="http://weixin.zjdialysis.com/admin/index/monitor.html" class="col-md-12 btn-success text-center custom" style="text-decoration: none;"><span style="font-size: 26px;" class="glyphicon glyphicon-dashboard"></span> 监控系统</a>
+        </div>
+        <div class="col-md-4">
+            <a href="http://weixin.zjdialysis.com/doctor/admin.html" class="col-md-12 btn-info text-center custom" style="text-decoration: none;"><span class="glyphicon glyphicon-ok-circle" style="font-size: 26px;"></span> 注册审核</a>
+        </div>
+        <div class="col-md-4">
+            <a href="http://weixin.zjdialysis.com/admin/publish/index.html" class="col-md-12 btn-warning text-center custom" style="text-decoration: none;"><span class="glyphicon glyphicon-pencil" style="font-size: 26px;"></span> 文章管理</a>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-md-4">
+            <a href="http://weixin.zjdialysis.com/admin/applysecure/login.html" class="col-md-12 text-center custom" style="text-decoration: none;background-color: #30aCaB;color: #fff"><span style="font-size: 26px;" class="glyphicon glyphicon-heart-empty"></span> 肾病保险</a>
+        </div>
+        <div class="col-md-4">
+            <a href="http://weixin.zjdialysis.com/admin/index/change.html" class="col-md-12 text-center custom" style="text-decoration: none;background-color: #eB90aC;color: #fff"><span style="font-size: 26px;" class="glyphicon glyphicon-saved"></span> 医院名称纠正</a>
+        </div>
+    </div>
+</div>
+ -->
+<div class="container-fluid">
+    <div class="row">
+        <div class="jumbotron" style="padding-top: 10px;height: 150px">
+            <ul id="mytabs" class="nav nav-tabs">
+                <div class="navbar-header" style="padding-top: 60px">
+                    <p class="navbar-brand" style="font-size: 40px;color:black;font-weight: bold">肾事联盟</p>
+                </div>
+                <li class="nav navbar-right" style="padding-top: 50px;margin-right:25px">
+                    <a id="drop_info" class="navbar-brand" style="font-size:40px" data-toggle="dropdown">
+          <span class="glyphicon glyphicon-user"></span>
+        </a>
+                    <ul class="dropdown-menu" role="menu" aria-labelledby="drop_info" style="min-width:220px;margin-top: 22px">
+                        <li role="presentation">
+                            <h4 style="margin-left:10px"><strong>个人信息</strong></h4>
+                        </li>
+                        <li role="presentation" class="divider"></li>
+                        <li role="presentation" style="line-height:30px">
+                            <span style="margin-left:10px"><strong>姓名：</strong></span>{{UserName}}
+                        </li>
+                        <li role="presentation" style="line-height:30px">
+                            <span style="margin-left:10px"><strong>角色：</strong></span>{{UserRole}}
+                        </li>
+                        <!--           <li role="presentation" style="line-height:30px">
+            <span style="margin-left:10px"><strong>上次登录时间：</strong></span>
+          </li>
+          <li role="presentation" style="line-height:30px">
+            <span style="margin-left:10px">{{userInfo.LastLoginTime}}</span>
+          </li> -->
+                        <br>
+                        <li role="presentation">
+                            <button class="btn btn-primary pull-left" style="margin-left:20px" ng-click="toChangePW()">修改密码</button>
+                            <button class="btn btn-danger pull-right" style="margin-right:20px" ng-click="ifOut()">注销</button>
+                        </li>
+                    </ul>
+                </li>
+                <div>
+                <ul class="nav navbar-nav" style="padding-top: 70px;font-size: 20px">
+                    <li class="active"><a href="#/main/usermanage/allUsers">用户管理</a></li>
+                    <li class="active"><a href="#/main/checkornot/unchecked">注册审核</a></li>
+                    <li class="active"><a href="#/main/enterornot/unentered">健康专员专区</a></li>
+                    <li class="active"><a href="#/main/insumanage/insupatmanage">保险人员专区</a></li>
+                    <li class="active"><a href="#/main/distrdepmanage/districts">地区/科室管理</a></li>
+                    <li class="active"><a href="#/main/datamanage/region">数据监控</a></li>
+                </ul>
+                </div>
+            </ul>
+        </div>
+    </div>
+    <div class="row" style="padding-right: 60px; padding-left:60px;margin-top: 25px">
+        <div class="col-md-4">
+            <a href="#/main/usermanage/allUsers" class="col-md-12 btn btn-success text-center" style="text-decoration: none;min-height:170px;background-color: #347ab6;border-color:#347ab6"><span style="font-size: 50px;padding-top: 25px" class="glyphicon glyphicon-dashboard"></span><p style="font-size: 30px;padding-top: 5px" >用户管理</p> </a>
+        </div>
+        <div class="col-md-4">
+            <a href="#/main/checkornot/unchecked" class=" col-md-12 btn btn-info text-center" style="text-decoration: none;min-height:170px;background-color: #708090;border-color:#708090"><span class="glyphicon glyphicon-ok-circle" style="font-size: 50px;padding-top: 25px"></span><p style="font-size: 30px;padding-top: 5px" > 注册审核</p></a>
+        </div>
+        <div class="col-md-4">
+            <a href="#/main/enterornot/unentered" class="col-md-12 btn btn-warning text-center " style="text-decoration: none;min-height:170px;background-color: #347ab6;border-color:#347ab6 "><span class="glyphicon glyphicon-pencil" style="font-size: 50px;padding-top: 25px"></span> <p style="font-size: 30px;padding-top: 5px" >健康专员专区</p></a>
+        </div>
+    </div>
+    <br>
+    <div class="row" style="padding-right: 60px; padding-left:60px;margin-top: 20px">
+        <div class="col-md-4">
+            <a href="#/main/insumanage/insupatmanage" class="col-md-12 btn btn-warning text-center " style="text-decoration: none;background-color: #708090;border-color:#708090;min-height:170px"><span style="font-size: 50px;padding-top: 25px" class="glyphicon glyphicon-heart-empty"></span> <p style="font-size: 30px;padding-top: 5px" >保险人员专区</p></a>
+        </div>
+        <div class="col-md-4">
+            <a href="#/main/distrdepmanage/districts" " class="col-md-12 btn btn-warning text-center " style="text-decoration: none;background-color: #347ab6;border-color:#347ab6;min-height:170px "><span style="font-size: 50px;padding-top: 25px " class="glyphicon glyphicon-map-marker "></span> <p style="font-size: 30px;padding-top: 5px " >地区/科室管理</p></a>
+        </div>
+                <div class="col-md-4 ">
+            <a href="#/main/datamanage/region " class="col-md-12 btn btn-warning text-center " style="text-decoration: none;background-color: #708090;border-color:#708090;min-height:170px "><span style="font-size: 50px;padding-top: 25px " class="glyphicon glyphicon-heart-empty "></span> <p style="font-size: 30px;padding-top: 5px " >数据监控</p></a>
+        </div>
+    </div>
+</div>

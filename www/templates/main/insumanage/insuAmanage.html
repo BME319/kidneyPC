@@ -1,0 +1,26 @@
+<h4 style="font-size: 15px;margin-top: -10px;">所有保险人员总数：{{totalNums}}位</h4>
+<form class="form-inline">
+    <!-- 保险搜索 -->
+    <div class="form-group">
+        <label class="sr-only">专员姓名</label>
+        <input type="text" class="form-control" ng-model="agentname" placeholder="请输入专员姓名" style="width: 130px">
+    </div>
+    </div>
+    <button type="submit" class="btn btn-default" ng-click="searchList()" >搜索</button>
+    <button type="button" class="btn btn-default" ng-click="searchClear()">清空搜索</button>
+</form>
+<table ng-table="insuAtableParams" class="table table-condensed table-bordered table-striped" style="margin-top: 10px;text-align: center;" id="departmentlist">
+    <tr ng-repeat="agent in $data">
+        <td title="'专员姓名'" sortable="'name'">{{agent.name}}
+        </td>
+        <td title="'性别'" sortable="'gender'">{{agent.gender|gender}}
+        </td>
+        <td title="'联系方式'" sortable="'phoneNo'">{{agent.phoneNo}}
+        </td>
+        <td title="'分配患者数量'" sortable="'sum'">{{agent.currentPatientNo}}
+        </td>
+        <td title="'操作'">
+            <button class="btn btn-link" style="text-decoration:none; outline:none; padding:0px; border:0px; font-size:10px;" ng-click="agentoff(agent.userId)">注销专员</button>
+        </td>
+    </tr>
+</table>
