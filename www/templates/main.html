@@ -24,9 +24,9 @@
             <span style="margin-left:10px">{{userInfo.LastLoginTime}}</span>
           </li> -->
                     <br>
-                    <li role="presentation">
-                        <button class="btn btn-primary pull-left" style="margin-left:20px" ng-click="toChangePW()">修改密码</button>
-                        <button class="btn btn-danger pull-right" style="margin-right:20px" ng-click="ifOut()">注销</button>
+                    <li role="presentation" style="margin-top: -10px">
+                        <!-- <button class="btn btn-primary pull-left" style="margin-left:20px" ng-click="toChangePW()">修改密码</button> -->
+                        <button class="btn btn-danger pull-right" style="margin-right:80px" ng-click="ifOut()">注销</button>
                     </li>
                 </ul>
             </li>
@@ -37,9 +37,9 @@
                 <uib-tab index="0" heading="用户管理" select="touser()" ng-show="flaguser"></uib-tab>
                 <uib-tab index="1" heading="医生注册审核" select="tounchecked()" ng-show="flagdoctor"></uib-tab>
                 <uib-tab index="2" heading="健康专员专区" select="tounentered()" ng-show="flaghealth"></uib-tab>
-                <uib-tab index="3" heading="地区/科室管理" select="todistrdep()" ng-show="flagdistrep"></uib-tab>
+                <uib-tab index="3" heading="地区/科室管理" select="todistrdep()" ng-show="flagdistrdp"></uib-tab>
                 <uib-tab index="4" heading="数据监控" select="todata()" ng-show="flagdata"></uib-tab>
-                <uib-tab index="5" heading="保险人员专区" select="toinsurance()" "></uib-tab>
+                <uib-tab index="5" heading="保险人员专区" select="toinsurance()" ng-show="flaginsu"></uib-tab>
             </uib-tabset>
             <li class="navbar-left " style="padding-left: 20px;margin-top: -23px ">
                 <a href="#/homepage ">

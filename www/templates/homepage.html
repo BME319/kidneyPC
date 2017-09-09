@@ -66,45 +66,45 @@
             <span style="margin-left:10px">{{userInfo.LastLoginTime}}</span>
           </li> -->
                         <br>
-                        <li role="presentation">
-                            <button class="btn btn-primary pull-left" style="margin-left:20px" ng-click="toChangePW()">修改密码</button>
-                            <button class="btn btn-danger pull-right" style="margin-right:20px" ng-click="ifOut()">注销</button>
+                        <li role="presentation" style="margin-top: -10px">
+                            <!-- <button class="btn btn-primary pull-left" style="margin-left:20px" ng-click="toChangePW()">修改密码</button> -->
+                            <button class="btn btn-danger pull-right" style="margin-right:80px;" ng-click="ifOut()">注销</button>
                         </li>
                     </ul>
                 </li>
                 <div>
                 <ul class="nav navbar-nav" style="padding-top: 70px;font-size: 20px">
-                    <li class="active"><a href="#/main/usermanage/allUsers">用户管理</a></li>
-                    <li class="active"><a href="#/main/checkornot/unchecked">注册审核</a></li>
-                    <li class="active"><a href="#/main/enterornot/unentered">健康专员专区</a></li>
-                    <li class="active"><a href="#/main/insumanage/insupatmanage">保险人员专区</a></li>
-                    <li class="active"><a href="#/main/distrdepmanage/districts">地区/科室管理</a></li>
-                    <li class="active"><a href="#/main/datamanage/region">数据监控</a></li>
+                    <li class="active" ng-show="flaguser"><a href="#/main/usermanage/allUsers">用户管理</a></li>
+                    <li class="active" ng-show="flagdoctor"><a href="#/main/checkornot/unchecked">注册审核</a></li>
+                    <li class="active" ng-show="flaghealth"><a href="#/main/enterornot/unentered">健康专员专区</a></li>
+                    <li class="active" ng-show="flaginsu"><a href="#/main/insumanage/insupatmanage">保险人员专区</a></li>
+                    <li class="active" ng-show="flagdistrdp"><a href="#/main/distrdepmanage/districts">地区/科室管理</a></li>
+                    <li class="active" ng-show="flagdata"><a href="#/main/datamanage/region">数据监控</a></li>
                 </ul>
                 </div>
             </ul>
         </div>
     </div>
     <div class="row" style="padding-right: 60px; padding-left:60px;margin-top: 25px">
-        <div class="col-md-4">
-            <a href="#/main/usermanage/allUsers" class="col-md-12 btn btn-success text-center" style="text-decoration: none;min-height:170px;background-color: #347ab6;border-color:#347ab6"><span style="font-size: 50px;padding-top: 25px" class="glyphicon glyphicon-dashboard"></span><p style="font-size: 30px;padding-top: 5px" >用户管理</p> </a>
+        <div class="col-md-4" ng-show="flaghealth">
+            <a href="#/main/enterornot/unentered" class="col-md-12 btn btn-success text-center" style="text-decoration: none;min-height:170px;background-color: #347ab6;border-color:#347ab6"><span style="font-size: 50px;padding-top: 25px" class="glyphicon glyphicon-dashboard"></span><p style="font-size: 30px;padding-top: 5px" >健康专员专区</p> </a>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4" ng-show="flagdoctor">
             <a href="#/main/checkornot/unchecked" class=" col-md-12 btn btn-info text-center" style="text-decoration: none;min-height:170px;background-color: #708090;border-color:#708090"><span class="glyphicon glyphicon-ok-circle" style="font-size: 50px;padding-top: 25px"></span><p style="font-size: 30px;padding-top: 5px" > 注册审核</p></a>
         </div>
-        <div class="col-md-4">
-            <a href="#/main/enterornot/unentered" class="col-md-12 btn btn-warning text-center " style="text-decoration: none;min-height:170px;background-color: #347ab6;border-color:#347ab6 "><span class="glyphicon glyphicon-pencil" style="font-size: 50px;padding-top: 25px"></span> <p style="font-size: 30px;padding-top: 5px" >健康专员专区</p></a>
+        <div class="col-md-4" ng-show="flaguser">
+            <a href="#/main/usermanage/allUsers" class="col-md-12 btn btn-warning text-center " style="text-decoration: none;min-height:170px;background-color: #347ab6;border-color:#347ab6 "><span class="glyphicon glyphicon-pencil" style="font-size: 50px;padding-top: 25px"></span> <p style="font-size: 30px;padding-top: 5px" >用户管理</p></a>
         </div>
     </div>
     <br>
     <div class="row" style="padding-right: 60px; padding-left:60px;margin-top: 20px">
-        <div class="col-md-4">
+        <div class="col-md-4" ng-show="flaginsu">
             <a href="#/main/insumanage/insupatmanage" class="col-md-12 btn btn-warning text-center " style="text-decoration: none;background-color: #708090;border-color:#708090;min-height:170px"><span style="font-size: 50px;padding-top: 25px" class="glyphicon glyphicon-heart-empty"></span> <p style="font-size: 30px;padding-top: 5px" >保险人员专区</p></a>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4" ng-show="flagdistrdp">
             <a href="#/main/distrdepmanage/districts" " class="col-md-12 btn btn-warning text-center " style="text-decoration: none;background-color: #347ab6;border-color:#347ab6;min-height:170px "><span style="font-size: 50px;padding-top: 25px " class="glyphicon glyphicon-map-marker "></span> <p style="font-size: 30px;padding-top: 5px " >地区/科室管理</p></a>
         </div>
-                <div class="col-md-4 ">
+                <div class="col-md-4 " ng-show="flagdata">
             <a href="#/main/datamanage/region " class="col-md-12 btn btn-warning text-center " style="text-decoration: none;background-color: #708090;border-color:#708090;min-height:170px "><span style="font-size: 50px;padding-top: 25px " class="glyphicon glyphicon-heart-empty "></span> <p style="font-size: 30px;padding-top: 5px " >数据监控</p></a>
         </div>
     </div>

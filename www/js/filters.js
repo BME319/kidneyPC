@@ -55,9 +55,9 @@ angular.module('filters', [])
     }])
     .filter('leadername', [function() {
         return function(type) {
-            var name = ''
+            var name = ""
             if (type == null) {
-                name == null
+                name = null
             } else {
                 for (i = 0; i < type.length; i++) {
                     name = name + type[i].name + ' ';
@@ -68,9 +68,9 @@ angular.module('filters', [])
     }])
     .filter('arraytostring', [function() {
         return function(type) {
-            var name = ''
+            var name = ""
             if (type == null) {
-                name == null
+                name = null
             } else {
                 for (i = 0; i < type.length; i++) {
                     name = name + type[i].name + ' ';
@@ -79,7 +79,20 @@ angular.module('filters', [])
             return name
         }
     }])
+    .filter('realarraytostring', [function() {
+        return function(type) {
+            var name = ""
 
+            if (type == null) {
+                name = null
+            } else {
+                for (i = 0; i < type.length; i++) {
+                    name = name + type[i] + ' ';
+                }
+            }
+            return name
+        }
+    }])
     .filter('filterAge', [function() {
         return function(date) {
             if (date == null) {
@@ -126,7 +139,7 @@ angular.module('filters', [])
             return name
         }
     }])
-        .filter('Policytype', [function() {
+    .filter('Policytype', [function() {
         return function(type) {
             var name = '--'
             switch (type) {
@@ -147,12 +160,12 @@ angular.module('filters', [])
                     break
                 case 5:
                     name = '保单过期'
-                    break     
+                    break
             }
             return name
         }
     }])
-    
+
     .filter('classname', [function() {
         return function(type) {
             var name
