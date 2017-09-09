@@ -7124,7 +7124,7 @@ angular.module('controllers', ['ngResource', 'services'])
             var control = $("#fuimageupload");
             control.fileinput({
                 language: 'zh', //设置语言
-                uploadUrl: "http://docker2.haihonghospitalmanagement.com/api/v2/upload?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwMzYzMzQ1MjM3NCwiaWF0IjoxNTAzNjI5ODUyfQ.7TmzSBqqnYGxiyQrcVRDZgJVibzOsr23_99O1bSZEKY", //上传的地址
+                uploadUrl: "http://docker2.haihonghospitalmanagement.com/api/v2/upload?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJpbnN1cmFuY2VDIiwiZXhwIjoxNTA1MDU1MjMzNjYyLCJpYXQiOjE1MDQ5Njg4MzN9.9bgdtAN59q-sStQoYgvw31-KjPoNlOB0HpURVhqZk_Q", //上传的地址
                 allowedFileExtensions: ['jpg', 'png', 'gif', 'jpeg'], //接收的文件后缀
                 // showUpload: false, //是否显示上传按钮
                 showCaption: false, //是否显示标题
