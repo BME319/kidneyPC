@@ -79,12 +79,12 @@
                 </tr>
             </table>
             <br>
-            <p style="font-weight: bold;font-size:18px">
+            <p ng-show="ifcheck" style="font-weight: bold;font-size:18px">
                 审核内容
             </p>
         </div>
         <div>
-            <textarea style="width:100%;font-size:20px;margin-bottom:5px;resize:none;" row="3" disabled="disabled" ng-model="review.reviewContent"></textarea>
+            <textarea ng-show="ifcheck" style="width:100%;font-size:20px;margin-bottom:5px;resize:none;" row="3" disabled="disabled" ng-model="review.reviewContent"></textarea>
             <div ng-hide="(status == 1)||(status == 2)">
                 <button class="btn btn-primary" style="margin-left:30%;margin-top:5px;margin-bottom:40px;width:70px;" ng-click="accept()">
                     通过
