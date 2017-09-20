@@ -247,6 +247,7 @@ angular.module('filters', [])
             return name
         }
     }])
+
     .filter('timeFormat', [function() {
         return function(date, format) {
             var d = new Date(date)

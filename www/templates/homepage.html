@@ -57,14 +57,14 @@
                             <span style="margin-left:10px"><strong>姓名：</strong></span>{{UserName}}
                         </li>
                         <li role="presentation" style="line-height:30px">
-                            <span style="margin-left:10px"><strong>角色：</strong></span>{{UserRole}}
+                            <span style="margin-left:10px"><strong>角色：</strong></span>{{UserRole|realarraytostring}}
                         </li>
-                        <!--           <li role="presentation" style="line-height:30px">
+                                  <li role="presentation" style="line-height:30px">
             <span style="margin-left:10px"><strong>上次登录时间：</strong></span>
           </li>
           <li role="presentation" style="line-height:30px">
-            <span style="margin-left:10px">{{userInfo.LastLoginTime}}</span>
-          </li> -->
+            <span style="margin-left:10px">{{LastLoginTime|timeFormat:'YYYY-MM-DD h:m'}}</span>
+          </li>
                         <br>
                         <li role="presentation" style="margin-top: -10px">
                             <!-- <button class="btn btn-primary pull-left" style="margin-left:20px" ng-click="toChangePW()">修改密码</button> -->
