@@ -10,6 +10,7 @@ angular.module('Kidney_Web', ['ui.router', 'ui.bootstrap', 'controllers', 'servi
                 url: '/login',
                 templateUrl: 'templates/login.html',
                 controller: 'LoginCtrl'
+                // cache:false,
             })
             .state('main', {
                 url: '/main',

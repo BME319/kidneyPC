@@ -1,6 +1,6 @@
 angular.module('controllers', ['ngResource', 'services'])
 
-    .controller('LoginCtrl', ['$scope', '$timeout', '$state', 'Storage', '$sce', 'Data', 'User', function($scope, $timeout, $state, Storage, $sce, Data, User) {
+    .controller('LoginCtrl', ['$scope', '$timeout', '$state', 'Storage', '$sce', 'Data', 'User', 'Alluser', function($scope, $timeout, $state, Storage, $sce, Data, User, Alluser) {
 
         if (Storage.get('USERNAME') != null && Storage.get('USERNAME') != undefined) {
             $scope.logOn = { username: Storage.get('USERNAME'), password: '' }
@@ -9,20 +9,21 @@ angular.module('controllers', ['ngResource', 'services'])
         }
 
         $scope.LogIn = function(logOn) {
-            switch (logOn.role) {
-                // case 'doctor':
-                //     userrole = '普通医生'
-                //     break
-                // case 'patient':
-                //     userrole = '患者'
-                //     break
-                case 'health':
-                    userrole = '健康专员'
-                    break
-                case 'admin':
-                    userrole = '管理员'
-                    break
-            }
+            // switch (logOn.role) {
+            //     // case 'doctor':
+            //     //     userrole = '普通医生'
+            //     //     break
+            //     // case 'patient':
+            //     //     userrole = '患者'
+            //     //     break
+            //     case 'health':
+            //         userrole = '健康专员'
+            //         break
+            //     case 'admin':
+            //         userrole = '管理员'
+            //         break
+            // }
+            userrole = 'PC'
             $scope.logStatus = ''
             if ((logOn.username != '') && (logOn.password != '')) {
                 var phoneReg = /^(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$/
@@ -30,24 +31,37 @@ angular.module('controllers', ['ngResource', 'services'])
                     $scope.logStatus = '手机号验证失败！'
                 } else {
                     Storage.set('USERNAME', logOn.username)
-                    User.logIn({ username: logOn.username, password: logOn.password, role: logOn.role }).then(function(data) {
+                    User.logIn({ username: logOn.username, password: logOn.password, role: userrole }).then(function(data) {
                         if (data.results == 1) {
                             $scope.logStatus = '请确认账号密码无误且角色选择正确！'
                         } else if (data.results.mesg == 'login success!') {
-                            $scope.logStatus = '登录成功！'
+                            // $scope.logStatus = '登录成功！'
                             Storage.set('PASSWORD', logOn.password)
+                            Storage.set('LASTLOGIN', data.results.lastlogin)
                             Storage.set('TOKEN', data.results.token)
                             Storage.set('isSignIN', 'Yes')
+                            Storage.set('USERID', data.results.userId)
                             var username = data.results.userName ? data.results.userName : data.results.userId
                             Storage.set('UName', username)
-                            Storage.set('ROLE', userrole)
-                            if (userrole=='管理员'){                           
-                                $state.go('homepage')
-                            } else if (userrole=='健康专员'){
-                                $state.go('main.enterornot.unentered')
-                            }
+                            var promise = Alluser.getUserList({ token: Storage.get('TOKEN') })
+                            promise.then(function(data) {
+                                for (var i = 0; i <= data.results.length; i++) {
+                                    if (data.results[i].userId == Storage.get('USERID')) {
+                                        Storage.set('ROLE', data.results[i].role)
+                                        break;
+                                    }
+                                }
+                            })
 
+                            // Storage.set('ROLE', userrole)
+                            $state.go('homepage')
+                            // if (userrole=='管理员'){                           
+                            //     $state.go('homepage')
+                            // } else if (userrole=='健康专员'){
+                            //     $state.go('main.enterornot.unentered')
+                            // }
                         }
+
                     }, function(err) {
                         if (err.results == null && err.status == 0) {
                             $scope.logStatus = '网络错误！'
@@ -61,8 +75,8 @@ angular.module('controllers', ['ngResource', 'services'])
             } else {
                 $scope.logStatus = '请输入完整信息！'
             }
-        }
 
+        }
         $scope.toReset = function() {
             $state.go('phonevalid', { phonevalidType: 'reset' })
         }
@@ -70,39 +84,67 @@ angular.module('controllers', ['ngResource', 'services'])
 
     .controller('MainCtrl', ['$scope', '$state', 'Storage', '$timeout', function($scope, $state, Storage, $timeout) {
         $scope.UserName = Storage.get('UName')
-        $scope.UserRole = Storage.get('ROLE')
+        var tempuserrole = Storage.get('ROLE')
+        var roles = new Array(); //定义一数组 
+        roles = tempuserrole.split(","); //字符分割 
+        console.log(roles)
+        // 角色字符串处理
+        for (var i = 0; i <= roles.length; i++) {
+            type = roles[i]
+            switch (type) {
+                case 'Leader':
+                    roles[i] = '地区负责人'
+                    break
+                case 'master':
+                    roles[i] = '科主任'
+                    break
+                case 'doctor':
+                    roles[i] = '普通医生'
+                    break
+                case 'patient':
+                    roles[i] = '患者'
+                    break
+                case 'nurse':
+                    roles[i] = '护士'
+                    break
+                case 'insuranceA':
+                    roles[i] = '沟通人员'
+                    break
+                case 'insuranceC':
+                    roles[i] = '保险主管'
+                    break
+                case 'insuranceR':
+                    roles[i] = '录入人员'
+                    break
+                case 'health':
+                    roles[i] = '健康专员'
+                    break
+                case 'admin':
+                    roles[i] = '管理员'
+                    break
+            }
+        }
+        $scope.UserRole = roles
 
+
+        $scope.LastLoginTime = Storage.get('LASTLOGIN')
         $scope.myIndex = Storage.get('Tab')
 
-        switch ($scope.UserRole) {
-            case '健康专员':
-                $scope.flagdoctor = false
-                $scope.flaguser = false
-                $scope.flagdistrdp = false
-                $scope.flaghealth = true
-                $scope.flagdata = false
-                $scope.flaginsu = false
-                break
-            case '管理员':
-                $scope.flagdoctor = true
-                $scope.flaguser = true
-                $scope.flagdistrdp = true
-                $scope.flaghealth = true
-                $scope.flagdata = true
-                $scope.flaginsu = true
-                break
-                // case '患者' :
-                //     $scope.flagdoctor = true
-                //     $scope.flaguser = true
-                //     $scope.flaghealth = true
-                //     break
-                // case '普通医生' :
-                //     $scope.flagdoctor = true
-                //     $scope.flaguser = false
-                //     $scope.flaghealth = false
-                //     break
+        if (tempuserrole.indexOf("admin") != -1) {
+            $scope.flagdoctor = true
+            $scope.flaguser = true
+            $scope.flagdistrdp = true
+            $scope.flaghealth = true
+            $scope.flagdata = true
+            $scope.flaginsu = true
+        } else if (tempuserrole.indexOf("health") != -1) {
+            $scope.flagdoctor = false
+            $scope.flaguser = false
+            $scope.flagdistrdp = false
+            $scope.flaghealth = true
+            $scope.flagdata = false
+            $scope.flaginsu = false
         }
-
 
         $scope.tounchecked = function() {
             $state.go('main.checkornot.unchecked')
@@ -124,7 +166,9 @@ angular.module('controllers', ['ngResource', 'services'])
         }
         //注销
         $scope.ifOut = function() {
-            $state.go('login')
+            $state.go('login', null, {
+                reload: true
+            });
         }
     }])
 
@@ -1480,6 +1524,7 @@ angular.module('controllers', ['ngResource', 'services'])
                                 }
                                 LabtestImport.GetPatientLabTest(patient).then(
                                     function(data) {
+                                        console.log(data)
                                         $scope.patientlabtests = data.results;
                                         for (var i = 0; i < $scope.patientlabtests.length; i++) {
                                             switch ($scope.patientlabtests[i].type) {
@@ -6950,15 +6995,14 @@ angular.module('controllers', ['ngResource', 'services'])
     }])
 
     // 保险管理——查看专员
-    .controller('insuAmanageCtrl', ['Roles', 'NgTableParams', 'Policy', '$scope', '$state', 'Storage', '$timeout', function(Roles, NgTableParams, Policy, $scope, $state, Review, Storage, $timeout) {
-        var token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJpbnN1cmFuY2VDIiwiZXhwIjoxNTA1Mzg0ODAxOTQ1LCJpYXQiOjE1MDUyOTg0MDF9.w_l5Hgamkqd2hlc5rZLJr0SD-VQSKHzsTTRc5op5GA8'
+    .controller('insuAmanageCtrl', ['Roles', 'NgTableParams', 'Policy', '$scope', '$state', 'Storage', '$timeout', function(Roles, NgTableParams, Policy, $scope, $state, Storage, $timeout) {
+        var token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJpbnN1cmFuY2VDIiwiZXhwIjoxNTA1NTU5MjY4Mjk3LCJpYXQiOjE1MDU0NzI4Njh9.lLW5NuIFFSi2YdlzuHUAZMm2Gqq_nec6zA_5jfgiqn0'
         var getLists = function() {
             AgentInfo = {
-                token: token
+                token: Storage.get('TOKEN'),
             }
             var promise = Policy.getAgentList(AgentInfo)
             promise.then(function(data) {
-                console.log(data.data)
                 $scope.insuAtableParams = new NgTableParams({
                     count: 10000
                 }, {
@@ -6973,13 +7017,13 @@ angular.module('controllers', ['ngResource', 'services'])
         $scope.agentoff = function(Id) {
             OffInfo = {
                 userId: Id,
-                token: token,
+                token: Storage.get('TOKEN'),
                 roles: 'insuranceA'
             }
             console.log(OffInfo)
             Policy.removeAgent({
                 insuranceAId: Id,
-                token: token
+                token: Storage.get('TOKEN')
             }).then(function(data) {}, function(err) {
                 console.log(err)
             })
@@ -6991,7 +7035,7 @@ angular.module('controllers', ['ngResource', 'services'])
         }
         $scope.searchList = function() {
             Info = {
-                token: token,
+                token: Storage.get('TOKEN'),
                 name: $scope.agentname
             }
             var promise = Policy.getAgentList(Info)
@@ -7021,14 +7065,14 @@ angular.module('controllers', ['ngResource', 'services'])
 
     // 保险管理——查看患者
     .controller('insupatmanageCtrl', ['NgTableParams', 'Policy', '$scope', '$state', 'Storage', '$timeout', 'Upload', function(NgTableParams, Policy, $scope, $state, Storage, $timeout, Upload) {
-        var token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJpbnN1cmFuY2VDIiwiZXhwIjoxNTA1Mzg0ODAxOTQ1LCJpYXQiOjE1MDUyOTg0MDF9.w_l5Hgamkqd2hlc5rZLJr0SD-VQSKHzsTTRc5op5GA8'
+        var token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJpbnN1cmFuY2VDIiwiZXhwIjoxNTA1NTU5MjY4Mjk3LCJpYXQiOjE1MDU0NzI4Njh9.lLW5NuIFFSi2YdlzuHUAZMm2Gqq_nec6zA_5jfgiqn0'
         // var token ='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWUwZGFiOGIwZDRlZDVlYjRjODMiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDA0IiwibmFtZSI6IumYruWNk-asoyIsInJvbGUiOiJpbnN1cmFuY2VBIiwiZXhwIjoxNTAyOTgwNDc2MTI4LCJpYXQiOjE1MDI5NzY4NzZ9.S12aq6jzDQE4CMW2FSdcQk8ArcG3pCyEky00X4YGmr0'
 
 
         // 患者列表显示
         var getLists = function(_userlist) {
             userlist = _userlist
-            userlist.token = token
+            userlist.token = Storage.get('TOKEN')
             var promise = Policy.getPatientList(userlist)
             promise.then(function(data) {
                 $scope.insupattableParams = new NgTableParams({
@@ -7076,7 +7120,7 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.history.name = userdetail.patientId.name
             var PatInfo = {
                 patientId: userdetail.patientId.userId,
-                token: token,
+                token: Storage.get('TOKEN'),
                 skip: 0,
                 limit: 10000
             }
@@ -7124,7 +7168,7 @@ angular.module('controllers', ['ngResource', 'services'])
             var control = $("#fuimageupload");
             control.fileinput({
                 language: 'zh', //设置语言
-                uploadUrl: "http://docker2.haihonghospitalmanagement.com/api/v2/upload?token="+token, //上传的地址
+                uploadUrl: "http://docker2.haihonghospitalmanagement.com/api/v2/upload?token=" + Storage.get('TOKEN') + "&type=followup", //上传的地址
                 allowedFileExtensions: ['jpg', 'png', 'gif', 'jpeg'], //接收的文件后缀
                 // showUpload: false, //是否显示上传按钮
                 showCaption: false, //是否显示标题
@@ -7169,7 +7213,7 @@ angular.module('controllers', ['ngResource', 'services'])
         $scope.followupInfo.photoUrls = []
 
         $scope.followup = function(_followupinfo) {
-            _followupinfo.token = token
+            _followupinfo.token = Storage.get('TOKEN')
             _followupinfo.patientId = tempuserID
             console.log(_followupinfo)
             var promise = Policy.postFollowUp(_followupinfo)
@@ -7235,7 +7279,7 @@ angular.module('controllers', ['ngResource', 'services'])
             var control = $("#poimageupload");
             control.fileinput({
                 language: 'zh', //设置语言
-                uploadUrl: "http://docker2.haihonghospitalmanagement.com/api/v2/upload?token="+token, //上传的地址
+                uploadUrl: "http://docker2.haihonghospitalmanagement.com/api/v2/upload?token=" + Storage.get('TOKEN') + "&type=policy", //上传的地址
                 allowedFileExtensions: ['jpg', 'png', 'gif', 'jpeg'], //接收的文件后缀
                 // showUpload: false, //是否显示上传按钮
                 showCaption: false, //是否显示标题
@@ -7257,7 +7301,7 @@ angular.module('controllers', ['ngResource', 'services'])
         $scope.policyInfo.photoUrls = []
 
         $scope.postpolicy = function(_policyinfo) {
-            _policyinfo.token = token
+            _policyinfo.token = Storage.get('TOKEN')
             _policyinfo.patientId = tempuserID
             console.log(_policyinfo)
             var promise = Policy.postPolicy(_policyinfo)
@@ -7298,7 +7342,7 @@ angular.module('controllers', ['ngResource', 'services'])
         $scope.changeAgent = function(patId) {
             changeid = patId
             Policy.getAgentList({
-                token:token
+                token: Storage.get('TOKEN')
             }).then(function(data) {
                 console.log(data)
                 $scope.tableagent = new NgTableParams({
@@ -7328,7 +7372,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     patientId: changeid,
                     insuranceAId: agentid,
                     reason: $scope.reason,
-                    token: token
+                    token: Storage.get('TOKEN')
                 }
                 console.log(changeInfo)
                 Policy.setinsuranceA(changeInfo).then(function(data) {
@@ -7371,7 +7415,7 @@ angular.module('controllers', ['ngResource', 'services'])
             reviewid = rid
             getpolicyInfo = {
                 patientId: rid,
-                token: token
+                token: Storage.get('TOKEN')
             }
             Policy.getPolicy(getpolicyInfo).then(function(data) {
                 $scope.review.content = data.data.content
@@ -7407,7 +7451,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     reviewResult: "consent",
                     startTime: starttime,
                     endTime: endtime,
-                    token: token
+                    token: Storage.get('TOKEN')
                 }
                 Policy.reviewPolicy(passInfo).then(function(data) {
                     if (data.code == 0) {
@@ -7438,7 +7482,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 patientId: reviewid,
                 reviewResult: "reject",
                 rejectReason: rejectreason,
-                token: token
+                token: Storage.get('TOKEN')
             }
             Policy.reviewPolicy(rejectInfo).then(function(data) {
                 if (data.code == 0) {
@@ -7481,39 +7525,67 @@ angular.module('controllers', ['ngResource', 'services'])
     // 主页
     .controller('homepageCtrl', ['$scope', '$state', 'Storage', '$timeout', function($scope, $state, Storage, $timeout) {
         $scope.UserName = Storage.get('UName')
-        $scope.UserRole = Storage.get('ROLE')
-
         $scope.myIndex = Storage.get('Tab')
         console.log($scope.myIndex)
-
-        switch ($scope.UserRole) {
-            case '健康专员':
-                $scope.flagdoctor = false
-                $scope.flaguser = false
-                $scope.flagdistrdp = false
-                $scope.flaghealth = true
-                $scope.flagdata = false
-                $scope.flaginsu = false
-                break
-            case '管理员':
-                $scope.flagdoctor = true
-                $scope.flaguser = true
-                $scope.flagdistrdp = true
-                $scope.flaghealth = true
-                $scope.flagdata = true
-                $scope.flaginsu = true
-                break
-                // case '患者' :
-                //     $scope.flagdoctor = true
-                //     $scope.flaguser = true
-                //     $scope.flaghealth = true
-                //     break
-                // case '普通医生' :
-                //     $scope.flagdoctor = true
-                //     $scope.flaguser = false
-                //     $scope.flaghealth = false
-                //     break
+        var tempuserrole = Storage.get('ROLE')
+        var roles = new Array(); //定义一数组 
+        roles = tempuserrole.split(","); //字符分割 
+        console.log(roles)
+        // 角色字符串处理
+        for (var i = 0; i <= roles.length; i++) {
+            type = roles[i]
+            switch (type) {
+                case 'Leader':
+                    roles[i] = '地区负责人'
+                    break
+                case 'master':
+                    roles[i] = '科主任'
+                    break
+                case 'doctor':
+                    roles[i] = '普通医生'
+                    break
+                case 'patient':
+                    roles[i] = '患者'
+                    break
+                case 'nurse':
+                    roles[i] = '护士'
+                    break
+                case 'insuranceA':
+                    roles[i] = '沟通人员'
+                    break
+                case 'insuranceC':
+                    roles[i] = '保险主管'
+                    break
+                case 'insuranceR':
+                    roles[i] = '录入人员'
+                    break
+                case 'health':
+                    roles[i] = '健康专员'
+                    break
+                case 'admin':
+                    roles[i] = '管理员'
+                    break
+            }
         }
+        $scope.UserRole = roles
+        $scope.LastLoginTime = Storage.get('LASTLOGIN')
+
+        if (tempuserrole.indexOf("admin") != -1) {
+            $scope.flagdoctor = true
+            $scope.flaguser = true
+            $scope.flagdistrdp = true
+            $scope.flaghealth = true
+            $scope.flagdata = true
+            $scope.flaginsu = true
+        } else if (tempuserrole.indexOf("health") != -1) {
+            $scope.flagdoctor = false
+            $scope.flaguser = false
+            $scope.flagdistrdp = false
+            $scope.flaghealth = true
+            $scope.flagdata = false
+            $scope.flaginsu = false
+        }
+
 
         $scope.tounchecked = function() {
             $state.go('main.checkornot.unchecked')
