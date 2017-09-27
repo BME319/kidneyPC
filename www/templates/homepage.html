@@ -81,7 +81,7 @@
                     <li class="active" ng-show="flagdistrdp"><a href="#/main/distrdepmanage/districts">地区/科室管理</a></li>
                     <li class="active" ng-show="flagdata"><a href="#/main/datamanage/region">数据监控</a></li>
                     <li class="active" ng-show="flagpatrefund"><a href="#/main/patrefund/refundtoprocess">患者退款审核</a></li>
-                    <li class="active" ng-show="flagadvice"><a href="#/main/advice">用户意见反馈</a></li>
+                    <li class="active" ng-show="flagadvice"><a href="#/main/adviceindex/advice">用户意见反馈</a></li>
                 </ul>
                 </div>
             </ul>
@@ -110,10 +110,12 @@
             <a href="#/main/distrdepmanage/districts" class="col-md-12 btn btn-warning text-center " style="text-decoration: none;background-color: #347ab6;border-color:#347ab6;min-height:170px "><span style="font-size: 50px;padding-top: 25px " class="glyphicon glyphicon-map-marker "></span> <p style="font-size: 30px;padding-top: 5px " >地区/科室管理</p></a>
         </div>
                 <div class="col-md-3 " ng-show="flagdata">
-            <a href="#/main/datamanage/region " class="col-md-12 btn btn-warning text-center " style="text-decoration: none;background-color: #708090;border-color:#708090;min-height:170px "><span style="font-size: 50px;padding-top: 25px " class="glyphicon glyphicon-tasks"></span> <p style="font-size: 30px;padding-top: 5px " >数据监控</p></a>
+            <a href="#/main/datamanage/region" class="col-md-12 btn btn-warning text-center " style="text-decoration: none;background-color: #708090;border-color:#708090;min-height:170px "><span style="font-size: 50px;padding-top: 25px " class="glyphicon glyphicon-tasks"></span> <p style="font-size: 30px;padding-top: 5px " >数据监控</p></a>
         </div>
         <div class="col-md-3" ng-show="flagadvice">
-            <a href="#/main/advice" class="col-md-12 btn btn-warning text-center " style="text-decoration: none;background-color: #347ab6;border-color:#347ab6;min-height:170px "><span style="font-size: 50px;padding-top: 25px " class="  glyphicon glyphicon-envelope"></span> <p style="font-size: 30px;padding-top: 5px " >用户意见反馈</p></a>
+            <a  href="#/main/adviceindex/advice" class="col-md-12 btn btn-warning text-center " style="text-decoration: none;background-color: #347ab6;border-color:#347ab6;min-height:170px "><span style="font-size: 50px;padding-top: 25px " class="  glyphicon glyphicon-envelope"></span> <p style="font-size: 30px;padding-top: 5px " >用户意见反馈</p></a>
+
+             <!-- <a  class="col-md-12 btn btn-warning text-center " ng-click="toadvice()" style="text-decoration: none;background-color: #347ab6;border-color:#347ab6;min-height:170px "><span style="font-size: 50px;padding-top: 25px " class="  glyphicon glyphicon-envelope"></span> <p style="font-size: 30px;padding-top: 5px " >用户意见反馈</p></a> -->
         </div>
     </div>
 </div>

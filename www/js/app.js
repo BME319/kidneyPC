@@ -63,9 +63,15 @@ angular.module('Kidney_Web', ['ui.router', 'ui.bootstrap', 'controllers', 'servi
             })
 
             // 用户建议页面
-            .state('main.advice', {
+            .state('main.adviceindex', {
+                url: '/adviceindex',
+                templateUrl: 'templates/main/adviceindex.html',
+                controller: 'AdviceindexCtrl'
+
+            })
+            .state('main.adviceindex.advice', {
                 url: '/advice',
-                templateUrl: 'templates/main/advice.html',
+                templateUrl: 'templates/main/advice/advice.html',
                 controller: 'AdviceCtrl'
             })
 

@@ -82,7 +82,7 @@ angular.module('controllers', ['ngResource', 'services'])
         }
     }])
 
-    .controller('MainCtrl', ['$scope', '$state', 'Storage', '$timeout', function($scope, $state, Storage, $timeout) {
+    .controller('MainCtrl', ['$scope', '$state', 'Storage', '$timeout', '$location', function($scope, $state, Storage, $timeout, $location) {
         $scope.UserName = Storage.get('UName')
         var tempuserrole = Storage.get('ROLE')
         var roles = new Array(); //定义一数组 
@@ -126,9 +126,25 @@ angular.module('controllers', ['ngResource', 'services'])
         }
         $scope.UserRole = roles
 
-
         $scope.LastLoginTime = Storage.get('LASTLOGIN')
-        $scope.myIndex = Storage.get('Tab')
+        var absurl = $location.absUrl();
+        if (absurl.indexOf("usermanage") != -1) {
+            $scope.myIndex = 0
+        } else if (absurl.indexOf("checkornot") != -1) {
+            $scope.myIndex = 1
+        } else if (absurl.indexOf("enterornot") != -1) {
+            $scope.myIndex = 2
+        } else if (absurl.indexOf("distrdepmanage") != -1) {
+            $scope.myIndex = 3
+        } else if (absurl.indexOf("datamanage") != -1) {
+            $scope.myIndex = 4
+        } else if (absurl.indexOf("insumanage") != -1) {
+            $scope.myIndex = 5
+        } else if (absurl.indexOf("patrefund") != -1) {
+            $scope.myIndex = 6
+        } else if (absurl.indexOf("adviceindex") != -1) {
+            $scope.myIndex = 7
+        }
 
         if (tempuserrole.indexOf("admin") != -1) {
             $scope.flagdoctor = true
@@ -174,7 +190,7 @@ angular.module('controllers', ['ngResource', 'services'])
             $state.go('main.patrefund.refundtoprocess')
         }
         $scope.toadvice = function() {
-            $state.go('main.advice')
+            $state.go('main.adviceindex.advice')
         }
 
         //注销
@@ -182,6 +198,7 @@ angular.module('controllers', ['ngResource', 'services'])
             $state.go('login', null, {
                 reload: true
             });
+            Storage.set('TOKEN', '')
         }
     }])
 
@@ -800,6 +817,7 @@ angular.module('controllers', ['ngResource', 'services'])
     }])
 
     .controller('EnterOrNotCtrl', ['$scope', '$state', 'Storage', '$timeout', function($scope, $state, Storage, $timeout) {
+        Storage.set('Tab', 2)
         $scope.toentered = function() {
             $state.go('main.enterornot.entered');
         }
@@ -4414,6 +4432,7 @@ angular.module('controllers', ['ngResource', 'services'])
 
     // 地区/科室管理
     .controller('distrdepmanageCtrl', ['$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function($scope, $state, Review, Storage, $timeout, NgTableParams) {
+        Storage.set('Tab', 3)
         $scope.todistricts = function() {
             $state.go('main.distrdepmanage.districts')
         }
@@ -7538,8 +7557,6 @@ angular.module('controllers', ['ngResource', 'services'])
     // 主页
     .controller('homepageCtrl', ['$scope', '$state', 'Storage', '$timeout', function($scope, $state, Storage, $timeout) {
         $scope.UserName = Storage.get('UName')
-        $scope.myIndex = Storage.get('Tab')
-        console.log($scope.myIndex)
         var tempuserrole = Storage.get('ROLE')
         var roles = new Array(); //定义一数组 
         roles = tempuserrole.split(","); //字符分割 
@@ -7605,25 +7622,31 @@ angular.module('controllers', ['ngResource', 'services'])
 
         }
 
+        // $scope.tounchecked = function() {
+        //     $state.go('main.checkornot.unchecked')
+        // }
+        // $scope.touser = function() {
+        //     $state.go('main.usermanage.allUsers')
+        // }
+        // $scope.todistrdep = function() {
+        //     $state.go('main.distrdepmanage.districts')
+        // }
+        // $scope.tounentered = function() {
+        //     $state.go('main.enterornot.unentered')
+        // }
+        // $scope.todata = function() {
+        //     $state.go('main.datamanage.region')
+        // }
+        // $scope.toinsurance = function() {
+        //     $state.go('main.insumanage')
+        // }
+        // $scope.topatrefund = function() {
+        //     $state.go('main.patrefund.refundtoprocess')
+        // }
+        // $scope.toadvice = function() {
+        //     $state.go('main.adviceindex.advice')
+        // }
 
-        $scope.tounchecked = function() {
-            $state.go('main.checkornot.unchecked')
-        }
-        $scope.touser = function() {
-            $state.go('main.usermanage.allUsers')
-        }
-        $scope.todistrdep = function() {
-            $state.go('main.distrdepmanage.districts')
-        }
-        $scope.tounentered = function() {
-            $state.go('main.enterornot.unentered')
-        }
-        $scope.todata = function() {
-            $state.go('main.datamanage.region')
-        }
-        $scope.toinsurance = function() {
-            $state.go('main.insumanage')
-        }
         //注销
         $scope.ifOut = function() {
             $state.go('login')
@@ -7822,7 +7845,7 @@ angular.module('controllers', ['ngResource', 'services'])
             }, function(err) {})
         }
 
-// 关闭modal控制
+        // 关闭modal控制
         $scope.modal_close = function(target) {
             $(target).modal('hide')
         }
@@ -7830,6 +7853,12 @@ angular.module('controllers', ['ngResource', 'services'])
     }])
 
     // 用户意见反馈
+    .controller('AdviceindexCtrl', ['$scope', '$state', 'Storage', '$timeout', 'NgTableParams', 'Advice', function($scope, $state, Storage, $timeout, NgTableParams, Advice) {
+        $scope.toadvice = function() {
+            $state.go('main.adviceindex.advice')
+        }
+
+    }])
     .controller('AdviceCtrl', ['$scope', '$state', 'Storage', '$timeout', 'NgTableParams', 'Advice', function($scope, $state, Storage, $timeout, NgTableParams, Advice) {
 
         // 意见反馈显示
