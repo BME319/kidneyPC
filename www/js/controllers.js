@@ -137,6 +137,9 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.flaghealth = true
             $scope.flagdata = true
             $scope.flaginsu = true
+            $scope.flagpatrefund = true
+            $scope.flagadvice = true
+
         } else if (tempuserrole.indexOf("health") != -1) {
             $scope.flagdoctor = false
             $scope.flaguser = false
@@ -144,6 +147,9 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.flaghealth = true
             $scope.flagdata = false
             $scope.flaginsu = false
+            $scope.flagpatrefund = false
+            $scope.flagadvice = false
+
         }
 
         $scope.tounchecked = function() {
@@ -164,6 +170,13 @@ angular.module('controllers', ['ngResource', 'services'])
         $scope.toinsurance = function() {
             $state.go('main.insumanage')
         }
+        $scope.topatrefund = function() {
+            $state.go('main.patrefund.refundtoprocess')
+        }
+        $scope.toadvice = function() {
+            $state.go('main.advice')
+        }
+
         //注销
         $scope.ifOut = function() {
             $state.go('login', null, {
@@ -7577,6 +7590,9 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.flaghealth = true
             $scope.flagdata = true
             $scope.flaginsu = true
+            $scope.flagpatrefund = true
+            $scope.flagadvice = true
+
         } else if (tempuserrole.indexOf("health") != -1) {
             $scope.flagdoctor = false
             $scope.flaguser = false
@@ -7584,6 +7600,9 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.flaghealth = true
             $scope.flagdata = false
             $scope.flaginsu = false
+            $scope.flagpatrefund = false
+            $scope.flagadvice = false
+
         }
 
 
@@ -7609,4 +7628,225 @@ angular.module('controllers', ['ngResource', 'services'])
         $scope.ifOut = function() {
             $state.go('login')
         }
+    }])
+
+    // 用户退款申请
+    .controller('PatrefundCtrl', ['$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function($scope, $state, Review, Storage, $timeout, NgTableParams) {
+        $scope.refundprocessed = function() {
+            $state.go('main.patrefund.refundprocessed')
+        }
+        $scope.refundtoprocess = function() {
+            $state.go('main.patrefund.refundtoprocess')
+        }
+        $scope.refundtonotice = function() {
+            $state.go('main.patrefund.refundtonotice')
+        }
+    }])
+
+    // 用户退款申请——已处理
+    .controller('RefundprocessedCtrl', ['$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', 'Services', function($scope, $state, Review, Storage, $timeout, NgTableParams, Services) {
+        // 意见反馈显示
+        var getLists = function() {
+            var promise = Services.getmanualRefundList({
+                token: Storage.get('TOKEN'),
+            })
+            promise.then(function(data) {
+                console.log(data)
+                var datanew = []
+                for (var i = 0; i < data.data.length; i++) {
+                    console.log(i)
+                    if ((data.data[i].perDiagObject.status == 9) || (data.data[i].perDiagObject.status == 8) || (data.data[i].perDiagObject.status == 7)) {
+                        // console.log(data.data[i])
+                        datanew.push(data.data[i])
+                    }
+                }
+                console.log(datanew)
+                $scope.tableParams = new NgTableParams({
+                    count: 10000
+                }, {
+                    // counts: [],
+                    dataset: datanew
+                })
+                $scope.count = datanew.length
+            }, function(err) {})
+        }
+
+        //初始化
+        getLists()
+    }])
+
+    // 用户退款申请——待处理
+    .controller('RefundtoprocessCtrl', ['$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', 'Services', function($scope, $state, Review, Storage, $timeout, NgTableParams, Services) {
+
+        // 意见反馈显示
+        var getLists = function() {
+            var promise = Services.getmanualRefundList({
+                token: Storage.get('TOKEN'),
+            })
+            promise.then(function(data) {
+                console.log(data)
+                var datanew = []
+                for (var i = 0; i < data.data.length; i++) {
+                    if (data.data[i].perDiagObject.status == 5) {
+                        // console.log(data.data[i])
+                        datanew.push(data.data[i])
+                    }
+                }
+                $scope.tableParams = new NgTableParams({
+                    count: 10000
+                }, {
+                    // counts: [],
+                    dataset: datanew
+                })
+                $scope.count = datanew.length
+            }, function(err) {})
+        }
+
+        //初始化
+        getLists()
+
+        var diagid = ''
+        $scope.ifagree = function(_diagid) {
+            $('#agreeOrNot').modal('show')
+            diagid = _diagid
+        }
+
+        $scope.ifreject = function(_diagid) {
+            $('#rejectOrNot').modal('show')
+            diagid = _diagid
+        }
+
+        $scope.agree = function() {
+            console.log(diagid)
+            var promise = Services.manualRefund({
+                token: Storage.get('TOKEN'),
+                diagId: diagid,
+                reviewResult: 'consent'
+            })
+            promise.then(function(data) {
+                    console.log(data)
+                    if (data.code == 0) {
+                        $('#agreeOrNot').modal('hide')
+
+                        $('#agreed').modal('show')
+                        $timeout(function() {
+                            $('#agreed').modal('hide')
+                        }, 1000)
+                        getLists()
+                    }
+                },
+                function(err) {})
+        }
+
+        $scope.reject = function() {
+            console.log(diagid)
+            var promise = Services.manualRefund({
+                token: Storage.get('TOKEN'),
+                diagId: diagid,
+                reviewResult: 'reject'
+            })
+            promise.then(function(data) {
+                console.log(data)
+                if (data.code == 0) {
+                    $('#rejectOrNot').modal('hide')
+                    $('#rejected').modal('show')
+                    $timeout(function() {
+                        $('#rejected').modal('hide')
+                    }, 1000)
+                    getLists()
+                }
+
+
+            }, function(err) {})
+        }
+
+        // 关闭modal控制
+        $scope.modal_close = function(target) {
+            $(target).modal('hide')
+        }
+    }])
+
+    // 用户退款申请——待通知
+    .controller('RefundtonoticeCtrl', ['$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', 'Services', function($scope, $state, Review, Storage, $timeout, NgTableParams, Services) {
+        // 意见反馈显示
+        var getLists = function() {
+            var promise = Services.getmanualRefundList({
+                token: Storage.get('TOKEN'),
+            })
+            promise.then(function(data) {
+                console.log(data)
+                var datanew = []
+                for (var i = 0; i < data.data.length; i++) {
+                    if (data.data[i].perDiagObject.status == 6) {
+                        // console.log(data.data[i])
+                        datanew.push(data.data[i])
+                    }
+                }
+                console.log(datanew)
+                $scope.tableParams = new NgTableParams({
+                    count: 10000
+                }, {
+                    // counts: [],
+                    dataset: datanew
+                })
+                $scope.count = datanew.length
+            }, function(err) {})
+        }
+
+        //初始化
+        getLists()
+        var diagid = ''
+
+        $scope.ifnotice = function(_diagid) {
+            $('#noticeOrNot').modal('show')
+            diagid = _diagid
+        }
+
+        $scope.notice = function() {
+            console.log(diagid)
+            var promise = Services.manualRefund({
+                token: Storage.get('TOKEN'),
+                diagId: diagid,
+                reviewResult: 'notice'
+            })
+            promise.then(function(data) {
+                console.log(data)
+                if (data.code == 0) {
+                    $('#noticeOrNot').modal('hide')
+                    $('#noticed').modal('show')
+                    $timeout(function() {
+                        $('#noticed').modal('hide')
+                    }, 1000)
+                    getLists()
+                }
+            }, function(err) {})
+        }
+
+// 关闭modal控制
+        $scope.modal_close = function(target) {
+            $(target).modal('hide')
+        }
+
+    }])
+
+    // 用户意见反馈
+    .controller('AdviceCtrl', ['$scope', '$state', 'Storage', '$timeout', 'NgTableParams', 'Advice', function($scope, $state, Storage, $timeout, NgTableParams, Advice) {
+
+        // 意见反馈显示
+        var getLists = function() {
+            var promise = Advice.getadvices({ token: Storage.get('TOKEN') })
+            promise.then(function(data) {
+                $scope.tableParams = new NgTableParams({
+                    count: 10000
+                }, {
+                    // counts: [],
+                    dataset: data.results
+                })
+                $scope.totalItems = data.results.length
+            }, function(err) {})
+        }
+
+        //初始化
+        getLists()
+
     }])
