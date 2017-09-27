@@ -39,6 +39,36 @@ angular.module('Kidney_Web', ['ui.router', 'ui.bootstrap', 'controllers', 'servi
                 controller: 'RejectedCtrl'
             })
 
+            // 患者退款页面
+            .state('main.patrefund', {
+                abstract: true,
+                url: '/patrefund',
+                templateUrl: 'templates/main/patrefund.html',
+                controller: 'PatrefundCtrl'
+            })
+            .state('main.patrefund.refundprocessed', {
+                url: '/refundprocessed',
+                templateUrl: 'templates/main/patrefund/refundprocessed.html',
+                controller: 'RefundprocessedCtrl'
+            })
+            .state('main.patrefund.refundtoprocess', {
+                url: '/refundtoprocess',
+                templateUrl: 'templates/main/patrefund/refundtoprocess.html',
+                controller: 'RefundtoprocessCtrl'
+            })
+            .state('main.patrefund.refundtonotice', {
+                url: '/refundtonotice',
+                templateUrl: 'templates/main/patrefund/refundtonotice.html',
+                controller: 'RefundtonoticeCtrl'
+            })
+
+            // 用户建议页面
+            .state('main.advice', {
+                url: '/advice',
+                templateUrl: 'templates/main/advice.html',
+                controller: 'AdviceCtrl'
+            })
+
             //主页
             .state('homepage', {
                 url: '/homepage',

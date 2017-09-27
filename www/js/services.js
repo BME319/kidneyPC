@@ -39,6 +39,19 @@ angular.module('services', ['ngResource'])
                 }
             })
         }
+        var Advice = function() {
+            return $resource(CONFIG.dictbaseUrl + ':path/:route', { path: 'advice' }, {
+                getadvices: { method: 'GET', params: { route: 'advices' ,token:'@token'}, timeout: 100000 }
+            })
+        }
+
+        var Services = function() {
+            return $resource(CONFIG.dictbaseUrl + ':path/:route', { path: 'services' }, {
+                getmanualRefundList: { method: 'GET', params: { route: 'manualRefundList' ,token:'@token',status:'@status'}, timeout: 100000 },
+                manualRefund: { method: 'POST', params: { route: 'manualRefund' ,token:'@token',reviewResult:'@reviewResult',diagId:'@diagId'}, timeout: 100000 }
+                            })
+        }
+
         var Mywechat = function() {
             return $resource(CONFIG.dictbaseUrl + ':path/:route', { path: 'wechat' }, {
                 createTDCticket: { method: 'POST', params: { route: 'createTDCticket' }, timeout: 100000 }
@@ -547,6 +560,9 @@ angular.module('services', ['ngResource'])
                 serve.Mywechat = Mywechat()
                 serve.Policy = Policy()
                 serve.Upload = Upload()
+                serve.Advice = Advice()
+                serve.Services = Services()
+
             }, 0, 1)
         }
         serve.Dict = Dict()
@@ -562,6 +578,8 @@ angular.module('services', ['ngResource'])
         serve.Mywechat = Mywechat()
         serve.Policy = Policy()
         serve.Upload = Upload()
+        serve.Advice = Advice()
+        serve.Services = Services()
         return serve
     }])
 
@@ -605,6 +623,58 @@ angular.module('services', ['ngResource'])
           }
           return self
     }])
+
+        .factory('Advice', ['$q', 'Data', function ($q, Data) {
+          var self = this
+
+          self.getadvices = function (params) {
+            var deferred = $q.defer()
+            Data.Advice.getadvices(
+                    params,
+                    function (data, headers) {
+                      deferred.resolve(data)
+                    },
+                    function (err) {
+                      deferred.reject(err)
+                    })
+            return deferred.promise
+          }
+          return self
+    }])
+
+                .factory('Services', ['$q', 'Data', function ($q, Data) {
+          var self = this
+
+          self.getmanualRefundList = function (params) {
+            var deferred = $q.defer()
+            Data.Services.getmanualRefundList(
+                    params,
+                    function (data, headers) {
+                      deferred.resolve(data)
+                    },
+                    function (err) {
+                      deferred.reject(err)
+                    })
+            return deferred.promise
+          }
+
+                    self.manualRefund = function (params) {
+            var deferred = $q.defer()
+            Data.Services.manualRefund(
+                    params,
+                    function (data, headers) {
+                      deferred.resolve(data)
+                    },
+                    function (err) {
+                      deferred.reject(err)
+                    })
+            return deferred.promise
+          }
+
+          return self
+    }])
+
+
 
     .factory('Upload', ['$q', 'Data', function ($q, Data) {
           var self = this

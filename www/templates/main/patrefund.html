@@ -1,0 +1,16 @@
+<div>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-xs-2" style="text-align: center;font-size: 15px;margin-top: 10px;margin-left: 10px;width:auto;">
+          <uib-tabset active="activePill" vertical="true" type="pills">
+            <uib-tab index="0" heading="待处理" select="refundtoprocess()"></uib-tab>
+            <uib-tab index="1" heading="待通知" select="refundtonotice()"></uib-tab>
+            <uib-tab index="2" heading="已处理" select="refundprocessed()"></uib-tab>
+          </uib-tabset>
+      </div>
+      <div class="col-xs-10" style="margin-top:30px;">
+      	<div ui-view></div>
+      </div>
+    </div>  
+  </div>
+</div>
