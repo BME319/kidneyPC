@@ -5527,6 +5527,7 @@ angular.module('controllers', ['ngResource', 'services'])
         var textInfo = ''
         $scope.Province = {}
         $scope.viewRegion = function() {
+            $scope.loadingflag=true
             console.log($scope.Province.province)
             if (($scope.Province.province == undefined) || ($scope.starttime == undefined) || ($scope.endtime == undefined) || ($scope.starttime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null) || ($scope.endtime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null)) {
                 $('#inputerror').modal('show')
@@ -5633,14 +5634,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     console.log(err)
                 }
         }
-        startProgerss()
-        //进度条控制  
-        function startProgerss() {
-            $scope.length = 90;
-            // $("div[role='progressbar']").css("width", "100%");
-            //短暂延迟后刷新页面,貌似""作用是刷新本页面  
-            $("div[role='progressbar']").css("width", $scope.length + "%");
-        }
+       
 
     }])
 
@@ -5716,6 +5710,8 @@ angular.module('controllers', ['ngResource', 'services'])
         var textInfo = ''
         $scope.Province = {}
         $scope.viewTrend = function() {
+        $scope.loadingflag=true
+
             if (($scope.Province.province == undefined) || ($scope.starttime == undefined) || ($scope.endtime == undefined) || ($scope.starttime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null) || ($scope.endtime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null)) {
                 $('#inputerror').modal('show')
                 $timeout(function() {
@@ -5960,6 +5956,8 @@ angular.module('controllers', ['ngResource', 'services'])
         }
 
         $scope.searchList = function() {
+        $scope.loadingflag=true
+
             if (($scope.Province.province == undefined) || ($scope.starttime == undefined) || ($scope.endtime == undefined) || ($scope.starttime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null) || ($scope.endtime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null)) {
                 $('#inputerror').modal('show')
                 $timeout(function() {
@@ -6109,6 +6107,8 @@ angular.module('controllers', ['ngResource', 'services'])
         }
 
         $scope.searchList = function() {
+        $scope.loadingflag=true
+
             if (($scope.Province.province == undefined) || ($scope.starttime == undefined) || ($scope.endtime == undefined) || ($scope.starttime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null) || ($scope.endtime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null)) {
                 $('#inputerror').modal('show')
                 $timeout(function() {
@@ -6286,6 +6286,8 @@ angular.module('controllers', ['ngResource', 'services'])
         }
 
         $scope.searchList = function() {
+        $scope.loadingflag=true
+
             if (($scope.Province.province == undefined) || ($scope.starttime == undefined) || ($scope.endtime == undefined) || ($scope.starttime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null) || ($scope.endtime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null)) {
                 $('#inputerror').modal('show')
                 $timeout(function() {
@@ -6435,6 +6437,8 @@ angular.module('controllers', ['ngResource', 'services'])
         }
 
         $scope.searchList = function() {
+        $scope.loadingflag=true
+
             if (($scope.Province.province == undefined) || ($scope.starttime == undefined) || ($scope.endtime == undefined) || ($scope.starttime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null) || ($scope.endtime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null)) {
                 $('#inputerror').modal('show')
                 $timeout(function() {
@@ -6538,6 +6542,8 @@ angular.module('controllers', ['ngResource', 'services'])
         var textInfo = ''
         $scope.Province = {}
         $scope.viewPatRegion = function() {
+        $scope.loadingflag=true
+
             if (($scope.Province.province == undefined) || ($scope.starttime == undefined) || ($scope.endtime == undefined) || ($scope.starttime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null) || ($scope.endtime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null)) {
                 $('#inputerror').modal('show')
                 $timeout(function() {
@@ -6572,6 +6578,7 @@ angular.module('controllers', ['ngResource', 'services'])
         }
 
         var showpie = function() {
+
             if (isClick == false) {
                 RegionInfo = {
                     province: '浙江省',
@@ -6707,6 +6714,8 @@ angular.module('controllers', ['ngResource', 'services'])
         var textInfo = ''
         $scope.Province = {}
         $scope.viewPatTrend = function() {
+        $scope.loadingflag=true
+
             if (($scope.Province.province == undefined) || ($scope.starttime == undefined) || ($scope.endtime == undefined) || ($scope.starttime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null) || ($scope.endtime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null)) {
                 $('#inputerror').modal('show')
                 $timeout(function() {
@@ -6950,6 +6959,8 @@ angular.module('controllers', ['ngResource', 'services'])
         }
 
         $scope.searchList = function() {
+        $scope.loadingflag=true
+
             if (($scope.Province.province == undefined) || ($scope.starttime == undefined) || ($scope.endtime == undefined) || ($scope.starttime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null) || ($scope.endtime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null)) {
                 $('#inputerror').modal('show')
                 $timeout(function() {
@@ -7024,7 +7035,7 @@ angular.module('controllers', ['ngResource', 'services'])
             var promise = Monitor2.GetPatGroup(tempinfo)
             promise.then(function(data) {
                 $scope.loadingflag=false
-                
+
                 console.log(data.results.length)
                 if (data.results.length == 0) {
                     $('#nodata').modal('show')
@@ -7059,6 +7070,8 @@ angular.module('controllers', ['ngResource', 'services'])
         // }
 
         $scope.viewclass = function() {
+        $scope.loadingflag=true
+            
             // isClick = true
             var value = $scope.value
             type = 'class_' + value
@@ -7122,6 +7135,7 @@ angular.module('controllers', ['ngResource', 'services'])
             })
         }
         $scope.searchList = function() {
+
             Info = {
                 token: Storage.get('TOKEN'),
                 name: $scope.agentname
