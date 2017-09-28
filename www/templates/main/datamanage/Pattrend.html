@@ -26,6 +26,8 @@
         </div>
         <button type="submit" class="btn btn-default" ng-click="viewPatTrend()" style="background:#347ab6;color:white;width: 60px">确 定</button>
     </form>
+    <!-- 进度条 -->
+    <div  style="margin-left: 300px;margin-top: 10px;" ng-show="loadingflag"><img src="templates/main/datamanage/loading.gif" alt="" /></div>
     <div style="font-size: 15px" ng-show = "viewshow"><br>选择省份后设置开始日期和结束日期，点击“确定”按钮查看图表！</div>
     <div id="Pattrend" style="height:400px;margin-top: 50px;width: 600px;margin-left: 60px">
     </div>
