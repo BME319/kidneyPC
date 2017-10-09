@@ -87,7 +87,6 @@ angular.module('controllers', ['ngResource', 'services'])
         var tempuserrole = Storage.get('ROLE')
         var roles = new Array(); //定义一数组 
         roles = tempuserrole.split(","); //字符分割 
-        console.log(roles)
         // 角色字符串处理
         for (var i = 0; i <= roles.length; i++) {
             type = roles[i]
@@ -6920,8 +6919,7 @@ angular.module('controllers', ['ngResource', 'services'])
             promise.then(function(data) {
                 $scope.loadingflag=false
 
-                $scope.insurancetableParams = new N
-                gTableParams({
+                $scope.insurancetableParams = new NgTableParams({
                     count: 20
                 }, {
                     counts: [],
@@ -7747,7 +7745,6 @@ angular.module('controllers', ['ngResource', 'services'])
                 console.log(data)
                 var datanew = []
                 for (var i = 0; i < data.data.length; i++) {
-                    console.log(i)
                     if ((data.data[i].perDiagObject.status == 9) || (data.data[i].perDiagObject.status == 8) || (data.data[i].perDiagObject.status == 7)) {
                         // console.log(data.data[i])
                         datanew.push(data.data[i])
