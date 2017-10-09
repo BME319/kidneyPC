@@ -1,6 +1,6 @@
 angular.module('controllers', ['ngResource', 'services'])
 
-    .controller('LoginCtrl', ['$scope', '$timeout', '$state', 'Storage', '$sce', 'Data', 'User', function($scope, $timeout, $state, Storage, $sce, Data, User) {
+    .controller('LoginCtrl', ['$scope', '$timeout', '$state', 'Storage', '$sce', 'Data', 'User', 'Alluser', function($scope, $timeout, $state, Storage, $sce, Data, User, Alluser) {
 
         if (Storage.get('USERNAME') != null && Storage.get('USERNAME') != undefined) {
             $scope.logOn = { username: Storage.get('USERNAME'), password: '' }
@@ -9,20 +9,21 @@ angular.module('controllers', ['ngResource', 'services'])
         }
 
         $scope.LogIn = function(logOn) {
-            switch (logOn.role) {
-                // case 'doctor':
-                //     userrole = '普通医生'
-                //     break
-                // case 'patient':
-                //     userrole = '患者'
-                //     break
-                case 'health':
-                    userrole = '健康专员'
-                    break
-                case 'admin':
-                    userrole = '管理员'
-                    break
-            }
+            // switch (logOn.role) {
+            //     // case 'doctor':
+            //     //     userrole = '普通医生'
+            //     //     break
+            //     // case 'patient':
+            //     //     userrole = '患者'
+            //     //     break
+            //     case 'health':
+            //         userrole = '健康专员'
+            //         break
+            //     case 'admin':
+            //         userrole = '管理员'
+            //         break
+            // }
+            userrole = 'PC'
             $scope.logStatus = ''
             if ((logOn.username != '') && (logOn.password != '')) {
                 var phoneReg = /^(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$/
@@ -30,19 +31,37 @@ angular.module('controllers', ['ngResource', 'services'])
                     $scope.logStatus = '手机号验证失败！'
                 } else {
                     Storage.set('USERNAME', logOn.username)
-                    User.logIn({ username: logOn.username, password: logOn.password, role: logOn.role }).then(function(data) {
+                    User.logIn({ username: logOn.username, password: logOn.password, role: userrole }).then(function(data) {
                         if (data.results == 1) {
                             $scope.logStatus = '请确认账号密码无误且角色选择正确！'
                         } else if (data.results.mesg == 'login success!') {
-                            $scope.logStatus = '登录成功！'
-                            $state.go('homepage')
+                            // $scope.logStatus = '登录成功！'
                             Storage.set('PASSWORD', logOn.password)
+                            Storage.set('LASTLOGIN', data.results.lastlogin)
                             Storage.set('TOKEN', data.results.token)
                             Storage.set('isSignIN', 'Yes')
+                            Storage.set('USERID', data.results.userId)
                             var username = data.results.userName ? data.results.userName : data.results.userId
                             Storage.set('UName', username)
-                            Storage.set('ROLE', userrole)
+                            var promise = Alluser.getUserList({ token: Storage.get('TOKEN') })
+                            promise.then(function(data) {
+                                for (var i = 0; i <= data.results.length; i++) {
+                                    if (data.results[i].userId == Storage.get('USERID')) {
+                                        Storage.set('ROLE', data.results[i].role)
+                                        break;
+                                    }
+                                }
+                            })
+
+                            // Storage.set('ROLE', userrole)
+                            $state.go('homepage')
+                            // if (userrole=='管理员'){                           
+                            //     $state.go('homepage')
+                            // } else if (userrole=='健康专员'){
+                            //     $state.go('main.enterornot.unentered')
+                            // }
                         }
+
                     }, function(err) {
                         if (err.results == null && err.status == 0) {
                             $scope.logStatus = '网络错误！'
@@ -56,44 +75,96 @@ angular.module('controllers', ['ngResource', 'services'])
             } else {
                 $scope.logStatus = '请输入完整信息！'
             }
-        }
 
+        }
         $scope.toReset = function() {
             $state.go('phonevalid', { phonevalidType: 'reset' })
         }
     }])
 
-    .controller('MainCtrl', ['$scope', '$state', 'Storage', '$timeout', function($scope, $state, Storage, $timeout) {
+    .controller('MainCtrl', ['$scope', '$state', 'Storage', '$timeout', '$location', function($scope, $state, Storage, $timeout, $location) {
         $scope.UserName = Storage.get('UName')
-        $scope.UserRole = Storage.get('ROLE')
+        var tempuserrole = Storage.get('ROLE')
+        var roles = new Array(); //定义一数组 
+        roles = tempuserrole.split(","); //字符分割 
+        // 角色字符串处理
+        for (var i = 0; i <= roles.length; i++) {
+            type = roles[i]
+            switch (type) {
+                case 'Leader':
+                    roles[i] = '地区负责人'
+                    break
+                case 'master':
+                    roles[i] = '科主任'
+                    break
+                case 'doctor':
+                    roles[i] = '普通医生'
+                    break
+                case 'patient':
+                    roles[i] = '患者'
+                    break
+                case 'nurse':
+                    roles[i] = '护士'
+                    break
+                case 'insuranceA':
+                    roles[i] = '沟通人员'
+                    break
+                case 'insuranceC':
+                    roles[i] = '保险主管'
+                    break
+                case 'insuranceR':
+                    roles[i] = '录入人员'
+                    break
+                case 'health':
+                    roles[i] = '健康专员'
+                    break
+                case 'admin':
+                    roles[i] = '管理员'
+                    break
+            }
+        }
+        $scope.UserRole = roles
 
-        $scope.myIndex = Storage.get('Tab')
+        $scope.LastLoginTime = Storage.get('LASTLOGIN')
+        var absurl = $location.absUrl();
+        if (absurl.indexOf("usermanage") != -1) {
+            $scope.myIndex = 0
+        } else if (absurl.indexOf("checkornot") != -1) {
+            $scope.myIndex = 1
+        } else if (absurl.indexOf("enterornot") != -1) {
+            $scope.myIndex = 2
+        } else if (absurl.indexOf("distrdepmanage") != -1) {
+            $scope.myIndex = 3
+        } else if (absurl.indexOf("datamanage") != -1) {
+            $scope.myIndex = 4
+        } else if (absurl.indexOf("insumanage") != -1) {
+            $scope.myIndex = 5
+        } else if (absurl.indexOf("patrefund") != -1) {
+            $scope.myIndex = 6
+        } else if (absurl.indexOf("adviceindex") != -1) {
+            $scope.myIndex = 7
+        }
 
-        switch ($scope.UserRole) {
-            case '健康专员':
-                $scope.flagdoctor = false
-                $scope.flaguser = false
-                $scope.flagdistrep = false
-                $scope.flaghealth = true
-                $scope.flagdata = false
-                break
-            case '管理员':
-                $scope.flagdoctor = true
-                $scope.flaguser = true
-                $scope.flagdistrep = true
-                $scope.flaghealth = true
-                $scope.flagdata = true
-                break
-                // case '患者' :
-                //     $scope.flagdoctor = true
-                //     $scope.flaguser = true
-                //     $scope.flaghealth = true
-                //     break
-                // case '普通医生' :
-                //     $scope.flagdoctor = true
-                //     $scope.flaguser = false
-                //     $scope.flaghealth = false
-                //     break
+        if (tempuserrole.indexOf("admin") != -1) {
+            $scope.flagdoctor = true
+            $scope.flaguser = true
+            $scope.flagdistrdp = true
+            $scope.flaghealth = true
+            $scope.flagdata = true
+            $scope.flaginsu = true
+            $scope.flagpatrefund = true
+            $scope.flagadvice = true
+
+        } else if (tempuserrole.indexOf("health") != -1) {
+            $scope.flagdoctor = false
+            $scope.flaguser = false
+            $scope.flagdistrdp = false
+            $scope.flaghealth = true
+            $scope.flagdata = false
+            $scope.flaginsu = false
+            $scope.flagpatrefund = false
+            $scope.flagadvice = false
+
         }
 
         $scope.tounchecked = function() {
@@ -114,6 +185,20 @@ angular.module('controllers', ['ngResource', 'services'])
         $scope.toinsurance = function() {
             $state.go('main.insumanage')
         }
+        $scope.topatrefund = function() {
+            $state.go('main.patrefund.refundtoprocess')
+        }
+        $scope.toadvice = function() {
+            $state.go('main.adviceindex.advice')
+        }
+
+        //注销
+        $scope.ifOut = function() {
+            $state.go('login', null, {
+                reload: true
+            });
+            Storage.set('TOKEN', '')
+        }
     }])
 
     .controller('CheckOrNotCtrl', ['$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function($scope, $state, Review, Storage, $timeout, NgTableParams) {
@@ -131,7 +216,7 @@ angular.module('controllers', ['ngResource', 'services'])
 
     // 未审核-LZN
     .controller('UncheckedCtrl', ['$scope', '$state', 'Review', 'Alluser', 'Storage', '$timeout', 'NgTableParams', '$uibModal', function($scope, $state, Review, Alluser, Storage, $timeout, NgTableParams, $uibModal) {
-        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwMzQ3OTg1NjczMiwiaWF0IjoxNTAzNDc2MjU2fQ.e5OhZEOc8Rfe8vr4gaPCcbO-2LD-ij8e9znerHjgHhs"
+        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
 
         // 获取列表
         var getLists = function(currentPage, itemsPerPage) {
@@ -139,7 +224,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 "reviewStatus": 0,
                 "limit": itemsPerPage,
                 "skip": (currentPage - 1) * itemsPerPage,
-                "token": token
+                "token": Storage.get('TOKEN')
             }
             Review.GetReviewInfo($scope.review).then(
                 function(data) {
@@ -180,7 +265,7 @@ angular.module('controllers', ['ngResource', 'services'])
         $scope.count = '';
         var count = {
             "reviewStatus": 0,
-            "token": token
+            "token": Storage.get('TOKEN')
         }
         Review.GetCount(count).then(
             function(data) {
@@ -199,7 +284,7 @@ angular.module('controllers', ['ngResource', 'services'])
             var postreview = {
                 "doctorId": $scope.doctorinfos[index].userId,
                 "reviewStatus": 1,
-                "token": token
+                "token": Storage.get('TOKEN')
             }
             console.log($scope.doctorinfos[index].phoneNo)
             Review.PostReviewInfo(postreview).then(
@@ -212,9 +297,9 @@ angular.module('controllers', ['ngResource', 'services'])
                         }, 1000);
                         $('#accepted').on('hidden.bs.modal', function() {
                             var sms = {
-                                "mobile":$scope.doctorinfos[index].phoneNo,
+                                "mobile": $scope.doctorinfos[index].phoneNo,
                                 "smsType": 3,
-                                "token": token
+                                "token": Storage.get('TOKEN')
                             }
                             Alluser.sms(sms).then(
                                 function(data) {
@@ -252,57 +337,57 @@ angular.module('controllers', ['ngResource', 'services'])
         // 拒绝
         $scope.reject = function(index) {
             console.log($scope.RejectReason.reason);
-            if($scope.RejectReason.reason == undefined){
+            if ($scope.RejectReason.reason == undefined) {
                 $('#reasonerror').modal('show')
                 $timeout(function() {
                     $('#reasonerror').modal('hide')
                 }, 1000)
-            }else{
-            var postreview = {
-                "doctorId": $scope.docId,
-                "reviewStatus": 2,
-                "reviewContent": $scope.RejectReason.reason,
-                "token": token
-            }
-            console.log(postreview);
-            Review.PostReviewInfo(postreview).then(
-                function(data) {
+            } else {
+                var postreview = {
+                    "doctorId": $scope.docId,
+                    "reviewStatus": 2,
+                    "reviewContent": $scope.RejectReason.reason,
+                    "token": Storage.get('TOKEN')
+                }
+                console.log(postreview);
+                Review.PostReviewInfo(postreview).then(
+                    function(data) {
 
-                    console.log(data.results);
-                    if (data.results == "审核信息保存成功") {
-                        $('#reject').modal('hide');
-                        $('#reject').on('hidden.bs.modal', function() {
-                            $('#rejected').modal('show');
-                            $timeout(function() {
-                                $('#rejected').modal('hide');
-                            }, 1000);
-                            $('#rejected').on('hidden.bs.modal', function() {
-                                var sms = {
-                                    "mobile": $scope.doctorinfos[index].phoneNo,
-                                    "smsType": 4,
-                                    "token": token,
-                                    "reason": $scope.RejectReason.reason
-                                }
-                                Alluser.sms(sms).then(
-                                    function(data) {
-                                        console.log(data.results);
-                                        $scope.RejectReason = {};
-                                        getLists($scope.currentPage, $scope.itemsPerPage);
-                                    },
-                                    function(e) {
+                        console.log(data.results);
+                        if (data.results == "审核信息保存成功") {
+                            $('#reject').modal('hide');
+                            $('#reject').on('hidden.bs.modal', function() {
+                                $('#rejected').modal('show');
+                                $timeout(function() {
+                                    $('#rejected').modal('hide');
+                                }, 1000);
+                                $('#rejected').on('hidden.bs.modal', function() {
+                                    var sms = {
+                                        "mobile": $scope.doctorinfos[index].phoneNo,
+                                        "smsType": 4,
+                                        "token": Storage.get('TOKEN'),
+                                        "reason": $scope.RejectReason.reason
+                                    }
+                                    Alluser.sms(sms).then(
+                                        function(data) {
+                                            console.log(data.results);
+                                            $scope.RejectReason = {};
+                                            getLists($scope.currentPage, $scope.itemsPerPage);
+                                        },
+                                        function(e) {
 
-                                    })
+                                        })
+
+                                })
 
                             })
+                        }
+                    },
+                    function(e) {
 
-                        })
-                    }
-                },
-                function(e) {
-
-                })
+                    })
+            }
         }
-    }
         // 搜索
         $scope.search = function() {
             $scope.review = {
@@ -310,7 +395,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 "limit": $scope.itemsPerPage,
                 "skip": ($scope.currentPage - 1) * $scope.itemsPerPage,
                 "name": $scope.doctorname,
-                "token": token
+                "token": Storage.get('TOKEN')
             }
             Review.GetReviewInfo($scope.review).then(
                 function(data) {
@@ -342,45 +427,58 @@ angular.module('controllers', ['ngResource', 'services'])
     }])
     // 查看医生资质证书-LZN
     .controller('DoctorLicenseCtrl', ['$scope', '$state', 'Review', 'Alluser', 'Storage', '$timeout', function($scope, $state, Review, Alluser, Storage, $timeout) {
-        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwMzQ3OTg1NjczMiwiaWF0IjoxNTAzNDc2MjU2fQ.e5OhZEOc8Rfe8vr4gaPCcbO-2LD-ij8e9znerHjgHhs"
+        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
         var id = Storage.get('docId');
 
         // 循环轮播到某个特定的帧 
-        $(".slide-one").click(function(){
+        $(".slide-one").click(function() {
             $("#myCarousel").carousel(0);
         });
-        $(".slide-two").click(function(){
+        $(".slide-two").click(function() {
             $("#myCarousel").carousel(1);
         });
 
         // 轮播到前后帧 
-        $("#prev").click(function(){
+        $("#prev").click(function() {
             $('#myCarousel').carousel('prev')
         });
-        $("#next").click(function(){
+        $("#next").click(function() {
             $('#myCarousel').carousel('next')
         });
 
         $scope.status = Storage.get('reviewstatus');
+        console.log($scope.status)
+        switch ($scope.status) {
+            case 0:
+                $scope.ifcheck = false;
+                break;
+            case 1:
+                $scope.ifcheck = false;
+                break;
+            case 2:
+                $scope.ifcheck = true;
+                break;
+        }
+
         $scope.doctorinfos = {};
         $scope.review = {};
         var params = {
             "doctorId": id,
-            "token": token
+            "token": Storage.get('TOKEN')
         }
         Review.GetCertificate(params).then(
             function(data) {
                 console.log(data)
                 $scope.doctorinfos = data.results;
-                $scope.certificatephoto=data.results.certificatePhotoUrl.replace("resized", "");
-                $scope.practisingphoto=data.results.practisingPhotoUrl.replace("resized", "");
+                $scope.certificatephoto = data.results.certificatePhotoUrl.replace("resized", "");
+                $scope.practisingphoto = data.results.practisingPhotoUrl.replace("resized", "");
                 if ($scope.doctorinfos.province == $scope.doctorinfos.city) $scope.doctorinfos.province = '';
                 var review = {
                     "reviewStatus": $scope.status,
                     "limit": 15,
                     "skip": 0,
                     "name": $scope.doctorinfos.name,
-                    "token": token
+                    "token": Storage.get('TOKEN')
                 }
                 Review.GetReviewInfo(review).then(
                     function(data) {
@@ -409,7 +507,7 @@ angular.module('controllers', ['ngResource', 'services'])
             var postreview = {
                 "doctorId": Storage.get('docId'),
                 "reviewStatus": 1,
-                "token": token
+                "token": Storage.get('TOKEN')
             }
             Review.PostReviewInfo(postreview).then(
                 function(data) {
@@ -423,7 +521,7 @@ angular.module('controllers', ['ngResource', 'services'])
                             var sms = {
                                 "mobile": $scope.doctorinfos.phoneNo,
                                 "smsType": 3,
-                                "token": token
+                                "token": Storage.get('TOKEN')
                             }
                             Alluser.sms(sms).then(
                                 function(data) {
@@ -444,67 +542,68 @@ angular.module('controllers', ['ngResource', 'services'])
         // 拒绝
         $scope.reject = function(docphoneNo) {
             console.log($scope.RejectReason.reason);
-            if($scope.RejectReason.reason == undefined){
+            if ($scope.RejectReason.reason == undefined) {
                 $('#reasonerror').modal('show')
                 $timeout(function() {
                     $('#reasonerror').modal('hide')
                 }, 1000)
-            }else{
-            var postreview = {
-                "doctorId": Storage.get('docId'),
-                "reviewStatus": 2,
-                "reviewContent": $scope.RejectReason.reason,
-                "token": token
+            } else {
+                var postreview = {
+                    "doctorId": Storage.get('docId'),
+                    "reviewStatus": 2,
+                    "reviewContent": $scope.RejectReason.reason,
+                    "token": Storage.get('TOKEN')
+                }
+                console.log(postreview);
+                Review.PostReviewInfo(postreview).then(
+                    function(data) {
+
+                        console.log(data.results);
+                        if (data.results == "审核信息保存成功") {
+                            $('#reject').modal('hide');
+                            $('#reject').on('hidden.bs.modal', function() {
+                                $('#rejected').modal('show');
+                                $timeout(function() {
+                                    $('#rejected').modal('hide');
+                                }, 1000);
+                            })
+                            $('#rejected').on('hidden.bs.modal', function() {
+                                var sms = {
+                                    "mobile": $scope.doctorinfos.phoneNo,
+                                    "smsType": 4,
+                                    "token": Storage.get('TOKEN'),
+                                    "reason": $scope.RejectReason.reason
+                                }
+                                Alluser.sms(sms).then(
+                                    function(data) {
+                                        console.log(data.results);
+                                        $scope.RejectReason = {};
+                                        $state.go('main.checkornot.unchecked');
+                                    },
+                                    function(e) {})
+
+                            })
+                        }
+                    },
+                    function(e) {
+
+                    })
             }
-            console.log(postreview);
-            Review.PostReviewInfo(postreview).then(
-                function(data) {
-
-                    console.log(data.results);
-                    if (data.results == "审核信息保存成功") {
-                        $('#reject').modal('hide');
-                        $('#reject').on('hidden.bs.modal', function() {
-                            $('#rejected').modal('show');
-                            $timeout(function() {
-                                $('#rejected').modal('hide');
-                            }, 1000);
-                        })
-                        $('#rejected').on('hidden.bs.modal', function() {
-                            var sms = {
-                                "mobile": $scope.doctorinfos.phoneNo,
-                                "smsType": 4,
-                                "token": token,
-                                "reason": $scope.RejectReason.reason
-                            }
-                            Alluser.sms(sms).then(
-                                function(data) {
-                                    console.log(data.results);
-                                    $scope.RejectReason = {};
-                                    $state.go('main.checkornot.unchecked');
-                                },
-                                function(e) {})
-
-                        })
-                    }
-                },
-                function(e) {
-
-                })
-        }}
+        }
         $scope.modal_close = function(target) {
             $(target).modal('hide')
         }
     }])
     // 已审核-LZN
     .controller('CheckedCtrl', ['$scope', '$state', 'Review', 'Storage', 'NgTableParams', '$timeout', function($scope, $state, Review, Storage, NgTableParams, $timeout) {
-        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwMzQ3OTg1NjczMiwiaWF0IjoxNTAzNDc2MjU2fQ.e5OhZEOc8Rfe8vr4gaPCcbO-2LD-ij8e9znerHjgHhs"
+        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
         // 获取列表
         var getLists = function(currentPage, itemsPerPage) {
             $scope.review = {
                 "reviewStatus": 1,
                 "limit": itemsPerPage,
                 "skip": (currentPage - 1) * itemsPerPage,
-                "token": token
+                "token": Storage.get('TOKEN')
             }
             Review.GetReviewInfo($scope.review).then(
                 function(data) {
@@ -553,7 +652,7 @@ angular.module('controllers', ['ngResource', 'services'])
         $scope.count = '';
         var count = {
             "reviewStatus": 1,
-            "token": token
+            "token": Storage.get('TOKEN')
         }
         Review.GetCount(count).then(
             function(data) {
@@ -572,7 +671,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 "limit": $scope.itemsPerPage,
                 "skip": ($scope.currentPage - 1) * $scope.itemsPerPage,
                 "name": $scope.doctorname,
-                "token": token
+                "token": Storage.get('TOKEN')
 
             }
             Review.GetReviewInfo($scope.review).then(
@@ -607,14 +706,14 @@ angular.module('controllers', ['ngResource', 'services'])
     }])
     // 已拒绝-RH
     .controller('RejectedCtrl', ['$scope', '$state', 'Review', 'Storage', 'NgTableParams', '$timeout', function($scope, $state, Review, Storage, NgTableParams, $timeout) {
-        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwMzQ3OTg1NjczMiwiaWF0IjoxNTAzNDc2MjU2fQ.e5OhZEOc8Rfe8vr4gaPCcbO-2LD-ij8e9znerHjgHhs"
+        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
         // 获取列表
         var getLists = function(currentPage, itemsPerPage) {
             $scope.review = {
                 "reviewStatus": 2,
                 "limit": itemsPerPage,
                 "skip": (currentPage - 1) * itemsPerPage,
-                "token": token
+                "token": Storage.get('TOKEN')
             }
             Review.GetReviewInfo($scope.review).then(
                 function(data) {
@@ -663,7 +762,7 @@ angular.module('controllers', ['ngResource', 'services'])
         $scope.count = '';
         var count = {
             "reviewStatus": 2,
-            "token": token
+            "token": Storage.get('TOKEN')
         }
         Review.GetCount(count).then(
             function(data) {
@@ -682,7 +781,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 "limit": $scope.itemsPerPage,
                 "skip": ($scope.currentPage - 1) * $scope.itemsPerPage,
                 "name": $scope.doctorname,
-                "token": token
+                "token": Storage.get('TOKEN')
 
             }
             Review.GetReviewInfo($scope.review).then(
@@ -717,6 +816,7 @@ angular.module('controllers', ['ngResource', 'services'])
     }])
 
     .controller('EnterOrNotCtrl', ['$scope', '$state', 'Storage', '$timeout', function($scope, $state, Storage, $timeout) {
+        Storage.set('Tab', 2)
         $scope.toentered = function() {
             $state.go('main.enterornot.entered');
         }
@@ -726,13 +826,16 @@ angular.module('controllers', ['ngResource', 'services'])
     }])
     // 未录入-LZN
     .controller('UnenteredCtrl', ['$scope', '$state', 'Storage', 'LabtestImport', 'NgTableParams', '$timeout', function($scope, $state, Storage, LabtestImport, NgTableParams, $timeout) {
+        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
+
+
         // 获取列表
         var getLists = function(currentPage, itemsPerPage) {
             $scope.lab = {
                 "labtestImportStatus": 0,
                 "limit": itemsPerPage,
                 "skip": (currentPage - 1) * itemsPerPage,
-                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJoZWFsdGgiLCJleHAiOjE1MDQ3OTc0MTY1NTUsImlhdCI6MTUwNDc5MzgxNn0.nwvH3C_f3HwzD8ZCGgaBrr2lwokQo9be5UMK3p3QlTc"
+                "token": Storage.get('TOKEN')
             }
             LabtestImport.GetLabtestInfo($scope.lab).then(
                 function(data) {
@@ -800,7 +903,7 @@ angular.module('controllers', ['ngResource', 'services'])
         $scope.count = '';
         var count = {
             "labtestImportStatus": 0,
-            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJoZWFsdGgiLCJleHAiOjE1MDQ3OTc0MTY1NTUsImlhdCI6MTUwNDc5MzgxNn0.nwvH3C_f3HwzD8ZCGgaBrr2lwokQo9be5UMK3p3QlTc"
+            "token": Storage.get('TOKEN')
         }
         LabtestImport.GetCount(count).then(
             function(data) {
@@ -857,7 +960,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 "limit": $scope.itemsPerPage,
                 "skip": ($scope.currentPage - 1) * $scope.itemsPerPage,
                 "name": $scope.patientname,
-                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJoZWFsdGgiLCJleHAiOjE1MDQ3OTc0MTY1NTUsImlhdCI6MTUwNDc5MzgxNn0.nwvH3C_f3HwzD8ZCGgaBrr2lwokQo9be5UMK3p3QlTc"
+                "token": Storage.get('TOKEN')
             }
             LabtestImport.GetLabtestInfo($scope.lab).then(
                 function(data) {
@@ -884,12 +987,14 @@ angular.module('controllers', ['ngResource', 'services'])
     }])
     // 已录入-LZN
     .controller('EnteredCtrl', ['$scope', '$state', 'Storage', 'LabtestImport', 'NgTableParams', '$timeout', function($scope, $state, Storage, LabtestImport, NgTableParams, $timeout) {
+        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
+
         var getLists = function(currentPage, itemsPerPage) {
             $scope.lab = {
                 "labtestImportStatus": 1,
                 "limit": itemsPerPage,
                 "skip": (currentPage - 1) * itemsPerPage,
-                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJoZWFsdGgiLCJleHAiOjE1MDQ3OTc0MTY1NTUsImlhdCI6MTUwNDc5MzgxNn0.nwvH3C_f3HwzD8ZCGgaBrr2lwokQo9be5UMK3p3QlTc"
+                "token": Storage.get('TOKEN')
             }
             LabtestImport.GetLabtestInfo($scope.lab).then(
                 function(data) {
@@ -967,7 +1072,7 @@ angular.module('controllers', ['ngResource', 'services'])
         $scope.count = '';
         var count = {
             "labtestImportStatus": 1,
-            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJoZWFsdGgiLCJleHAiOjE1MDQ3OTc0MTY1NTUsImlhdCI6MTUwNDc5MzgxNn0.nwvH3C_f3HwzD8ZCGgaBrr2lwokQo9be5UMK3p3QlTc"
+            "token": Storage.get('TOKEN')
         }
         LabtestImport.GetCount(count).then(
             function(data) {
@@ -1024,7 +1129,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 "limit": $scope.itemsPerPage,
                 "skip": ($scope.currentPage - 1) * $scope.itemsPerPage,
                 "name": $scope.patientname,
-                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJoZWFsdGgiLCJleHAiOjE1MDQ3OTc0MTY1NTUsImlhdCI6MTUwNDc5MzgxNn0.nwvH3C_f3HwzD8ZCGgaBrr2lwokQo9be5UMK3p3QlTc"
+                "token": Storage.get('TOKEN')
             }
             LabtestImport.GetLabtestInfo($scope.lab).then(
                 function(data) {
@@ -1054,6 +1159,9 @@ angular.module('controllers', ['ngResource', 'services'])
         }
     }])
     .controller('LabInfoCtrl', ['$scope', '$state', 'Storage', 'LabtestImport', 'NgTableParams', '$uibModal', '$timeout', function($scope, $state, Storage, LabtestImport, NgTableParams, $uibModal, $timeout) {
+        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
+
+
         $scope.Lab = '';
         $scope.patname = Storage.get('patName');
         $scope.Lab.LabType = {
@@ -1233,13 +1341,13 @@ angular.module('controllers', ['ngResource', 'services'])
 
         var patient = {
             'patientId': Storage.get('patId'),
-            'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJoZWFsdGgiLCJleHAiOjE1MDQ3OTc0MTY1NTUsImlhdCI6MTUwNDc5MzgxNn0.nwvH3C_f3HwzD8ZCGgaBrr2lwokQo9be5UMK3p3QlTc'
+            "token": Storage.get('TOKEN')
         }
         LabtestImport.GetPhotoList(patient).then(
             function(data) {
                 // 对结果的去“resized”处理
-                for (var i=0;i<data.results.length;i++){
-                    data.results[i].photo=data.results[i].photo.replace("resized", "");
+                for (var i = 0; i < data.results.length; i++) {
+                    data.results[i].photo = data.results[i].photo.replace("resized", "");
                 }
 
                 $scope.slides = data.results;
@@ -1411,7 +1519,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     "type": type,
                     "value": $scope.postBack[i].LabValue,
                     "unit": unit,
-                    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJoZWFsdGgiLCJleHAiOjE1MDQ3OTc0MTY1NTUsImlhdCI6MTUwNDc5MzgxNn0.nwvH3C_f3HwzD8ZCGgaBrr2lwokQo9be5UMK3p3QlTc"
+                    "token": Storage.get('TOKEN')
                 }
                 console.log(params);
                 LabtestImport.PostLabTestInfo(params).then(
@@ -1425,7 +1533,7 @@ angular.module('controllers', ['ngResource', 'services'])
             var label = {
                 "photoType": $scope.phototype,
                 "photoId": $scope.photoId,
-                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJoZWFsdGgiLCJleHAiOjE1MDQ3OTc0MTY1NTUsImlhdCI6MTUwNDc5MzgxNn0.nwvH3C_f3HwzD8ZCGgaBrr2lwokQo9be5UMK3p3QlTc"
+                "token": Storage.get('TOKEN')
             }
             LabtestImport.LabelPhoto(label).then(
                 function(data) {
@@ -1442,10 +1550,11 @@ angular.module('controllers', ['ngResource', 'services'])
                                 $scope.phototype = '';
                                 var patient = {
                                     'patientId': Storage.get('patId'),
-                                    'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJoZWFsdGgiLCJleHAiOjE1MDQ3OTc0MTY1NTUsImlhdCI6MTUwNDc5MzgxNn0.nwvH3C_f3HwzD8ZCGgaBrr2lwokQo9be5UMK3p3QlTc'
+                                    "token": Storage.get('TOKEN')
                                 }
                                 LabtestImport.GetPatientLabTest(patient).then(
                                     function(data) {
+                                        console.log(data)
                                         $scope.patientlabtests = data.results;
                                         for (var i = 0; i < $scope.patientlabtests.length; i++) {
                                             switch ($scope.patientlabtests[i].type) {
@@ -1536,7 +1645,7 @@ angular.module('controllers', ['ngResource', 'services'])
         $scope.skip = function() {
             var label = {
                 "photoId": $scope.photoId,
-                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJoZWFsdGgiLCJleHAiOjE1MDQ3OTc0MTY1NTUsImlhdCI6MTUwNDc5MzgxNn0.nwvH3C_f3HwzD8ZCGgaBrr2lwokQo9be5UMK3p3QlTc"
+                "token": Storage.get('TOKEN')
             }
             LabtestImport.LabelPhoto(label).then(
                 function(data) {
@@ -1553,7 +1662,7 @@ angular.module('controllers', ['ngResource', 'services'])
                                 $scope.phototype = '';
                                 var patient = {
                                     'patientId': Storage.get('patId'),
-                                    'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJoZWFsdGgiLCJleHAiOjE1MDQ3OTc0MTY1NTUsImlhdCI6MTUwNDc5MzgxNn0.nwvH3C_f3HwzD8ZCGgaBrr2lwokQo9be5UMK3p3QlTc'
+                                    "token": Storage.get('TOKEN')
                                 }
                                 LabtestImport.GetPhotoList(patient).then(
                                     function(data) {
@@ -1613,11 +1722,13 @@ angular.module('controllers', ['ngResource', 'services'])
     // }])
     // 已录入患者的化验信息-LZN
     .controller('PatientLabInfoCtrl', ['$scope', '$state', 'Storage', 'LabtestImport', 'NgTableParams', '$timeout', function($scope, $state, Storage, LabtestImport, NgTableParams, $timeout) {
+        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
+
         $scope.patname = Storage.get('patName')
         $scope.patientlabtests = {};
         var patient = {
             "patientId": Storage.get('patId'),
-            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJoZWFsdGgiLCJleHAiOjE1MDQ3OTc0MTY1NTUsImlhdCI6MTUwNDc5MzgxNn0.nwvH3C_f3HwzD8ZCGgaBrr2lwokQo9be5UMK3p3QlTc"
+            "token": Storage.get('TOKEN')
         }
         LabtestImport.GetPatientLabTest(patient).then(
             function(data) {
@@ -1673,6 +1784,8 @@ angular.module('controllers', ['ngResource', 'services'])
     }])
     // 查看/编辑已录入信息-LZN
     .controller('ModifyLabInfoCtrl', ['$scope', '$state', 'Storage', 'LabtestImport', 'NgTableParams', '$timeout', function($scope, $state, Storage, LabtestImport, NgTableParams, $timeout) {
+        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
+
         $scope.patname = Storage.get('patName');
         var type = Storage.get('labtype');
         switch (Storage.get('labtype')) {
@@ -1765,7 +1878,7 @@ angular.module('controllers', ['ngResource', 'services'])
         $scope.photolist = {};
         var labtest = {
             'labtestId': Storage.get('labtestId'),
-            'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJoZWFsdGgiLCJleHAiOjE1MDQ3OTc0MTY1NTUsImlhdCI6MTUwNDc5MzgxNn0.nwvH3C_f3HwzD8ZCGgaBrr2lwokQo9be5UMK3p3QlTc'
+            "token": Storage.get('TOKEN')
         }
         LabtestImport.GetPhotobyLabtest(labtest).then(
             function(data) {
@@ -1810,7 +1923,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 "type": type,
                 "value": $scope.LabValue,
                 "unit": unit,
-                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJoZWFsdGgiLCJleHAiOjE1MDQ3OTc0MTY1NTUsImlhdCI6MTUwNDc5MzgxNn0.nwvH3C_f3HwzD8ZCGgaBrr2lwokQo9be5UMK3p3QlTc"
+                "token": Storage.get('TOKEN')
             }
             console.log(params);
             LabtestImport.EditResult(params).then(
@@ -1834,11 +1947,13 @@ angular.module('controllers', ['ngResource', 'services'])
     }])
     // 已录入患者的化验信息-LZN
     .controller('PatientLabInfoCtrl', ['$scope', '$state', 'Storage', 'LabtestImport', 'NgTableParams', '$timeout', function($scope, $state, Storage, LabtestImport, NgTableParams, $timeout) {
+        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
+
         $scope.patname = Storage.get('patName')
         $scope.patientlabtests = {}
         var patient = {
             'patientId': Storage.get('patId'),
-            'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJoZWFsdGgiLCJleHAiOjE1MDQ3OTc0MTY1NTUsImlhdCI6MTUwNDc5MzgxNn0.nwvH3C_f3HwzD8ZCGgaBrr2lwokQo9be5UMK3p3QlTc'
+            "token": Storage.get('TOKEN')
         }
         LabtestImport.GetPatientLabTest(patient).then(
             function(data) {
@@ -1979,12 +2094,12 @@ angular.module('controllers', ['ngResource', 'services'])
         $scope.photolist = {}
         var labtest = {
             'labtestId': Storage.get('labtestId'),
-            'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJoZWFsdGgiLCJleHAiOjE1MDQ3OTc0MTY1NTUsImlhdCI6MTUwNDc5MzgxNn0.nwvH3C_f3HwzD8ZCGgaBrr2lwokQo9be5UMK3p3QlTc'
+            "token": Storage.get('TOKEN')
         }
         LabtestImport.GetPhotobyLabtest(labtest).then(
             function(data) {
                 console.log(data.results)
-                data.results.photo=data.results.photo.replace("resized", "");
+                data.results.photo = data.results.photo.replace("resized", "");
                 $scope.photolist = data.results
             },
             function(e) {
@@ -2021,7 +2136,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 'type': type,
                 'value': $scope.LabValue,
                 'unit': unit,
-                'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJoZWFsdGgiLCJleHAiOjE1MDQ3OTc0MTY1NTUsImlhdCI6MTUwNDc5MzgxNn0.nwvH3C_f3HwzD8ZCGgaBrr2lwokQo9be5UMK3p3QlTc'
+                "token": Storage.get('TOKEN')
             }
             console.log(params)
             LabtestImport.EditResult(params).then(
@@ -2071,13 +2186,13 @@ angular.module('controllers', ['ngResource', 'services'])
     // 所有用户--张桠童
     .controller('allUsersCtrl', ['$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', 'Roles', '$window',
         function($scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, Roles, $window) {
-            var token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwMzQ3OTg1NjczMiwiaWF0IjoxNTAzNDc2MjU2fQ.e5OhZEOc8Rfe8vr4gaPCcbO-2LD-ij8e9znerHjgHhs'
+            var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
 
             Storage.set('Tab', 1)
             // -----------获取列表总条数------------------
             var getTotalNums = function(role1) {
                 var countInfo = {
-                    token: token,
+                    token: Storage.get('TOKEN'),
                     role1: role1
                 }
                 console.log(countInfo)
@@ -2093,7 +2208,7 @@ angular.module('controllers', ['ngResource', 'services'])
             var getLists = function(currentPage, itemsPerPage, _userlist, role_count) {
                 // 完善userlist
                 var userlist = _userlist
-                userlist.token = token
+                userlist.token = Storage.get('TOKEN')
                 userlist.limit = itemsPerPage
                 userlist.skip = (currentPage - 1) * itemsPerPage
                 // 完善countInfo
@@ -2338,7 +2453,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     var addInfo = {
                         userId: userdetail_temp.userId,
                         roles: role_add[i],
-                        token: token
+                        token: Storage.get('TOKEN')
                     }
                     var promise = Roles.addRoles(addInfo)
                     promise.then(function(data) {
@@ -2351,7 +2466,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     var removeInfo = {
                         userId: userdetail_temp.userId,
                         roles: role_remove[i],
-                        token: token
+                        token: Storage.get('TOKEN')
                     }
                     var promise = Roles.removeRoles(removeInfo)
                     promise.then(function(data) {
@@ -2387,14 +2502,14 @@ angular.module('controllers', ['ngResource', 'services'])
     // 医生--张桠童
     .controller('doctorsCtrl', ['$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', 'Roles', 'Doctor', 'Mywechat',
         function($scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, Roles, Doctor, Mywechat) {
-            var token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwMzQ3OTg1NjczMiwiaWF0IjoxNTAzNDc2MjU2fQ.e5OhZEOc8Rfe8vr4gaPCcbO-2LD-ij8e9znerHjgHhs'
+            var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
 
             Storage.set('Tab', 1)
 
             // -----------获取列表总条数------------------
             var getTotalNums = function(role1) {
                 var countInfo = {
-                    token: token,
+                    token: Storage.get('TOKEN'),
                     role1: role1
                 }
                 console.log(countInfo)
@@ -2410,7 +2525,7 @@ angular.module('controllers', ['ngResource', 'services'])
             var getLists = function(currentPage, itemsPerPage, _userlist, role_count) {
                 // 完善userlist
                 var userlist = _userlist
-                userlist.token = token
+                userlist.token = Storage.get('TOKEN')
                 userlist.limit = itemsPerPage
                 userlist.skip = (currentPage - 1) * itemsPerPage
                 // 完善countInfo
@@ -2635,12 +2750,12 @@ angular.module('controllers', ['ngResource', 'services'])
     // 护士--张桠童
     .controller('nursesCtrl', ['$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', 'Roles',
         function($scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, Roles) {
-            var token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwMzQ3OTg1NjczMiwiaWF0IjoxNTAzNDc2MjU2fQ.e5OhZEOc8Rfe8vr4gaPCcbO-2LD-ij8e9znerHjgHhs'
+            var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
 
             // -----------获取列表总条数------------------
             var getTotalNums = function(role1) {
                 var countInfo = {
-                    token: token,
+                    token: Storage.get('TOKEN'),
                     role1: role1
                 }
                 console.log(countInfo)
@@ -2656,7 +2771,7 @@ angular.module('controllers', ['ngResource', 'services'])
             var getLists = function(currentPage, itemsPerPage, _userlist, role_count) {
                 // 完善userlist
                 var userlist = _userlist
-                userlist.token = token
+                userlist.token = Storage.get('TOKEN')
                 userlist.limit = itemsPerPage
                 userlist.skip = (currentPage - 1) * itemsPerPage
                 // 完善countInfo
@@ -2828,12 +2943,12 @@ angular.module('controllers', ['ngResource', 'services'])
     // 患者--张桠童
     .controller('patientsCtrl', ['$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', 'Roles',
         function($scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, Roles) {
-            var token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwMzQ3OTg1NjczMiwiaWF0IjoxNTAzNDc2MjU2fQ.e5OhZEOc8Rfe8vr4gaPCcbO-2LD-ij8e9znerHjgHhs'
+            var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
 
             // -----------获取列表总条数------------------
             var getTotalNums = function(role1) {
                 var countInfo = {
-                    token: token,
+                    token: Storage.get('TOKEN'),
                     role1: role1
                 }
                 console.log(countInfo)
@@ -2849,7 +2964,7 @@ angular.module('controllers', ['ngResource', 'services'])
             var getLists = function(currentPage, itemsPerPage, _userlist, role_count) {
                 // 完善userlist
                 var userlist = _userlist
-                userlist.token = token
+                userlist.token = Storage.get('TOKEN')
                 userlist.limit = itemsPerPage
                 userlist.skip = (currentPage - 1) * itemsPerPage
                 // 完善countInfo
@@ -3029,12 +3144,12 @@ angular.module('controllers', ['ngResource', 'services'])
     // 保险人员--张桠童
     .controller('insuranceOfficersCtrl', ['$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', 'Roles',
         function($scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, Roles) {
-            var token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwMzQ3OTg1NjczMiwiaWF0IjoxNTAzNDc2MjU2fQ.e5OhZEOc8Rfe8vr4gaPCcbO-2LD-ij8e9znerHjgHhs'
+            var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
 
             // -----------获取列表总条数------------------
             var getTotalNums = function(role1) {
                 var countInfo = {
-                    token: token,
+                    token: Storage.get('TOKEN'),
                     role1: role1
                 }
                 console.log(countInfo)
@@ -3050,7 +3165,7 @@ angular.module('controllers', ['ngResource', 'services'])
             var getLists = function(currentPage, itemsPerPage, _userlist, role_count) {
                 // 完善userlist
                 var userlist = _userlist
-                userlist.token = token
+                userlist.token = Storage.get('TOKEN')
                 userlist.limit = itemsPerPage
                 userlist.skip = (currentPage - 1) * itemsPerPage
                 // 完善countInfo
@@ -3073,12 +3188,12 @@ angular.module('controllers', ['ngResource', 'services'])
                     for (var i = 0; i < data.results.length; i++) {
                         var temproles = new Array()
                         for (var j = 0; j < data.results[i].role.length; j++) {
-                            if ((data.results[i].role[j] == 'insuranceA')||(data.results[i].role[j] == 'insuranceR')||(data.results[i].role[j] == 'insuranceC')) {
-                               temproles.push(data.results[i].role[j])
+                            if ((data.results[i].role[j] == 'insuranceA') || (data.results[i].role[j] == 'insuranceR') || (data.results[i].role[j] == 'insuranceC')) {
+                                temproles.push(data.results[i].role[j])
                             }
-                            }
-                        data.results[i].role=temproles
-    
+                        }
+                        data.results[i].role = temproles
+
                     }
                     console.log(data.results)
                     $scope.tableParams = new NgTableParams({
@@ -3202,7 +3317,7 @@ angular.module('controllers', ['ngResource', 'services'])
             }
             // 完善新用户信息
             $scope.perfect = function() {
-                $scope.newUserInfo.token = token
+                $scope.newUserInfo.token = Storage.get('TOKEN')
                 $scope.newUserInfo.gender = parseInt($scope.newUserInfo.gender)
                 // console.log($scope.newUserInfo);
                 if ($scope.newUserInfo.userId != undefined && $scope.newUserInfo.gender != undefined && $scope.newUserInfo.boardingTime != undefined && $scope.newUserInfo.workAmounts != undefined && $scope.newUserInfo.name != undefined && $scope.newUserInfo.token != undefined) {
@@ -3227,7 +3342,7 @@ angular.module('controllers', ['ngResource', 'services'])
             }
             // 搜索用户
             $scope.userlist = {}
-            $scope.userlist.token = token
+            $scope.userlist.token = Storage.get('TOKEN')
             $scope.searchUser = function() {
                 // console.log($scope.userlist.name);
                 if ($scope.userlist.name == undefined) {
@@ -3263,7 +3378,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     // 关闭添加角色modal
                     $('#new_add').modal('hide')
                     // 增加角色
-                    $scope.addInfo.token = token
+                    $scope.addInfo.token = Storage.get('TOKEN')
                     console.log($scope.addInfo)
                     var promise = Roles.addRoles($scope.addInfo)
                     promise.then(function(data) {
@@ -3355,7 +3470,7 @@ angular.module('controllers', ['ngResource', 'services'])
                         $scope.changeInfo = {}
                         angular.copy(userdetail, $scope.changeInfo);
 
-                        $scope.changeInfo.token = token
+                        $scope.changeInfo.token = Storage.get('TOKEN')
                         console.log($scope.changeInfo)
                         // 打开修改保险人员信息modal
                         $('#changeInfo').modal('show')
@@ -3472,12 +3587,12 @@ angular.module('controllers', ['ngResource', 'services'])
     // 健康专员--张桠童
     .controller('healthOfficersCtrl', ['$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', 'Roles',
         function($scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, Roles) {
-            var token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwMzQ3OTg1NjczMiwiaWF0IjoxNTAzNDc2MjU2fQ.e5OhZEOc8Rfe8vr4gaPCcbO-2LD-ij8e9znerHjgHhs'
+            var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
 
             // -----------获取列表总条数------------------
             var getTotalNums = function(role1) {
                 var countInfo = {
-                    token: token,
+                    token: Storage.get('TOKEN'),
                     role1: role1
                 }
                 console.log(countInfo)
@@ -3493,7 +3608,7 @@ angular.module('controllers', ['ngResource', 'services'])
             var getLists = function(currentPage, itemsPerPage, _userlist, role_count) {
                 // 完善userlist
                 var userlist = _userlist
-                userlist.token = token
+                userlist.token = Storage.get('TOKEN')
                 userlist.limit = itemsPerPage
                 userlist.skip = (currentPage - 1) * itemsPerPage
                 // 完善countInfo
@@ -3631,7 +3746,7 @@ angular.module('controllers', ['ngResource', 'services'])
             }
             // 完善新用户信息
             $scope.perfect = function() {
-                $scope.newUserInfo.token = token
+                $scope.newUserInfo.token = Storage.get('TOKEN')
                 $scope.newUserInfo.gender = parseInt($scope.newUserInfo.gender)
                 // console.log($scope.newUserInfo);
                 if ($scope.newUserInfo.userId != undefined && $scope.newUserInfo.gender != undefined && $scope.newUserInfo.boardingTime != undefined && $scope.newUserInfo.workAmounts != undefined && $scope.newUserInfo.name != undefined && $scope.newUserInfo.token != undefined) {
@@ -3656,7 +3771,7 @@ angular.module('controllers', ['ngResource', 'services'])
             }
             // 搜索用户
             $scope.userlist = {}
-            $scope.userlist.token = token
+            $scope.userlist.token = Storage.get('TOKEN')
             $scope.searchUser = function() {
                 // console.log($scope.userlist.name);
                 if ($scope.userlist.name == undefined) {
@@ -3689,7 +3804,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     // 关闭添加角色modal
                     $('#new_add').modal('hide')
                     // 增加角色
-                    $scope.addInfo.token = token
+                    $scope.addInfo.token = Storage.get('TOKEN')
                     var promise = Roles.addRoles($scope.addInfo)
                     promise.then(function(data) {
                         console.log(data.mesg)
@@ -3776,7 +3891,7 @@ angular.module('controllers', ['ngResource', 'services'])
                         $scope.changeInfo = {}
                         angular.copy(userdetail, $scope.changeInfo);
 
-                        $scope.changeInfo.token = token
+                        $scope.changeInfo.token = Storage.get('TOKEN')
                         console.log($scope.changeInfo)
 
                         // 打开修改保险人员信息modal
@@ -3894,12 +4009,12 @@ angular.module('controllers', ['ngResource', 'services'])
     // 管理员--张桠童
     .controller('administratorsCtrl', ['$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', 'Roles',
         function($scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, Roles) {
-            var token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwMzQ3OTg1NjczMiwiaWF0IjoxNTAzNDc2MjU2fQ.e5OhZEOc8Rfe8vr4gaPCcbO-2LD-ij8e9znerHjgHhs'
+            var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
 
             // -----------获取列表总条数------------------
             var getTotalNums = function(role1) {
                 var countInfo = {
-                    token: token,
+                    token: Storage.get('TOKEN'),
                     role1: role1
                 }
                 console.log(countInfo)
@@ -3915,7 +4030,7 @@ angular.module('controllers', ['ngResource', 'services'])
             var getLists = function(currentPage, itemsPerPage, _userlist, role_count) {
                 // 完善userlist
                 var userlist = _userlist
-                userlist.token = token
+                userlist.token = Storage.get('TOKEN')
                 userlist.limit = itemsPerPage
                 userlist.skip = (currentPage - 1) * itemsPerPage
                 // 完善countInfo
@@ -4050,7 +4165,7 @@ angular.module('controllers', ['ngResource', 'services'])
             }
             // 完善新用户信息
             $scope.perfect = function() {
-                $scope.newUserInfo.token = token
+                $scope.newUserInfo.token = Storage.get('TOKEN')
                 $scope.newUserInfo.gender = parseInt($scope.newUserInfo.gender)
                 // console.log($scope.newUserInfo);
                 if ($scope.newUserInfo.userId != undefined && $scope.newUserInfo.gender != undefined && $scope.newUserInfo.creationTime != undefined && $scope.newUserInfo.workUnit != undefined && $scope.newUserInfo.name != undefined && $scope.newUserInfo.token != undefined) {
@@ -4075,7 +4190,7 @@ angular.module('controllers', ['ngResource', 'services'])
             }
             // 搜索用户
             $scope.userlist = {}
-            $scope.userlist.token = token
+            $scope.userlist.token = Storage.get('TOKEN')
             $scope.searchUser = function() {
                 // console.log($scope.userlist.name);
                 if ($scope.userlist.name == undefined) {
@@ -4108,7 +4223,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     // 关闭添加角色modal
                     $('#new_add').modal('hide')
                     // 增加角色
-                    $scope.addInfo.token = token
+                    $scope.addInfo.token = Storage.get('TOKEN')
                     var promise = Roles.addRoles($scope.addInfo)
                     promise.then(function(data) {
                         console.log(data.mesg)
@@ -4198,7 +4313,7 @@ angular.module('controllers', ['ngResource', 'services'])
                         $scope.changeInfo = {}
                         angular.copy(userdetail, $scope.changeInfo);
 
-                        $scope.changeInfo.token = token
+                        $scope.changeInfo.token = Storage.get('TOKEN')
                         console.log($scope.changeInfo)
                         // 打开修改保险人员信息modal
                         $('#changeInfo').modal('show')
@@ -4316,6 +4431,7 @@ angular.module('controllers', ['ngResource', 'services'])
 
     // 地区/科室管理
     .controller('distrdepmanageCtrl', ['$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function($scope, $state, Review, Storage, $timeout, NgTableParams) {
+        Storage.set('Tab', 3)
         $scope.todistricts = function() {
             $state.go('main.distrdepmanage.districts')
         }
@@ -4326,7 +4442,7 @@ angular.module('controllers', ['ngResource', 'services'])
 
     // 地区
     .controller('districtsCtrl', ['$scope', '$state', 'Review', '$uibModal', 'Storage', '$timeout', 'Alluser', 'NgTableParams', 'Department', 'Roles', function($scope, $state, Review, $uibModal, Storage, $timeout, Alluser, NgTableParams, Department, Roles) {
-        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNDYxNDEzMjEwMCwiaWF0IjoxNTA0NjEwNTMyfQ.oBgWWRjXstubb5fe67zU9n5lrj9LlHjwLlCJ4gTqb_o"
+        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
 
         var ifcontain = function(arrayname, item) {
             if ((arrayname == undefined) || (arrayname == [])) { return false }
@@ -4339,7 +4455,7 @@ angular.module('controllers', ['ngResource', 'services'])
         var getLists = function(_districtlist) {
             // 完善districtlist
             var districtlist = _districtlist
-            districtlist.token = token
+            districtlist.token = Storage.get('TOKEN')
             // districtlist.district = ''
             // 获取列表
             console.log(districtlist)
@@ -4389,7 +4505,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 }, 1000)
             } else {
                 var searchlist = {}
-                searchlist.token = token
+                searchlist.token = Storage.get('TOKEN')
                 searchlist.name = searchname
                 // console.log(searchlist)
                 $scope.newflag = true
@@ -4460,7 +4576,7 @@ angular.module('controllers', ['ngResource', 'services'])
             } else {
                 console.log($scope.registerInfo.newportleader)
                 // 增加角色
-                $scope.addInfo.token = token
+                $scope.addInfo.token = Storage.get('TOKEN')
                 var promise = Roles.addRoles($scope.addInfo)
                 promise.then(function(data) {
                     console.log($scope.addInfo)
@@ -4490,7 +4606,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 districtInfo.new = {}
                 districtInfo.new.newdistrict = $scope.registerInfo.newdistrict
                 districtInfo.new.newportleader = $scope.registerInfo.newportleader
-                districtInfo.token = token
+                districtInfo.token = Storage.get('TOKEN')
                 console.log(districtInfo)
                 if ($scope.registerInfo.newportleader != undefined && $scope.registerInfo.newdistrict != undefined) {
                     var promise = Department.UpdateDistrict(districtInfo)
@@ -4617,7 +4733,7 @@ angular.module('controllers', ['ngResource', 'services'])
         $scope.change = function() {
             console.log(_changeInfo);
             console.log(_changeInfo.new.newportleader);
-            _changeInfo.token = token;
+            _changeInfo.token = Storage.get('TOKEN');
             if (_changeInfo.new.newportleader == []) {
                 for (i = 0; i < district.portleader.length; i++) {
                     _changeInfo.new.newportleader[i] = district.portleader[i]._id
@@ -4692,7 +4808,7 @@ angular.module('controllers', ['ngResource', 'services'])
             // 获得该地区下属科室数据
             var districtInfo = {}
             districtInfo.district = districtname
-            districtInfo.token = token
+            districtInfo.token = Storage.get('TOKEN')
             var promise = Department.GetDepartmentInfo(districtInfo)
             var thisdepartmentlist = []
             if (showdepartmentflag == true) {
@@ -4741,11 +4857,11 @@ angular.module('controllers', ['ngResource', 'services'])
 
     // 科室
     .controller('departmentsCtrl', ['$scope', '$state', 'Review', '$uibModal', 'Storage', '$timeout', 'Alluser', 'NgTableParams', 'Department', 'Roles', function($scope, $state, Review, $uibModal, Storage, $timeout, Alluser, NgTableParams, Department, Roles) {
-        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNDYxNDEzMjEwMCwiaWF0IjoxNTA0NjEwNTMyfQ.oBgWWRjXstubb5fe67zU9n5lrj9LlHjwLlCJ4gTqb_o"
+        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
 
         // 科室列表
         var district = {}
-        district.token = token;
+        district.token = Storage.get('TOKEN');
         var promise = Department.GetDistrictInfo(district)
         promise.then(function(data) {
             $scope.districtlist = data.results
@@ -4755,7 +4871,7 @@ angular.module('controllers', ['ngResource', 'services'])
         var getLists = function(_departmentlist) {
             // 完善departmentlist
             var departmentlist = _departmentlist
-            departmentlist.token = token
+            departmentlist.token = Storage.get('TOKEN')
             // 获取列表
             var promise = Department.GetDepartmentInfo(departmentlist)
             promise.then(function(data) {
@@ -4808,7 +4924,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 }, 1000)
             } else {
                 var searchlist = {}
-                searchlist.token = token
+                searchlist.token = Storage.get('TOKEN')
                 searchlist.name = searchname
                 // console.log(searchlist)
                 $scope.newflag = true
@@ -4906,13 +5022,13 @@ angular.module('controllers', ['ngResource', 'services'])
                         $scope.addInfo.userId = newuserID.newdoctor
                     }
                 }
-                $scope.addInfo.token = token
+                $scope.addInfo.token = Storage.get('TOKEN')
                 $scope.addInfo.roles = rolenow
                 $scope.newflagdoctor = false
                 $scope.newflagleader = false
                 $scope.userlist.departleader = ""
                 $scope.userlist.doctor = ""
-                
+
                 console.log($scope.addInfo)
 
                 var promise = Roles.addRoles($scope.addInfo)
@@ -4949,7 +5065,7 @@ angular.module('controllers', ['ngResource', 'services'])
             console.log(departmentInfo);
             // $scope.registerInfo.newdepartleader.push($scope.registerInfo._id)
             // $scope.registerInfo.newdoctor.push($scope.registerInfo._id)
-            departmentInfo.token = token
+            departmentInfo.token = Storage.get('TOKEN')
             console.log(departmentInfo)
             if ($scope.registerInfo.department == undefined) {
                 $('#NoDepartment').modal('show')
@@ -5156,7 +5272,7 @@ angular.module('controllers', ['ngResource', 'services'])
             _changeInfo.district = $scope.changeInfo.district
             _changeInfo.department = $scope.changeInfo.department
             _changeInfo.hospital = $scope.changeInfo.hospital
-            _changeInfo.token = token;
+            _changeInfo.token = Storage.get('TOKEN');
             var promise = Department.UpdateDepartment(_changeInfo)
             promise.then(function(data) {
                 // console.log(data.msg);
@@ -5228,7 +5344,7 @@ angular.module('controllers', ['ngResource', 'services'])
             }
 
             // 获得该科室下设医生数据
-            department.token = token
+            department.token = Storage.get('TOKEN')
             var promise = Department.GetDoctorList(department)
             var thisdoctorlist = []
 
@@ -5262,14 +5378,14 @@ angular.module('controllers', ['ngResource', 'services'])
     // 科室--详细信息modal
     .controller('detail_departmentCtrl', ['$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', '$uibModalInstance', 'userdetail', 'Department',
         function($scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, $uibModalInstance, userdetail, Department) {
-            var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNDYxNDEzMjEwMCwiaWF0IjoxNTA0NjEwNTMyfQ.oBgWWRjXstubb5fe67zU9n5lrj9LlHjwLlCJ4gTqb_o"
+            var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
 
             $scope.departmentInfo = userdetail
             Department.GetDoctorList({
                 district: userdetail.district,
                 hospital: userdetail.hospital,
                 department: userdetail.department,
-                token: token
+                token: Storage.get('TOKEN')
             }).then(
                 function(data) {
                     console.log(data);
@@ -5339,7 +5455,9 @@ angular.module('controllers', ['ngResource', 'services'])
 
     // 数据监控——医生地区分布
     .controller('regionCtrl', ['Dict', 'Monitor1', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Dict, Monitor1, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
-        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNDYxNDEzMjEwMCwiaWF0IjoxNTA0NjEwNTMyfQ.oBgWWRjXstubb5fe67zU9n5lrj9LlHjwLlCJ4gTqb_o"
+        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
+
+        $scope.loadingflag=true
 
         // datetimepicker插件属性设置
         $('.datetimepicker').datetimepicker({
@@ -5408,6 +5526,7 @@ angular.module('controllers', ['ngResource', 'services'])
         var textInfo = ''
         $scope.Province = {}
         $scope.viewRegion = function() {
+            $scope.loadingflag=true
             console.log($scope.Province.province)
             if (($scope.Province.province == undefined) || ($scope.starttime == undefined) || ($scope.endtime == undefined) || ($scope.starttime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null) || ($scope.endtime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null)) {
                 $('#inputerror').modal('show')
@@ -5433,7 +5552,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     province: selectprovince,
                     startTime: starttime,
                     endTime: endtime,
-                    token: token
+                    token: Storage.get('TOKEN')
                 }
                 textInfo = selectprovince + '医生地区分布'
             } else {
@@ -5442,7 +5561,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     city: selectcity.name,
                     startTime: starttime,
                     endTime: endtime,
-                    token: token
+                    token: Storage.get('TOKEN')
 
                 }
                 textInfo = selectprovince + selectcity.name + '医生地区分布'
@@ -5458,11 +5577,12 @@ angular.module('controllers', ['ngResource', 'services'])
                     city: '',
                     startTime: '2017-01-01 00:00:00',
                     endTime: now,
-                    token: token
+                    token: Storage.get('TOKEN')
                 }
                 textInfo = '浙江省医生地区分布'
             }
             Monitor1.GetRegion(RegionInfo).then(function(data) {
+                    $scope.loadingflag=false
                     if (data.results.length == 0) {
                         $('#nodata').modal('show')
                         $timeout(function() {
@@ -5513,11 +5633,15 @@ angular.module('controllers', ['ngResource', 'services'])
                     console.log(err)
                 }
         }
+       
+
     }])
 
     // 数据监控——医生变化趋势
     .controller('trendCtrl', ['Dict', 'Monitor1', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Dict, Monitor1, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
-        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNDYxNDEzMjEwMCwiaWF0IjoxNTA0NjEwNTMyfQ.oBgWWRjXstubb5fe67zU9n5lrj9LlHjwLlCJ4gTqb_o"
+        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
+        
+        $scope.loadingflag=true
 
         // 医生变化趋势--折线图
         $('.datetimepicker').datetimepicker({
@@ -5585,6 +5709,8 @@ angular.module('controllers', ['ngResource', 'services'])
         var textInfo = ''
         $scope.Province = {}
         $scope.viewTrend = function() {
+        $scope.loadingflag=true
+
             if (($scope.Province.province == undefined) || ($scope.starttime == undefined) || ($scope.endtime == undefined) || ($scope.starttime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null) || ($scope.endtime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null)) {
                 $('#inputerror').modal('show')
                 $timeout(function() {
@@ -5601,7 +5727,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     province: selectprovince,
                     startTime: starttime,
                     endTime: endtime,
-                    token: token
+                    token: Storage.get('TOKEN')
                 }
                 textInfo = selectprovince + '医生注册变化趋势折线图'
             } else {
@@ -5610,7 +5736,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     city: selectcity.name,
                     startTime: starttime,
                     endTime: endtime,
-                    token: token
+                    token: Storage.get('TOKEN')
                 }
                 textInfo = selectprovince + selectcity.name + '医生注册变化趋势折线图'
             }
@@ -5625,11 +5751,12 @@ angular.module('controllers', ['ngResource', 'services'])
                     city: '',
                     startTime: '2017-01-01 00:00:00',
                     endTime: now,
-                    token: token
+                    token: Storage.get('TOKEN')
                 }
                 textInfo = '浙江省医生注册变化趋势折线图'
             }
             Monitor1.GetTrend(TrendInfo).then(function(data) {
+                    $scope.loadingflag=false
                     if (data.results.length == 0) {
                         $('#nodata').modal('show')
                         $timeout(function() {
@@ -5707,7 +5834,9 @@ angular.module('controllers', ['ngResource', 'services'])
 
     // 数据监控——医生超时咨询统计
     .controller('overtimeCtrl', ['Dict', 'Monitor1', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Dict, Monitor1, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
-        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNDYxNDEzMjEwMCwiaWF0IjoxNTA0NjEwNTMyfQ.oBgWWRjXstubb5fe67zU9n5lrj9LlHjwLlCJ4gTqb_o"
+        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
+        
+        $scope.loadingflag=true
 
         $('.datetimepicker').datetimepicker({
             language: 'zh-CN',
@@ -5767,17 +5896,17 @@ angular.module('controllers', ['ngResource', 'services'])
 
         // ---------------获取搜索(或未搜索)列表及列表数------------------------
         var getLists = function(currentPage, itemsPerPage, countInfo) {
-            countInfo.token = token,
+            countInfo.token = Storage.get('TOKEN'),
                 Info = Object.assign({}, countInfo)
             Info.limit = itemsPerPage,
                 Info.skip = (currentPage - 1) * itemsPerPage
             if (isClick == false) {
                 countInfo = {
-                    province: '浙江省',
-                    city: '',
+                    // province: '浙江省',
+                    // city: '',
                     startTime: '2017-01-01',
                     endTime: now,
-                    token: token
+                    token: Storage.get('TOKEN')
                 }
                 Info = Object.assign({}, countInfo),
                     Info.limit = itemsPerPage,
@@ -5787,8 +5916,9 @@ angular.module('controllers', ['ngResource', 'services'])
             //获取搜索列表
             var promise = Monitor1.GetOvertime(Info)
             promise.then(function(data) {
+                $scope.loadingflag=false
                 $scope.overtimetableParams = new NgTableParams({
-                    count: 10000
+                    count: 20
                 }, {
                     counts: [],
                     dataset: data.results
@@ -5810,7 +5940,7 @@ angular.module('controllers', ['ngResource', 'services'])
         // ---------------------------------------------------------------------
         //初始化列表
         $scope.currentPage = 1
-        $scope.itemsPerPage = 50
+        $scope.itemsPerPage = 100
         getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         // 页面改变
         $scope.pageChanged = function() {
@@ -5825,6 +5955,8 @@ angular.module('controllers', ['ngResource', 'services'])
         }
 
         $scope.searchList = function() {
+        $scope.loadingflag=true
+
             if (($scope.Province.province == undefined) || ($scope.starttime == undefined) || ($scope.endtime == undefined) || ($scope.starttime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null) || ($scope.endtime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null)) {
                 $('#inputerror').modal('show')
                 $timeout(function() {
@@ -5848,7 +5980,9 @@ angular.module('controllers', ['ngResource', 'services'])
 
     // 数据监控——医生评分统计
     .controller('evaluationCtrl', ['Dict', 'Monitor1', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Dict, Monitor1, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
-        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNDYxNDEzMjEwMCwiaWF0IjoxNTA0NjEwNTMyfQ.oBgWWRjXstubb5fe67zU9n5lrj9LlHjwLlCJ4gTqb_o"
+        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
+
+        $scope.loadingflag=true
 
         // 关闭modal控制
         $scope.modal_close = function(target) {
@@ -5913,7 +6047,7 @@ angular.module('controllers', ['ngResource', 'services'])
 
         // ---------------获取搜索(或未搜索)列表及列表数------------------------
         var getLists = function(currentPage, itemsPerPage, countInfo) {
-            countInfo.token = token,
+            countInfo.token = Storage.get('TOKEN'),
                 Info = Object.assign({}, countInfo)
             Info.limit = itemsPerPage,
                 Info.skip = (currentPage - 1) * itemsPerPage
@@ -5923,7 +6057,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     city: '',
                     startTime: '2017-01-01',
                     endTime: now,
-                    token: token
+                    token: Storage.get('TOKEN')
                 }
                 Info = Object.assign({}, countInfo),
                     Info.limit = itemsPerPage,
@@ -5933,8 +6067,9 @@ angular.module('controllers', ['ngResource', 'services'])
             //获取搜索列表
             var promise = Monitor1.GetEvaluation(Info)
             promise.then(function(data) {
+                $scope.loadingflag=false
                 $scope.scoretableParams = new NgTableParams({
-                    count: 10000
+                    count: 20
                 }, {
                     counts: [],
                     dataset: data.results
@@ -5956,7 +6091,7 @@ angular.module('controllers', ['ngResource', 'services'])
         // ---------------------------------------------------------------------
         //初始化列表
         $scope.currentPage = 1
-        $scope.itemsPerPage = 50
+        $scope.itemsPerPage = 100
         getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         // 页面改变
         $scope.pageChanged = function() {
@@ -5971,6 +6106,8 @@ angular.module('controllers', ['ngResource', 'services'])
         }
 
         $scope.searchList = function() {
+        $scope.loadingflag=true
+
             if (($scope.Province.province == undefined) || ($scope.starttime == undefined) || ($scope.endtime == undefined) || ($scope.starttime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null) || ($scope.endtime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null)) {
                 $('#inputerror').modal('show')
                 $timeout(function() {
@@ -5996,14 +6133,14 @@ angular.module('controllers', ['ngResource', 'services'])
                     doctoruserId: Id,
                     startTime: '2017-01-01',
                     endTime: now,
-                    token: token
+                    token: Storage.get('TOKEN')
                 }
             } else {
                 DetailInfo = {
                     doctoruserId: Id,
                     startTime: starttime,
                     endTime: endtime,
-                    token: token
+                    token: Storage.get('TOKEN')
                 }
             }
             Monitor1.GetEvaDetail(DetailInfo).then(function(data) {
@@ -6023,7 +6160,9 @@ angular.module('controllers', ['ngResource', 'services'])
 
     // 数据监控——医生收费统计
     .controller('chargeCtrl', ['Dict', 'Monitor1', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Dict, Monitor1, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
-        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNDYxNDEzMjEwMCwiaWF0IjoxNTA0NjEwNTMyfQ.oBgWWRjXstubb5fe67zU9n5lrj9LlHjwLlCJ4gTqb_o"
+        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
+
+        $scope.loadingflag=true
 
         // 关闭modal控制
         $scope.modal_close = function(target) {
@@ -6087,7 +6226,7 @@ angular.module('controllers', ['ngResource', 'services'])
 
         // ---------------获取搜索(或未搜索)列表及列表数------------------------
         var getLists = function(currentPage, itemsPerPage, countInfo) {
-            countInfo.token = token,
+            countInfo.token = Storage.get('TOKEN'),
                 Info = Object.assign({}, countInfo)
             Info.limit = itemsPerPage,
                 Info.skip = (currentPage - 1) * itemsPerPage
@@ -6097,7 +6236,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     city: '',
                     startTime: '2017-01-01',
                     endTime: now,
-                    token: token
+                    token: Storage.get('TOKEN')
                 }
                 Info = Object.assign({}, countInfo),
                     Info.limit = itemsPerPage,
@@ -6107,8 +6246,9 @@ angular.module('controllers', ['ngResource', 'services'])
             //获取搜索列表
             var promise = Monitor1.GetCharge(Info)
             promise.then(function(data) {
+                $scope.loadingflag=false
                 $scope.chargetableParams = new NgTableParams({
-                    count: 10000
+                    count: 20
                 }, {
                     counts: [],
                     dataset: data.results
@@ -6130,7 +6270,7 @@ angular.module('controllers', ['ngResource', 'services'])
         // ---------------------------------------------------------------------
         //初始化列表
         $scope.currentPage = 1
-        $scope.itemsPerPage = 50
+        $scope.itemsPerPage = 100
         getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         // 页面改变
         $scope.pageChanged = function() {
@@ -6145,6 +6285,8 @@ angular.module('controllers', ['ngResource', 'services'])
         }
 
         $scope.searchList = function() {
+        $scope.loadingflag=true
+
             if (($scope.Province.province == undefined) || ($scope.starttime == undefined) || ($scope.endtime == undefined) || ($scope.starttime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null) || ($scope.endtime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null)) {
                 $('#inputerror').modal('show')
                 $timeout(function() {
@@ -6173,7 +6315,9 @@ angular.module('controllers', ['ngResource', 'services'])
 
     // 数据监控——医生工作量统计
     .controller('workloadCtrl', ['Dict', 'Monitor1', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Dict, Monitor1, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
-        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNDYxNDEzMjEwMCwiaWF0IjoxNTA0NjEwNTMyfQ.oBgWWRjXstubb5fe67zU9n5lrj9LlHjwLlCJ4gTqb_o"
+        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
+
+        $scope.loadingflag=true
 
         $('.datetimepicker').datetimepicker({
             language: 'zh-CN',
@@ -6233,7 +6377,7 @@ angular.module('controllers', ['ngResource', 'services'])
 
         // ---------------获取搜索(或未搜索)列表及列表数------------------------
         var getLists = function(currentPage, itemsPerPage, countInfo) {
-            countInfo.token = token,
+            countInfo.token = Storage.get('TOKEN'),
                 Info = Object.assign({}, countInfo)
             Info.limit = itemsPerPage,
                 Info.skip = (currentPage - 1) * itemsPerPage
@@ -6243,7 +6387,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     city: '',
                     startTime: now,
                     endTime: now,
-                    token: token
+                    token: Storage.get('TOKEN')
                 }
                 Info = Object.assign({}, countInfo),
                     Info.limit = itemsPerPage,
@@ -6253,8 +6397,9 @@ angular.module('controllers', ['ngResource', 'services'])
             //获取搜索列表
             var promise = Monitor1.GetWorkload(Info)
             promise.then(function(data) {
+                $scope.loadingflag=false
                 $scope.workloadtableParams = new NgTableParams({
-                    count: 10000
+                    count: 20
                 }, {
                     counts: [],
                     dataset: data.results
@@ -6276,7 +6421,7 @@ angular.module('controllers', ['ngResource', 'services'])
         // ---------------------------------------------------------------------
         //初始化列表
         $scope.currentPage = 1
-        $scope.itemsPerPage = 50
+        $scope.itemsPerPage = 100
         getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         // 页面改变
         $scope.pageChanged = function() {
@@ -6291,6 +6436,8 @@ angular.module('controllers', ['ngResource', 'services'])
         }
 
         $scope.searchList = function() {
+        $scope.loadingflag=true
+
             if (($scope.Province.province == undefined) || ($scope.starttime == undefined) || ($scope.endtime == undefined) || ($scope.starttime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null) || ($scope.endtime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null)) {
                 $('#inputerror').modal('show')
                 $timeout(function() {
@@ -6310,11 +6457,25 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.currentPage = 1
             getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         }
+
+                
+        //进度条控制  
+    
+        // startProgerss()
+        // function startProgerss() {
+        //     $scope.length = 90;
+        //     // $("div[role='progressbar']").css("width", "100%");
+        //     //短暂延迟后刷新页面,貌似""作用是刷新本页面  
+        //     $("div[role='progressbar']").css("width", $scope.length + "%");
+        // }
+
     }])
 
     // 数据监控——患者地区分布
     .controller('PatregionCtrl', ['Dict', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Dict, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
-        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNDYxNDEzMjEwMCwiaWF0IjoxNTA0NjEwNTMyfQ.oBgWWRjXstubb5fe67zU9n5lrj9LlHjwLlCJ4gTqb_o"
+        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
+
+        $scope.loadingflag=true
 
         $('.datetimepicker').datetimepicker({
             language: 'zh-CN',
@@ -6380,6 +6541,8 @@ angular.module('controllers', ['ngResource', 'services'])
         var textInfo = ''
         $scope.Province = {}
         $scope.viewPatRegion = function() {
+        $scope.loadingflag=true
+
             if (($scope.Province.province == undefined) || ($scope.starttime == undefined) || ($scope.endtime == undefined) || ($scope.starttime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null) || ($scope.endtime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null)) {
                 $('#inputerror').modal('show')
                 $timeout(function() {
@@ -6397,7 +6560,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     province: selectprovince,
                     startTime: starttime,
                     endTime: endtime,
-                    token: token
+                    token: Storage.get('TOKEN')
                 }
                 textInfo = selectprovince + '患者地区分布'
             } else {
@@ -6406,7 +6569,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     city: selectcity.name,
                     startTime: starttime,
                     endTime: endtime,
-                    token: token
+                    token: Storage.get('TOKEN')
                 }
                 textInfo = selectprovince + selectcity.name + '患者地区分布'
             }
@@ -6414,17 +6577,20 @@ angular.module('controllers', ['ngResource', 'services'])
         }
 
         var showpie = function() {
+
             if (isClick == false) {
                 RegionInfo = {
                     province: '浙江省',
                     city: '',
                     startTime: '2017-01-01 00:00:00',
                     endTime: now,
-                    token: token
+                    token: Storage.get('TOKEN')
                 }
                 textInfo = '浙江省患者地区分布'
             }
             Monitor2.GetPatRegion(RegionInfo).then(function(data) {
+                $scope.loadingflag=false
+
                     if (data.results.length == 0) {
                         $('#nodata').modal('show')
                         $timeout(function() {
@@ -6478,7 +6644,9 @@ angular.module('controllers', ['ngResource', 'services'])
 
     // 数据监控——患者变化趋势
     .controller('PattrendCtrl', ['Dict', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Dict, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
-        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNDYxNDEzMjEwMCwiaWF0IjoxNTA0NjEwNTMyfQ.oBgWWRjXstubb5fe67zU9n5lrj9LlHjwLlCJ4gTqb_o"
+        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
+
+        $scope.loadingflag=true
 
         $('.datetimepicker').datetimepicker({
             language: 'zh-CN',
@@ -6545,6 +6713,8 @@ angular.module('controllers', ['ngResource', 'services'])
         var textInfo = ''
         $scope.Province = {}
         $scope.viewPatTrend = function() {
+        $scope.loadingflag=true
+
             if (($scope.Province.province == undefined) || ($scope.starttime == undefined) || ($scope.endtime == undefined) || ($scope.starttime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null) || ($scope.endtime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null)) {
                 $('#inputerror').modal('show')
                 $timeout(function() {
@@ -6562,7 +6732,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     province: selectprovince,
                     startTime: starttime,
                     endTime: endtime,
-                    token: token
+                    token: Storage.get('TOKEN')
                 }
                 textInfo = selectprovince + '患者注册变化趋势折线图'
             } else {
@@ -6571,7 +6741,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     city: selectcity.name,
                     startTime: starttime,
                     endTime: endtime,
-                    token: token
+                    token: Storage.get('TOKEN')
                 }
                 textInfo = selectprovince + selectcity.name + '患者注册变化趋势折线图'
             }
@@ -6585,11 +6755,13 @@ angular.module('controllers', ['ngResource', 'services'])
                     city: '',
                     startTime: '2017-01-01 00:00:00',
                     endTime: now,
-                    token: token
+                    token: Storage.get('TOKEN')
                 }
                 textInfo = '浙江省患者注册变化趋势折线图'
             }
             Monitor2.GetPatTrend(Info).then(function(data) {
+                $scope.loadingflag=false
+
                     if (data.results.length == 0) {
                         $('#nodata').modal('show')
                         $timeout(function() {
@@ -6664,7 +6836,9 @@ angular.module('controllers', ['ngResource', 'services'])
 
     // 数据监控——患者保险统计
     .controller('PatinsuranceCtrl', ['Dict', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Dict, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
-        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNDYxNDEzMjEwMCwiaWF0IjoxNTA0NjEwNTMyfQ.oBgWWRjXstubb5fe67zU9n5lrj9LlHjwLlCJ4gTqb_o"
+        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
+
+        $scope.loadingflag=true
 
         $('.datetimepicker').datetimepicker({
             language: 'zh-CN',
@@ -6723,7 +6897,7 @@ angular.module('controllers', ['ngResource', 'services'])
 
         // ---------------获取搜索(或未搜索)列表及列表数------------------------
         var getLists = function(currentPage, itemsPerPage, countInfo) {
-            countInfo.token = token,
+            countInfo.token = Storage.get('TOKEN'),
                 Info = Object.assign({}, countInfo)
             Info.limit = itemsPerPage,
                 Info.skip = (currentPage - 1) * itemsPerPage
@@ -6733,7 +6907,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     city: '',
                     startTime: '2017-01-01',
                     endTime: now,
-                    token: token
+                    token: Storage.get('TOKEN')
                 }
                 Info = Object.assign({}, countInfo),
                     Info.limit = itemsPerPage,
@@ -6743,8 +6917,10 @@ angular.module('controllers', ['ngResource', 'services'])
             //获取搜索列表
             var promise = Monitor2.GetPatInsurance(Info)
             promise.then(function(data) {
+                $scope.loadingflag=false
+
                 $scope.insurancetableParams = new NgTableParams({
-                    count: 10000
+                    count: 20
                 }, {
                     counts: [],
                     dataset: data.results
@@ -6766,7 +6942,7 @@ angular.module('controllers', ['ngResource', 'services'])
         // ---------------------------------------------------------------------
         //初始化列表
         $scope.currentPage = 1
-        $scope.itemsPerPage = 50
+        $scope.itemsPerPage = 100
         getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         // 页面改变
         $scope.pageChanged = function() {
@@ -6781,6 +6957,8 @@ angular.module('controllers', ['ngResource', 'services'])
         }
 
         $scope.searchList = function() {
+        $scope.loadingflag=true
+
             if (($scope.Province.province == undefined) || ($scope.starttime == undefined) || ($scope.endtime == undefined) || ($scope.starttime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null) || ($scope.endtime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null)) {
                 $('#inputerror').modal('show')
                 $timeout(function() {
@@ -6802,30 +6980,61 @@ angular.module('controllers', ['ngResource', 'services'])
 
     // 数据监控——患者分组统计
     .controller('PatgroupCtrl', ['Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
-        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNDYxNDEzMjEwMCwiaWF0IjoxNTA0NjEwNTMyfQ.oBgWWRjXstubb5fe67zU9n5lrj9LlHjwLlCJ4gTqb_o"
+        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
+
+        $scope.loadingflag=true
 
         // 患者分组显示--图表
-        var isClick = false
-        var type = {}
-        $scope.$on('$viewContentLoaded', function() {
-            showlist()
-        });
+        // var isClick = false
+        var type = ''
+        var tempinfo = {
+            classNo: 'class_1',
+            token: Storage.get('TOKEN')
+        }
+        var countInfo = {}
 
-        var showlist = function() {
-            if (isClick == false) {
-                // statemen{
-                Info = {
-                    classNo: 'class_1',
-                    token: token
-                }
-            } else {
-                Info = {
-                    classNo: type,
-                    token: token
-                }
-            }
-            var promise = Monitor2.GetPatGroup(Info)
+        // $scope.$on('$viewContentLoaded', function() {
+        //     showlist()
+        // });
+
+        // if (isClick == false) {
+        //     // statemen{
+        //     Info = {
+        //         classNo: 'class_1',
+        //         token: Storage.get('TOKEN')
+        //     }
+        // } else {
+        //     Info = {
+        //         classNo: type,
+        //         token: Storage.get('TOKEN')
+        //     }
+        // }
+
+        // ---------------获取列表------------------------
+        var getLists = function(currentPage, itemsPerPage, countInfo) {
+            countInfo.token = Storage.get('TOKEN'),
+                tempinfo = Object.assign({}, countInfo)
+            tempinfo.limit = itemsPerPage,
+                tempinfo.skip = (currentPage - 1) * itemsPerPage
+            // if (isClick == false) {
+            //     countInfo = {
+            //         province: '浙江省',
+            //         city: '',
+            //         startTime: '2017-01-01',
+            //         endTime: now,
+            //         token: Storage.get('TOKEN')
+            //     }
+            //     tempinfo = Object.assign({}, countInfo),
+            //         tempinfo.limit = itemsPerPage,
+            //         Info.skip = (currentPage - 1) * itemsPerPage
+            // }
+            console.log(tempinfo);
+            //获取列表
+            var promise = Monitor2.GetPatGroup(tempinfo)
             promise.then(function(data) {
+                $scope.loadingflag=false
+
+                console.log(data.results.length)
                 if (data.results.length == 0) {
                     $('#nodata').modal('show')
                     $timeout(function() {
@@ -6833,18 +7042,43 @@ angular.module('controllers', ['ngResource', 'services'])
                     }, 1000)
                 }
                 $scope.grouptableParams = new NgTableParams({
-                    count: 10
+                    count: 20
                 }, {
+                    counts: [],
                     dataset: data.results
                 })
             })
         }
 
+        //初始化列表
+        $scope.currentPage = 1
+        $scope.itemsPerPage = 100
+        getLists($scope.currentPage, $scope.itemsPerPage, tempinfo)
+
+        // 页面改变
+        // $scope.pageChanged = function() {
+        //     getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
+        // }
+
+        // 当前页面的总条目数改变
+        // $scope.changeLimit = function(num) {
+        //     $scope.itemsPerPage = num
+        //     $scope.currentPage = 1
+        //     getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
+        // }
+
         $scope.viewclass = function() {
-            isClick = true
+        $scope.loadingflag=true
+            
+            // isClick = true
             var value = $scope.value
             type = 'class_' + value
-            showlist()
+            tempinfo = {
+                classNo: type,
+                token: Storage.get('TOKEN')
+            }
+            getLists($scope.currentPage, $scope.itemsPerPage, tempinfo)
+
         }
 
     }])
@@ -6860,15 +7094,14 @@ angular.module('controllers', ['ngResource', 'services'])
     }])
 
     // 保险管理——查看专员
-    .controller('insuAmanageCtrl', ['Roles', 'NgTableParams', 'Policy', '$scope', '$state', 'Storage', '$timeout', function(Roles, NgTableParams, Policy, $scope, $state, Review, Storage, $timeout) {
-        var token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWUwZGFiOGIwZDRlZDVlYjRjODMiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDA0IiwibmFtZSI6IumYruWNk-asoyIsInJvbGUiOiJpbnN1cmFuY2VDIiwiZXhwIjoxNTAyOTgwNDI3ODU2LCJpYXQiOjE1MDI5NzY4Mjd9.M27GqxS4eQ1MoliZgD7zaBKtevPrRJIJSNSNePnJaus'
+    .controller('insuAmanageCtrl', ['Roles', 'NgTableParams', 'Policy', '$scope', '$state', 'Storage', '$timeout', function(Roles, NgTableParams, Policy, $scope, $state, Storage, $timeout) {
+        var token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJpbnN1cmFuY2VDIiwiZXhwIjoxNTA1NTU5MjY4Mjk3LCJpYXQiOjE1MDU0NzI4Njh9.lLW5NuIFFSi2YdlzuHUAZMm2Gqq_nec6zA_5jfgiqn0'
         var getLists = function() {
             AgentInfo = {
-                token: token
+                token: Storage.get('TOKEN'),
             }
             var promise = Policy.getAgentList(AgentInfo)
             promise.then(function(data) {
-                console.log(data.data)
                 $scope.insuAtableParams = new NgTableParams({
                     count: 10000
                 }, {
@@ -6883,13 +7116,13 @@ angular.module('controllers', ['ngResource', 'services'])
         $scope.agentoff = function(Id) {
             OffInfo = {
                 userId: Id,
-                token: token,
+                token: Storage.get('TOKEN'),
                 roles: 'insuranceA'
             }
             console.log(OffInfo)
             Policy.removeAgent({
                 insuranceAId: Id,
-                token: token
+                token: Storage.get('TOKEN')
             }).then(function(data) {}, function(err) {
                 console.log(err)
             })
@@ -6900,8 +7133,9 @@ angular.module('controllers', ['ngResource', 'services'])
             })
         }
         $scope.searchList = function() {
+
             Info = {
-                token: token,
+                token: Storage.get('TOKEN'),
                 name: $scope.agentname
             }
             var promise = Policy.getAgentList(Info)
@@ -6931,14 +7165,14 @@ angular.module('controllers', ['ngResource', 'services'])
 
     // 保险管理——查看患者
     .controller('insupatmanageCtrl', ['NgTableParams', 'Policy', '$scope', '$state', 'Storage', '$timeout', 'Upload', function(NgTableParams, Policy, $scope, $state, Storage, $timeout, Upload) {
-        var token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWUwZGFiOGIwZDRlZDVlYjRjODMiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDA0IiwibmFtZSI6IumYruWNk-asoyIsInJvbGUiOiJpbnN1cmFuY2VDIiwiZXhwIjoxNTAyOTgwNDI3ODU2LCJpYXQiOjE1MDI5NzY4Mjd9.M27GqxS4eQ1MoliZgD7zaBKtevPrRJIJSNSNePnJaus'
+        var token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJpbnN1cmFuY2VDIiwiZXhwIjoxNTA1NTU5MjY4Mjk3LCJpYXQiOjE1MDU0NzI4Njh9.lLW5NuIFFSi2YdlzuHUAZMm2Gqq_nec6zA_5jfgiqn0'
         // var token ='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWUwZGFiOGIwZDRlZDVlYjRjODMiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDA0IiwibmFtZSI6IumYruWNk-asoyIsInJvbGUiOiJpbnN1cmFuY2VBIiwiZXhwIjoxNTAyOTgwNDc2MTI4LCJpYXQiOjE1MDI5NzY4NzZ9.S12aq6jzDQE4CMW2FSdcQk8ArcG3pCyEky00X4YGmr0'
 
 
         // 患者列表显示
         var getLists = function(_userlist) {
             userlist = _userlist
-            userlist.token = token
+            userlist.token = Storage.get('TOKEN')
             var promise = Policy.getPatientList(userlist)
             promise.then(function(data) {
                 $scope.insupattableParams = new NgTableParams({
@@ -6986,7 +7220,7 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.history.name = userdetail.patientId.name
             var PatInfo = {
                 patientId: userdetail.patientId.userId,
-                token: token,
+                token: Storage.get('TOKEN'),
                 skip: 0,
                 limit: 10000
             }
@@ -7034,7 +7268,7 @@ angular.module('controllers', ['ngResource', 'services'])
             var control = $("#fuimageupload");
             control.fileinput({
                 language: 'zh', //设置语言
-                uploadUrl: "http://docker2.haihonghospitalmanagement.com/api/v2/upload?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwMzYzMzQ1MjM3NCwiaWF0IjoxNTAzNjI5ODUyfQ.7TmzSBqqnYGxiyQrcVRDZgJVibzOsr23_99O1bSZEKY", //上传的地址
+                uploadUrl: "http://docker2.haihonghospitalmanagement.com/api/v2/upload?token=" + Storage.get('TOKEN') + "&type=followup", //上传的地址
                 allowedFileExtensions: ['jpg', 'png', 'gif', 'jpeg'], //接收的文件后缀
                 // showUpload: false, //是否显示上传按钮
                 showCaption: false, //是否显示标题
@@ -7079,7 +7313,7 @@ angular.module('controllers', ['ngResource', 'services'])
         $scope.followupInfo.photoUrls = []
 
         $scope.followup = function(_followupinfo) {
-            _followupinfo.token = token
+            _followupinfo.token = Storage.get('TOKEN')
             _followupinfo.patientId = tempuserID
             console.log(_followupinfo)
             var promise = Policy.postFollowUp(_followupinfo)
@@ -7145,7 +7379,7 @@ angular.module('controllers', ['ngResource', 'services'])
             var control = $("#poimageupload");
             control.fileinput({
                 language: 'zh', //设置语言
-                uploadUrl: "http://docker2.haihonghospitalmanagement.com/api/v2/upload?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTk1NWRkZGFiOGIwZDRlZDVlYjRjODIiLCJ1c2VySWQiOiJVMjAxNzA4MTcwMDAzIiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwMzYzMzQ1MjM3NCwiaWF0IjoxNTAzNjI5ODUyfQ.7TmzSBqqnYGxiyQrcVRDZgJVibzOsr23_99O1bSZEKY", //上传的地址
+                uploadUrl: "http://docker2.haihonghospitalmanagement.com/api/v2/upload?token=" + Storage.get('TOKEN') + "&type=policy", //上传的地址
                 allowedFileExtensions: ['jpg', 'png', 'gif', 'jpeg'], //接收的文件后缀
                 // showUpload: false, //是否显示上传按钮
                 showCaption: false, //是否显示标题
@@ -7167,7 +7401,7 @@ angular.module('controllers', ['ngResource', 'services'])
         $scope.policyInfo.photoUrls = []
 
         $scope.postpolicy = function(_policyinfo) {
-            _policyinfo.token = token
+            _policyinfo.token = Storage.get('TOKEN')
             _policyinfo.patientId = tempuserID
             console.log(_policyinfo)
             var promise = Policy.postPolicy(_policyinfo)
@@ -7208,7 +7442,7 @@ angular.module('controllers', ['ngResource', 'services'])
         $scope.changeAgent = function(patId) {
             changeid = patId
             Policy.getAgentList({
-                token: token
+                token: Storage.get('TOKEN')
             }).then(function(data) {
                 console.log(data)
                 $scope.tableagent = new NgTableParams({
@@ -7238,7 +7472,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     patientId: changeid,
                     insuranceAId: agentid,
                     reason: $scope.reason,
-                    token: token
+                    token: Storage.get('TOKEN')
                 }
                 console.log(changeInfo)
                 Policy.setinsuranceA(changeInfo).then(function(data) {
@@ -7281,7 +7515,7 @@ angular.module('controllers', ['ngResource', 'services'])
             reviewid = rid
             getpolicyInfo = {
                 patientId: rid,
-                token: token
+                token: Storage.get('TOKEN')
             }
             Policy.getPolicy(getpolicyInfo).then(function(data) {
                 $scope.review.content = data.data.content
@@ -7317,7 +7551,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     reviewResult: "consent",
                     startTime: starttime,
                     endTime: endtime,
-                    token: token
+                    token: Storage.get('TOKEN')
                 }
                 Policy.reviewPolicy(passInfo).then(function(data) {
                     if (data.code == 0) {
@@ -7348,7 +7582,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 patientId: reviewid,
                 reviewResult: "reject",
                 rejectReason: rejectreason,
-                token: token
+                token: Storage.get('TOKEN')
             }
             Policy.reviewPolicy(rejectInfo).then(function(data) {
                 if (data.code == 0) {
@@ -7391,54 +7625,324 @@ angular.module('controllers', ['ngResource', 'services'])
     // 主页
     .controller('homepageCtrl', ['$scope', '$state', 'Storage', '$timeout', function($scope, $state, Storage, $timeout) {
         $scope.UserName = Storage.get('UName')
-        $scope.UserRole = Storage.get('ROLE')
+        var tempuserrole = Storage.get('ROLE')
+        var roles = new Array(); //定义一数组 
+        roles = tempuserrole.split(","); //字符分割 
+        console.log(roles)
+        // 角色字符串处理
+        for (var i = 0; i <= roles.length; i++) {
+            type = roles[i]
+            switch (type) {
+                case 'Leader':
+                    roles[i] = '地区负责人'
+                    break
+                case 'master':
+                    roles[i] = '科主任'
+                    break
+                case 'doctor':
+                    roles[i] = '普通医生'
+                    break
+                case 'patient':
+                    roles[i] = '患者'
+                    break
+                case 'nurse':
+                    roles[i] = '护士'
+                    break
+                case 'insuranceA':
+                    roles[i] = '沟通人员'
+                    break
+                case 'insuranceC':
+                    roles[i] = '保险主管'
+                    break
+                case 'insuranceR':
+                    roles[i] = '录入人员'
+                    break
+                case 'health':
+                    roles[i] = '健康专员'
+                    break
+                case 'admin':
+                    roles[i] = '管理员'
+                    break
+            }
+        }
+        $scope.UserRole = roles
+        $scope.LastLoginTime = Storage.get('LASTLOGIN')
 
-        $scope.myIndex = Storage.get('Tab')
-        console.log($scope.myIndex)
+        if (tempuserrole.indexOf("admin") != -1) {
+            $scope.flagdoctor = true
+            $scope.flaguser = true
+            $scope.flagdistrdp = true
+            $scope.flaghealth = true
+            $scope.flagdata = true
+            $scope.flaginsu = true
+            $scope.flagpatrefund = true
+            $scope.flagadvice = true
 
-        switch ($scope.UserRole) {
-            case '健康专员':
-                $scope.flagdoctor = false
-                $scope.flaguser = false
-                $scope.flagdistrep = false
-                $scope.flaghealth = true
-                $scope.flagdata = false
-                break
-            case '管理员':
-                $scope.flagdoctor = true
-                $scope.flaguser = true
-                $scope.flagdistrep = true
-                $scope.flaghealth = true
-                $scope.flagdata = true
-                break
-                // case '患者' :
-                //     $scope.flagdoctor = true
-                //     $scope.flaguser = true
-                //     $scope.flaghealth = true
-                //     break
-                // case '普通医生' :
-                //     $scope.flagdoctor = true
-                //     $scope.flaguser = false
-                //     $scope.flaghealth = false
-                //     break
+        } else if (tempuserrole.indexOf("health") != -1) {
+            $scope.flagdoctor = false
+            $scope.flaguser = false
+            $scope.flagdistrdp = false
+            $scope.flaghealth = true
+            $scope.flagdata = false
+            $scope.flaginsu = false
+            $scope.flagpatrefund = false
+            $scope.flagadvice = false
+
         }
 
-        $scope.tounchecked = function() {
-            $state.go('main.checkornot.unchecked')
+        // $scope.tounchecked = function() {
+        //     $state.go('main.checkornot.unchecked')
+        // }
+        // $scope.touser = function() {
+        //     $state.go('main.usermanage.allUsers')
+        // }
+        // $scope.todistrdep = function() {
+        //     $state.go('main.distrdepmanage.districts')
+        // }
+        // $scope.tounentered = function() {
+        //     $state.go('main.enterornot.unentered')
+        // }
+        // $scope.todata = function() {
+        //     $state.go('main.datamanage.region')
+        // }
+        // $scope.toinsurance = function() {
+        //     $state.go('main.insumanage')
+        // }
+        // $scope.topatrefund = function() {
+        //     $state.go('main.patrefund.refundtoprocess')
+        // }
+        // $scope.toadvice = function() {
+        //     $state.go('main.adviceindex.advice')
+        // }
+
+        //注销
+        $scope.ifOut = function() {
+            $state.go('login')
         }
-        $scope.touser = function() {
-            $state.go('main.usermanage.allUsers')
+    }])
+
+    // 用户退款申请
+    .controller('PatrefundCtrl', ['$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function($scope, $state, Review, Storage, $timeout, NgTableParams) {
+        $scope.refundprocessed = function() {
+            $state.go('main.patrefund.refundprocessed')
         }
-        $scope.todistrdep = function() {
-            $state.go('main.distrdepmanage.districts')
+        $scope.refundtoprocess = function() {
+            $state.go('main.patrefund.refundtoprocess')
         }
-        $scope.tounentered = function() {
-            $state.go('main.enterornot.unentered')
+        $scope.refundtonotice = function() {
+            $state.go('main.patrefund.refundtonotice')
         }
-        $scope.todata = function() {
-            $state.go('main.datamanage.region')
+    }])
+
+    // 用户退款申请——已处理
+    .controller('RefundprocessedCtrl', ['$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', 'Services', function($scope, $state, Review, Storage, $timeout, NgTableParams, Services) {
+        // 意见反馈显示
+        var getLists = function() {
+            var promise = Services.getmanualRefundList({
+                token: Storage.get('TOKEN'),
+            })
+            promise.then(function(data) {
+                console.log(data)
+                var datanew = []
+                for (var i = 0; i < data.data.length; i++) {
+                    if ((data.data[i].perDiagObject.status == 9) || (data.data[i].perDiagObject.status == 8) || (data.data[i].perDiagObject.status == 7)) {
+                        // console.log(data.data[i])
+                        datanew.push(data.data[i])
+                    }
+                }
+                console.log(datanew)
+                $scope.tableParams = new NgTableParams({
+                    count: 10000
+                }, {
+                    // counts: [],
+                    dataset: datanew
+                })
+                $scope.count = datanew.length
+            }, function(err) {})
         }
-        $scope.toinsurance = function() {
-            $state.go('main.insumanage')
+
+        //初始化
+        getLists()
+    }])
+
+    // 用户退款申请——待处理
+    .controller('RefundtoprocessCtrl', ['$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', 'Services', function($scope, $state, Review, Storage, $timeout, NgTableParams, Services) {
+
+        // 意见反馈显示
+        var getLists = function() {
+            var promise = Services.getmanualRefundList({
+                token: Storage.get('TOKEN'),
+            })
+            promise.then(function(data) {
+                console.log(data)
+                var datanew = []
+                for (var i = 0; i < data.data.length; i++) {
+                    if (data.data[i].perDiagObject.status == 5) {
+                        // console.log(data.data[i])
+                        datanew.push(data.data[i])
+                    }
+                }
+                $scope.tableParams = new NgTableParams({
+                    count: 10000
+                }, {
+                    // counts: [],
+                    dataset: datanew
+                })
+                $scope.count = datanew.length
+            }, function(err) {})
         }
+
+        //初始化
+        getLists()
+
+        var diagid = ''
+        $scope.ifagree = function(_diagid) {
+            $('#agreeOrNot').modal('show')
+            diagid = _diagid
+        }
+
+        $scope.ifreject = function(_diagid) {
+            $('#rejectOrNot').modal('show')
+            diagid = _diagid
+        }
+
+        $scope.agree = function() {
+            console.log(diagid)
+            var promise = Services.manualRefund({
+                token: Storage.get('TOKEN'),
+                diagId: diagid,
+                reviewResult: 'consent'
+            })
+            promise.then(function(data) {
+                    console.log(data)
+                    if (data.code == 0) {
+                        $('#agreeOrNot').modal('hide')
+
+                        $('#agreed').modal('show')
+                        $timeout(function() {
+                            $('#agreed').modal('hide')
+                        }, 1000)
+                        getLists()
+                    }
+                },
+                function(err) {})
+        }
+
+        $scope.reject = function() {
+            console.log(diagid)
+            var promise = Services.manualRefund({
+                token: Storage.get('TOKEN'),
+                diagId: diagid,
+                reviewResult: 'reject'
+            })
+            promise.then(function(data) {
+                console.log(data)
+                if (data.code == 0) {
+                    $('#rejectOrNot').modal('hide')
+                    $('#rejected').modal('show')
+                    $timeout(function() {
+                        $('#rejected').modal('hide')
+                    }, 1000)
+                    getLists()
+                }
+
+
+            }, function(err) {})
+        }
+
+        // 关闭modal控制
+        $scope.modal_close = function(target) {
+            $(target).modal('hide')
+        }
+    }])
+
+    // 用户退款申请——待通知
+    .controller('RefundtonoticeCtrl', ['$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', 'Services', function($scope, $state, Review, Storage, $timeout, NgTableParams, Services) {
+        // 意见反馈显示
+        var getLists = function() {
+            var promise = Services.getmanualRefundList({
+                token: Storage.get('TOKEN'),
+            })
+            promise.then(function(data) {
+                console.log(data)
+                var datanew = []
+                for (var i = 0; i < data.data.length; i++) {
+                    if (data.data[i].perDiagObject.status == 6) {
+                        // console.log(data.data[i])
+                        datanew.push(data.data[i])
+                    }
+                }
+                console.log(datanew)
+                $scope.tableParams = new NgTableParams({
+                    count: 10000
+                }, {
+                    // counts: [],
+                    dataset: datanew
+                })
+                $scope.count = datanew.length
+            }, function(err) {})
+        }
+
+        //初始化
+        getLists()
+        var diagid = ''
+
+        $scope.ifnotice = function(_diagid) {
+            $('#noticeOrNot').modal('show')
+            diagid = _diagid
+        }
+
+        $scope.notice = function() {
+            console.log(diagid)
+            var promise = Services.manualRefund({
+                token: Storage.get('TOKEN'),
+                diagId: diagid,
+                reviewResult: 'notice'
+            })
+            promise.then(function(data) {
+                console.log(data)
+                if (data.code == 0) {
+                    $('#noticeOrNot').modal('hide')
+                    $('#noticed').modal('show')
+                    $timeout(function() {
+                        $('#noticed').modal('hide')
+                    }, 1000)
+                    getLists()
+                }
+            }, function(err) {})
+        }
+
+        // 关闭modal控制
+        $scope.modal_close = function(target) {
+            $(target).modal('hide')
+        }
+
+    }])
+
+    // 用户意见反馈
+    .controller('AdviceindexCtrl', ['$scope', '$state', 'Storage', '$timeout', 'NgTableParams', 'Advice', function($scope, $state, Storage, $timeout, NgTableParams, Advice) {
+        $scope.toadvice = function() {
+            $state.go('main.adviceindex.advice')
+        }
+
+    }])
+    .controller('AdviceCtrl', ['$scope', '$state', 'Storage', '$timeout', 'NgTableParams', 'Advice', function($scope, $state, Storage, $timeout, NgTableParams, Advice) {
+
+        // 意见反馈显示
+        var getLists = function() {
+            var promise = Advice.getadvices({ token: Storage.get('TOKEN') })
+            promise.then(function(data) {
+                $scope.tableParams = new NgTableParams({
+                    count: 10000
+                }, {
+                    // counts: [],
+                    dataset: data.results
+                })
+                $scope.totalItems = data.results.length
+            }, function(err) {})
+        }
+
+        //初始化
+        getLists()
+
     }])

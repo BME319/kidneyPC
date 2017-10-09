@@ -26,6 +26,8 @@
         </div>
         <button type="submit" class="btn btn-default" ng-click="searchList()" style="background:#347ab6;color:white;width: 60px">确 定</button>
     </form>
+    <!-- 进度条 -->
+    <div  style="margin-left: 300px;margin-top: 10px;" ng-show="loadingflag"><img src="templates/main/datamanage/loading.gif" alt="" /></div>
 <table ng-table="insurancetableParams" class="table table-condensed table-bordered table-striped" style="margin-top: 10px;">
     <tr ng-repeat="i in $data" style="text-align: center;">
         <td title="'申请人姓名'"  sortable="'patientId'">{{i.patientname}}
@@ -68,7 +70,7 @@
     <button type="button" class="btn btn-default" ng-click="changeLimit(100)">100</button>
 </div>
 <!-- 分页条 -->
-<ul uib-pagination  
+<!-- <ul uib-pagination  
     max-size="10" 
     class="pagination" 
     boundary-links="true" 
@@ -85,4 +87,4 @@
     ng-change="pageChanged()"
     ng-model="currentPage"
     >
-</ul>
+</ul> -->

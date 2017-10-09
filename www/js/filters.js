@@ -36,6 +36,95 @@ angular.module('filters', [])
             return name
         }
     }])
+    // 支付状态
+    .filter('paystatus', [function() {
+        return function(type) {
+            var name
+            switch (type) {
+                case 0:
+                    name = '生成商户订单成功'
+                    break
+                case 1:
+                    name = '生成预付单成功'
+                    break
+                case 2:
+                    name = '支付成功'
+                    break
+                case 3:
+                    name = '支付失败'
+                    break
+                case 4:
+                    name = '取消订单'
+                    break
+                case 5:
+                    name = '订单超时'
+                    break
+                case 6:
+                    name = '退款处理中'
+                    break
+                case 7:
+                    name = '退款关闭'
+                    break
+                case 8:
+                    name = '退款异常'
+                    break
+                case 9:
+                    name = '退款成功'
+                    break
+            }
+            return name
+        }
+    }])
+
+    // 预约时间
+    .filter('bookingTime', [function() {
+        return function(type) {
+            var name
+            switch (type) {
+                case 'Morning':
+                    name = '上午'
+                    break
+                case 'Afternoon':
+                    name = '下午'
+                    break
+            }
+            return name
+        }
+    }])
+     // 退款金额
+    .filter('refundmoney', [function() {
+        return function(type) {
+            var name
+            name = type/100
+            return name
+        }
+    }])
+    // 退款状态
+    .filter('refundstatus', [function() {
+        return function(type) {
+            var name
+            switch (type) {
+                case 5:
+                    name = '患者申请取消，等待人工处理退款'
+                    break
+                case 6:
+                    name = '医生停诊或取消，等待人工通知'
+                    break
+                case 7:
+                    name = '患者取消，人工处理不予退款'
+                    break
+                case 8:
+                    name = '患者取消，人工退款'
+                    break
+                case 9:
+                    name = '医生停诊或取消，人工通知完成'
+                    break
+            }
+            return name
+        }
+    }])
+
+
     .filter('checkornotType', [function() {
         return function(type) {
             var name
@@ -55,9 +144,9 @@ angular.module('filters', [])
     }])
     .filter('leadername', [function() {
         return function(type) {
-            var name = ''
+            var name = ""
             if (type == null) {
-                name == null
+                name = null
             } else {
                 for (i = 0; i < type.length; i++) {
                     name = name + type[i].name + ' ';
@@ -68,9 +157,9 @@ angular.module('filters', [])
     }])
     .filter('arraytostring', [function() {
         return function(type) {
-            var name = ''
+            var name = ""
             if (type == null) {
-                name == null
+                name = null
             } else {
                 for (i = 0; i < type.length; i++) {
                     name = name + type[i].name + ' ';
@@ -79,7 +168,20 @@ angular.module('filters', [])
             return name
         }
     }])
+    .filter('realarraytostring', [function() {
+        return function(type) {
+            var name = ""
 
+            if (type == null) {
+                name = null
+            } else {
+                for (i = 0; i < type.length; i++) {
+                    name = name + type[i] + ' ';
+                }
+            }
+            return name
+        }
+    }])
     .filter('filterAge', [function() {
         return function(date) {
             if (date == null) {
@@ -126,7 +228,7 @@ angular.module('filters', [])
             return name
         }
     }])
-        .filter('Policytype', [function() {
+    .filter('Policytype', [function() {
         return function(type) {
             var name = '--'
             switch (type) {
@@ -147,12 +249,12 @@ angular.module('filters', [])
                     break
                 case 5:
                     name = '保单过期'
-                    break     
+                    break
             }
             return name
         }
     }])
-    
+
     .filter('classname', [function() {
         return function(type) {
             var name
@@ -234,6 +336,7 @@ angular.module('filters', [])
             return name
         }
     }])
+
     .filter('timeFormat', [function() {
         return function(date, format) {
             var d = new Date(date)

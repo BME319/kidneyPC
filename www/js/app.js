@@ -10,6 +10,7 @@ angular.module('Kidney_Web', ['ui.router', 'ui.bootstrap', 'controllers', 'servi
                 url: '/login',
                 templateUrl: 'templates/login.html',
                 controller: 'LoginCtrl'
+                // cache:false,
             })
             .state('main', {
                 url: '/main',
@@ -36,6 +37,42 @@ angular.module('Kidney_Web', ['ui.router', 'ui.bootstrap', 'controllers', 'servi
                 url: '/rejected',
                 templateUrl: 'templates/main/checkornot/rejected.html',
                 controller: 'RejectedCtrl'
+            })
+
+            // 患者退款页面
+            .state('main.patrefund', {
+                abstract: true,
+                url: '/patrefund',
+                templateUrl: 'templates/main/patrefund.html',
+                controller: 'PatrefundCtrl'
+            })
+            .state('main.patrefund.refundprocessed', {
+                url: '/refundprocessed',
+                templateUrl: 'templates/main/patrefund/refundprocessed.html',
+                controller: 'RefundprocessedCtrl'
+            })
+            .state('main.patrefund.refundtoprocess', {
+                url: '/refundtoprocess',
+                templateUrl: 'templates/main/patrefund/refundtoprocess.html',
+                controller: 'RefundtoprocessCtrl'
+            })
+            .state('main.patrefund.refundtonotice', {
+                url: '/refundtonotice',
+                templateUrl: 'templates/main/patrefund/refundtonotice.html',
+                controller: 'RefundtonoticeCtrl'
+            })
+
+            // 用户建议页面
+            .state('main.adviceindex', {
+                url: '/adviceindex',
+                templateUrl: 'templates/main/adviceindex.html',
+                controller: 'AdviceindexCtrl'
+
+            })
+            .state('main.adviceindex.advice', {
+                url: '/advice',
+                templateUrl: 'templates/main/advice/advice.html',
+                controller: 'AdviceCtrl'
             })
 
             //主页
@@ -217,3 +254,4 @@ angular.module('Kidney_Web', ['ui.router', 'ui.bootstrap', 'controllers', 'servi
             })
 
     }])
+

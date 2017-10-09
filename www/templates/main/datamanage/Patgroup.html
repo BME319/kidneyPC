@@ -16,17 +16,19 @@
             <button type="submit" class="btn btn-default" ng-click="viewPatgroup()" style="background:#347ab6;color:white;width: 60px">确 定</button>
         </div> -->
     </form>
+    <!-- 进度条 -->
+    <div  style="margin-left: 300px;margin-top: 10px;" ng-show="loadingflag"><img src="templates/main/datamanage/loading.gif" alt="" /></div>
     <table ng-table="grouptableParams" class="table table-condensed table-bordered table-striped" style="margin-top: 10px;">
         <tr ng-repeat="g in $data" style="text-align: center;">
             <td title="'患者姓名'" sortable="'name'">{{g.name}}
             </td>
             <td title="'诊断类型'">{{g.class|diseasetype}}
             </td>
-            <td title="'内容'">{{g.content|leadername}}
+            <td title="'内容'">{{g.content|realarraytostring}}
             </td>
             <td title="'主管医生'" sortable="'doctorname'">{{g.doctorname|leadername}}
             </td>
-            <td title="'诊断时间'" sortable="'creationTime'">{{g.creationTime|timeFormat:"YYYY-MM-DD h:m"}}
+            <td title="'诊断时间'" sortable="'creationTime'">{{g.creationTime|timeFormat:"YYYY-MM-DD"}}
             </td>
         </tr>
     </table>
@@ -38,3 +40,29 @@
         </div>
     </div>
 </div>
+<!-- 每页数量 -->
+<div class="btn-group  btn-group-sm pull-right" style="margin-top: 18px">
+    <button type="button" class="btn btn-default" ng-click="changeLimit(20)">20</button>
+    <button type="button" class="btn btn-default" ng-click="changeLimit(30)">30</button>
+    <button type="button" class="btn btn-default" ng-click="changeLimit(50)">50</button>
+    <button type="button" class="btn btn-default" ng-click="changeLimit(100)">100</button>
+</div>
+<!-- 分页条 -->
+<!-- <ul uib-pagination  
+    max-size="10" 
+    class="pagination" 
+    boundary-links="true" 
+    boundary-link-numbers="true"
+    direction-links="true"
+    first-text="首页"
+    last-text="末页"
+    previous-text="上一页"
+    next-text="下一页"
+    force-ellipses="true"
+    rotate="true" 
+    total-items="totalItems"
+    items-per-page="itemsPerPage"
+    ng-change="pageChanged()"
+    ng-model="currentPage"
+    >
+</ul> -->

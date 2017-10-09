@@ -1,6 +1,5 @@
 <div class="panel-body">
     <form class="form-inline" style="margin-top: -30px">
-    <div>{{datetest|timeFormat:"YYYY-MM-DD"}}</div>
         <div class="form-group">
             <select style="width:120px;height: 34px;font-size: 14px;border: 1px solid #ccc;border-radius: 4px;background-color: white;" ng-options="Province.name for Province in Provinces track by Province.province" style="width:40%" ng-change="getCity(Province.province)" ng-model="Province.province" >
                 <option selected value="">省份</option>
@@ -27,6 +26,8 @@
         </div>
         <button type="submit" class="btn btn-default" ng-click="searchList()" style="background:#347ab6;color:white;width: 60px">确 定</button>
     </form>
+    <!-- 进度条 -->
+    <div  style="margin-left: 300px;margin-top: 10px;" ng-show="loadingflag"><img src="templates/main/datamanage/loading.gif" alt="" /></div>
     <table ng-table="chargetableParams" class="table table-condensed table-bordered table-striped" style="margin-top: 10px;">
         <tr ng-repeat="c in $data" style="text-align: center;">
             <td title="'医生姓名'" sortable="'doctorname'">{{c.doctorname}}
@@ -99,7 +100,7 @@
     <button type="button" class="btn btn-default" ng-click="changeLimit(100)">100</button>
 </div>
 <!-- 分页条 -->
-<ul uib-pagination  
+<!-- <ul uib-pagination  
     max-size="10" 
     class="pagination" 
     boundary-links="true" 
@@ -116,6 +117,6 @@
     ng-change="pageChanged()"
     ng-model="currentPage"
     >
-</ul>
+</ul> -->
 
 

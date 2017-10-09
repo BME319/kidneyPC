@@ -12,7 +12,6 @@
     <link href="lib/bootstrap-datetimepicker/css/bootstrap-datetimepicker.css" rel="stylesheet" media="screen">
     <!-- 自定义css -->
     <link href="css/mystyle.css" rel="stylesheet">
-
     <!-- jquery引用 -->
     <script src="lib/jquery.min.js"></script>
     <link rel="stylesheet" href="lib/tag-editor/css/jquery.tag-editor.css">
@@ -22,7 +21,6 @@
     <!-- <script src='lib/tag-editor/js/jquery.tag-editor.js'></script> -->
     <script src="lib/tag-editor/js/jquery.ui.datepicker-zh-CN.min.js"></script>
     <script src="lib/tag-editor/js/jquery-ui.js"></script>
-
     <!--angularjs js -->
     <script src="lib/angular/angular.js"></script>
     <script src="lib/angular/angular-ui-router.min.js"></script>
@@ -31,12 +29,10 @@
     <script src="lib/angular-material-icons/angular-material-icons.js"></script>
     <script src="lib/bootstrap-3.3.7-dist/js/ui-bootstrap-tpls-2.5.0.js"></script>
     <script src='lib/echarts.js'></script>
-
     <!-- 上传图片fileinput -->
     <script src="lib/fileinput/fileinput.js"></script>
     <script src="lib/fileinput/zh.js"></script>
     <link rel="stylesheet" href="lib/fileinput/fileinput.css">
-
     <!-- 第三方js -->
     <script src="lib/angular-resource/angular-resource.min.js"></script>
     <script src="lib/angular-locale_zh-cn.js"></script>
@@ -51,10 +47,27 @@
     <script src="js/controllers.js"></script>
     <script src="js/filters.js"></script>
     <script src="js/directives.js"></script>
+    <script>
+    var _hmt = _hmt || [];
+    (function() {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?a764369b0dd9ce4eb634a8bcbeb1f703";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
+    </script>
+    <!--  <script>
+        var _hmt = _hmt || [];
+        </script> -->
 </head>
 
 <body>
     <div ui-view></div>
+    <!--  <script type="text/javascript">
+        var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+        document.write(unescape("%3Cscript src='" + _bdhmProtocol + 
+"hm.baidu.com/h.js%3F01234567890ABCDEF01234567890ABCDEF' type='text/javascript'%3E%3C/script%3E"));
+        </script> -->
 </body>
 
 </html>

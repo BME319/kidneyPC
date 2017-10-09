@@ -42,10 +42,10 @@
         <div class="jumbotron" style="padding-top: 10px;height: 150px">
             <ul id="mytabs" class="nav nav-tabs">
                 <div class="navbar-header" style="padding-top: 60px">
-                    <p class="navbar-brand" style="font-size: 40px;color:black;font-weight: bold">肾事联盟</p>
+                    <p class="navbar-brand" style="font-size: 28px;color:black;font-weight: bold">肾事联盟</p>
                 </div>
                 <li class="nav navbar-right" style="padding-top: 50px;margin-right:25px">
-                    <a id="drop_info" class="navbar-brand" style="font-size:40px" data-toggle="dropdown">
+                    <a id="drop_info" class="navbar-brand" style="font-size:28px;margin-top: 10px" data-toggle="dropdown">
           <span class="glyphicon glyphicon-user"></span>
         </a>
                     <ul class="dropdown-menu" role="menu" aria-labelledby="drop_info" style="min-width:220px;margin-top: 22px">
@@ -57,55 +57,65 @@
                             <span style="margin-left:10px"><strong>姓名：</strong></span>{{UserName}}
                         </li>
                         <li role="presentation" style="line-height:30px">
-                            <span style="margin-left:10px"><strong>角色：</strong></span>{{UserRole}}
+                            <span style="margin-left:10px"><strong>角色：</strong></span>{{UserRole|realarraytostring}}
                         </li>
-                        <!--           <li role="presentation" style="line-height:30px">
+                                  <li role="presentation" style="line-height:30px">
             <span style="margin-left:10px"><strong>上次登录时间：</strong></span>
           </li>
           <li role="presentation" style="line-height:30px">
-            <span style="margin-left:10px">{{userInfo.LastLoginTime}}</span>
-          </li> -->
+            <span style="margin-left:10px">{{LastLoginTime|timeFormat:'YYYY-MM-DD h:m'}}</span>
+          </li>
                         <br>
-                        <li role="presentation">
-                            <button class="btn btn-primary pull-left" style="margin-left:20px" ng-click="toChangePW()">修改密码</button>
-                            <button class="btn btn-danger pull-right" style="margin-right:20px" ng-click="ifOut()">注销</button>
+                        <li role="presentation" style="margin-top: -10px">
+                            <!-- <button class="btn btn-primary pull-left" style="margin-left:20px" ng-click="toChangePW()">修改密码</button> -->
+                            <button class="btn btn-danger pull-right" style="margin-right:80px;" ng-click="ifOut()">注销</button>
                         </li>
                     </ul>
                 </li>
                 <div>
-                <ul class="nav navbar-nav" style="padding-top: 70px;font-size: 20px">
-                    <li class="active"><a href="#/main/usermanage/allUsers">用户管理</a></li>
-                    <li class="active"><a href="#/main/checkornot/unchecked">注册审核</a></li>
-                    <li class="active"><a href="#/main/enterornot/unentered">健康专员专区</a></li>
-                    <li class="active"><a href="#/main/insumanage/insupatmanage">保险人员专区</a></li>
-                    <li class="active"><a href="#/main/distrdepmanage/districts">地区/科室管理</a></li>
-                    <li class="active"><a href="#/main/datamanage/region">数据监控</a></li>
+                <ul class="nav navbar-nav" style="padding-top: 70px;font-size: 16px">
+                    <li class="active" ng-show="flaguser"><a href="#/main/usermanage/allUsers">用户管理</a></li>
+                    <li class="active" ng-show="flagdoctor"><a href="#/main/checkornot/unchecked">注册审核</a></li>
+                    <li class="active" ng-show="flaghealth"><a href="#/main/enterornot/unentered">健康专员专区</a></li>
+                    <li class="active" ng-show="flaginsu"><a href="#/main/insumanage/insupatmanage">保险人员专区</a></li>
+                    <li class="active" ng-show="flagdistrdp"><a href="#/main/distrdepmanage/districts">地区/科室管理</a></li>
+                    <li class="active" ng-show="flagdata"><a href="#/main/datamanage/region">数据监控</a></li>
+                    <li class="active" ng-show="flagpatrefund"><a href="#/main/patrefund/refundtoprocess">患者退款审核</a></li>
+                    <li class="active" ng-show="flagadvice"><a href="#/main/adviceindex/advice">用户意见反馈</a></li>
                 </ul>
                 </div>
             </ul>
         </div>
     </div>
     <div class="row" style="padding-right: 60px; padding-left:60px;margin-top: 25px">
-        <div class="col-md-4">
-            <a href="#/main/usermanage/allUsers" class="col-md-12 btn btn-success text-center" style="text-decoration: none;min-height:170px;background-color: #347ab6;border-color:#347ab6"><span style="font-size: 50px;padding-top: 25px" class="glyphicon glyphicon-dashboard"></span><p style="font-size: 30px;padding-top: 5px" >用户管理</p> </a>
+        <div class="col-md-3" ng-show="flaghealth">
+            <a href="#/main/enterornot/unentered" class="col-md-12 btn btn-success text-center" style="text-decoration: none;min-height:170px;background-color: #347ab6;border-color:#347ab6"><span style="font-size: 50px;padding-top: 25px" class="glyphicon glyphicon-heart-empty"></span><p style="font-size: 30px;padding-top: 5px" >健康专员专区</p> </a>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3" ng-show="flagdoctor">
             <a href="#/main/checkornot/unchecked" class=" col-md-12 btn btn-info text-center" style="text-decoration: none;min-height:170px;background-color: #708090;border-color:#708090"><span class="glyphicon glyphicon-ok-circle" style="font-size: 50px;padding-top: 25px"></span><p style="font-size: 30px;padding-top: 5px" > 注册审核</p></a>
         </div>
-        <div class="col-md-4">
-            <a href="#/main/enterornot/unentered" class="col-md-12 btn btn-warning text-center " style="text-decoration: none;min-height:170px;background-color: #347ab6;border-color:#347ab6 "><span class="glyphicon glyphicon-pencil" style="font-size: 50px;padding-top: 25px"></span> <p style="font-size: 30px;padding-top: 5px" >健康专员专区</p></a>
+        <div class="col-md-3" ng-show="flaguser">
+            <a href="#/main/usermanage/allUsers" class="col-md-12 btn btn-warning text-center " style="text-decoration: none;min-height:170px;background-color: #347ab6;border-color:#347ab6 "><span class="    glyphicon glyphicon-user" style="font-size: 50px;padding-top: 25px"></span> <p style="font-size: 30px;padding-top: 5px" >用户管理</p></a>
+        </div>
+        <div class="col-md-3" ng-show="flagpatrefund">
+            <a href="#/main/patrefund/refundtoprocess" class=" col-md-12 btn btn-info text-center" style="text-decoration: none;min-height:170px;background-color: #708090;border-color:#708090"><span class="  glyphicon glyphicon-lock" style="font-size: 50px;padding-top: 25px"></span><p style="font-size: 30px;padding-top: 5px" > 患者退款审核</p></a>
         </div>
     </div>
     <br>
     <div class="row" style="padding-right: 60px; padding-left:60px;margin-top: 20px">
-        <div class="col-md-4">
-            <a href="#/main/insumanage/insupatmanage" class="col-md-12 btn btn-warning text-center " style="text-decoration: none;background-color: #708090;border-color:#708090;min-height:170px"><span style="font-size: 50px;padding-top: 25px" class="glyphicon glyphicon-heart-empty"></span> <p style="font-size: 30px;padding-top: 5px" >保险人员专区</p></a>
+        <div class="col-md-3" ng-show="flaginsu">
+            <a href="#/main/insumanage/insupatmanage" class="col-md-12 btn btn-warning text-center " style="text-decoration: none;background-color: #708090;border-color:#708090;min-height:170px"><span style="font-size: 50px;padding-top: 25px" class="glyphicon glyphicon-briefcase"></span> <p style="font-size: 30px;padding-top: 5px" >保险人员专区</p></a>
         </div>
-        <div class="col-md-4">
-            <a href="#/main/distrdepmanage/districts" " class="col-md-12 btn btn-warning text-center " style="text-decoration: none;background-color: #347ab6;border-color:#347ab6;min-height:170px "><span style="font-size: 50px;padding-top: 25px " class="glyphicon glyphicon-map-marker "></span> <p style="font-size: 30px;padding-top: 5px " >地区/科室管理</p></a>
+        <div class="col-md-3" ng-show="flagdistrdp">
+            <a href="#/main/distrdepmanage/districts" class="col-md-12 btn btn-warning text-center " style="text-decoration: none;background-color: #347ab6;border-color:#347ab6;min-height:170px "><span style="font-size: 50px;padding-top: 25px " class="glyphicon glyphicon-map-marker "></span> <p style="font-size: 30px;padding-top: 5px " >地区/科室管理</p></a>
         </div>
-                <div class="col-md-4 ">
-            <a href="#/main/datamanage/region " class="col-md-12 btn btn-warning text-center " style="text-decoration: none;background-color: #708090;border-color:#708090;min-height:170px "><span style="font-size: 50px;padding-top: 25px " class="glyphicon glyphicon-heart-empty "></span> <p style="font-size: 30px;padding-top: 5px " >数据监控</p></a>
+                <div class="col-md-3 " ng-show="flagdata">
+            <a href="#/main/datamanage/region" class="col-md-12 btn btn-warning text-center " style="text-decoration: none;background-color: #708090;border-color:#708090;min-height:170px "><span style="font-size: 50px;padding-top: 25px " class="glyphicon glyphicon-tasks"></span> <p style="font-size: 30px;padding-top: 5px " >数据监控</p></a>
+        </div>
+        <div class="col-md-3" ng-show="flagadvice">
+            <a  href="#/main/adviceindex/advice" class="col-md-12 btn btn-warning text-center " style="text-decoration: none;background-color: #347ab6;border-color:#347ab6;min-height:170px "><span style="font-size: 50px;padding-top: 25px " class="  glyphicon glyphicon-envelope"></span> <p style="font-size: 30px;padding-top: 5px " >用户意见反馈</p></a>
+
+             <!-- <a  class="col-md-12 btn btn-warning text-center " ng-click="toadvice()" style="text-decoration: none;background-color: #347ab6;border-color:#347ab6;min-height:170px "><span style="font-size: 50px;padding-top: 25px " class="  glyphicon glyphicon-envelope"></span> <p style="font-size: 30px;padding-top: 5px " >用户意见反馈</p></a> -->
         </div>
     </div>
 </div>
