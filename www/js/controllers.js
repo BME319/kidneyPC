@@ -87,7 +87,6 @@ angular.module('controllers', ['ngResource', 'services'])
         var tempuserrole = Storage.get('ROLE')
         var roles = new Array(); //定义一数组 
         roles = tempuserrole.split(","); //字符分割 
-        console.log(roles)
         // 角色字符串处理
         for (var i = 0; i <= roles.length; i++) {
             type = roles[i]
@@ -5458,7 +5457,7 @@ angular.module('controllers', ['ngResource', 'services'])
     .controller('regionCtrl', ['Dict', 'Monitor1', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Dict, Monitor1, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
         var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
 
-        $scope.loadingflag=true
+        $scope.loadingflag = true
 
         // datetimepicker插件属性设置
         $('.datetimepicker').datetimepicker({
@@ -5521,54 +5520,98 @@ angular.module('controllers', ['ngResource', 'services'])
         // 获取当前日期
         var myDate = new Date();
         var now = myDate.toLocaleDateString();
+        var formatDateTime = function(date) {
+            var y = date.getFullYear();
+            var m = date.getMonth() + 1;
+            m = m < 10 ? ('0' + m) : m;
+            var d = date.getDate();
+            d = d < 10 ? ('0' + d) : d;
+            var h = date.getHours();
+            h = h < 10 ? ('0' + h) : h;
+            var minute = date.getMinutes();
+            minute = minute < 10 ? ('0' + minute) : minute;
+            var second = date.getSeconds();
+            second = second < 10 ? ('0' + second) : second;
+            return y + '-' + m + '-' + d + ' ' + h + ':' + minute + ':' + second;
+        };
+        var nowtime = formatDateTime(myDate)
 
         var isClick = false
         var RegionInfo = {}
         var textInfo = ''
         $scope.Province = {}
         $scope.viewRegion = function() {
-            $scope.loadingflag=true
+            $scope.loadingflag = true
             console.log($scope.Province.province)
-            if (($scope.Province.province == undefined) || ($scope.starttime == undefined) || ($scope.endtime == undefined) || ($scope.starttime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null) || ($scope.endtime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null)) {
+            if (($scope.Province.province == undefined) && ($scope.City == undefined) && (($scope.starttime == undefined) || ($scope.endtime == undefined))) {
                 $('#inputerror').modal('show')
                 $timeout(function() {
                     $('#inputerror').modal('hide')
                 }, 1000)
+                $scope.loadingflag = false
             } else {
-                var selectprovince = $scope.Province.province.name
-                var selectcity = $scope.City.city
-                var starttime = $scope.starttime + ' 00:00:00'
-                var endtime = $scope.endtime + ' 00:00:00'
-            }
-            // console.log($scope.selectprovince)
-            // console.log($scope.selectcity)
-            // console.log($scope.starttime + ' 00:00:00')
-            // console.log($scope.endtime + ' 00:00:00')
-            // console.log(selectprovince)
-            // console.log(selectcity)
-            // console.log(starttime)
-            // console.log(endtime)
-            if (selectcity == undefined) {
-                RegionInfo = {
-                    province: selectprovince,
-                    startTime: starttime,
-                    endTime: endtime,
-                    token: Storage.get('TOKEN')
-                }
-                textInfo = selectprovince + '医生地区分布'
-            } else {
-                RegionInfo = {
-                    province: selectprovince,
-                    city: selectcity.name,
-                    startTime: starttime,
-                    endTime: endtime,
-                    token: Storage.get('TOKEN')
+                // console.log($scope.selectprovince)
+                // console.log($scope.selectcity)
+                // console.log($scope.starttime + ' 00:00:00')
+                // console.log($scope.endtime + ' 00:00:00')
+                // console.log(selectprovince)
+                // console.log(selectcity)
+                // console.log(starttime)
+                // console.log(endtime)
 
+                if (!($scope.Province.province == undefined)) {
+                    if (($scope.starttime == undefined) && ($scope.endtime == undefined)) {
+                        if ($scope.City.city == undefined) {
+                            RegionInfo = {
+                                province: $scope.Province.province.name,
+                                // city: $scope.City.city.name,
+                                startTime: '2016-01-01  00:00:00',
+                                endTime: nowtime,
+                                token: Storage.get('TOKEN')
+                            }
+                            textInfo = $scope.Province.province.name + '医生地区分布'
+                        } else {
+                            RegionInfo = {
+                                province: $scope.Province.province.name,
+                                city: $scope.City.city.name,
+                                startTime: '2016-01-01  00:00:00',
+                                endTime: nowtime,
+                                token: Storage.get('TOKEN')
+                            }
+                            textInfo = $scope.Province.province.name + $scope.City.city.name + '医生地区分布'
+                        }
+                    } else if ($scope.City.city == undefined) {
+                        RegionInfo = {
+                            province: $scope.Province.province.name,
+                            city: $scope.City.city.name,
+                            startTime: $scope.starttime + ' 00:00:00',
+                            endTime: $scope.endtime + ' 00:00:00',
+                            token: Storage.get('TOKEN')
+                        }
+                        textInfo = $scope.Province.province.name+  $scope.City.city.name+ '医生地区分布'
+                    } else {
+                        RegionInfo = {
+                            province: $scope.Province.province.name,
+                            // city: $scope.City.city.name,
+                            startTime: $scope.starttime + ' 00:00:00',
+                            endTime: $scope.endtime + ' 00:00:00',
+                            token: Storage.get('TOKEN')
+                        }
+                        textInfo = $scope.Province.province.name + '医生地区分布'
+                    }
+                } else if ((!($scope.City == undefined)) && (!($scope.starttime == undefined))) {
+                    RegionInfo = {
+                        // province:  $scope.Province.province.name,
+                        // city: $scope.City.city.name,
+                        startTime: $scope.starttime + ' 00:00:00',
+                        endTime: $scope.endtime + ' 00:00:00',
+                        token: Storage.get('TOKEN')
+                    }
+                    textInfo = '注册医生地区分布'
                 }
-                textInfo = selectprovince + selectcity.name + '医生地区分布'
+                isClick = true
+                showpie()
             }
-            isClick = true
-            showpie()
         }
 
         var showpie = function() {
@@ -5576,21 +5619,20 @@ angular.module('controllers', ['ngResource', 'services'])
                 RegionInfo = {
                     province: '浙江省',
                     city: '',
-                    startTime: '2017-01-01 00:00:00',
-                    endTime: now,
+                    startTime: '2016-01-01  00:00:00',
+                    endTime: nowtime,
                     token: Storage.get('TOKEN')
                 }
                 textInfo = '浙江省医生地区分布'
             }
             Monitor1.GetRegion(RegionInfo).then(function(data) {
-                    $scope.loadingflag=false
+                    $scope.loadingflag = false
                     if (data.results.length == 0) {
                         $('#nodata').modal('show')
                         $timeout(function() {
                             $('#nodata').modal('hide')
                         }, 1000)
                     }
-
                     var array = data.results
                     var arr = new Array()
                     var sum = 0
@@ -5601,7 +5643,6 @@ angular.module('controllers', ['ngResource', 'services'])
                         }
                         sum += array[i].count
                     }
-
                     var myChart = echarts.init(document.getElementById('region'))
                     var option = {
                         title: {
@@ -5634,15 +5675,15 @@ angular.module('controllers', ['ngResource', 'services'])
                     console.log(err)
                 }
         }
-       
+
 
     }])
 
     // 数据监控——医生变化趋势
     .controller('trendCtrl', ['Dict', 'Monitor1', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Dict, Monitor1, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
         var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
-        
-        $scope.loadingflag=true
+
+        $scope.loadingflag = true
 
         // 医生变化趋势--折线图
         $('.datetimepicker').datetimepicker({
@@ -5704,60 +5745,106 @@ angular.module('controllers', ['ngResource', 'services'])
         // 获取当前日期
         var myDate = new Date();
         var now = myDate.toLocaleDateString();
+        var formatDateTime = function(date) {
+            var y = date.getFullYear();
+            var m = date.getMonth() + 1;
+            m = m < 10 ? ('0' + m) : m;
+            var d = date.getDate();
+            d = d < 10 ? ('0' + d) : d;
+            var h = date.getHours();
+            h = h < 10 ? ('0' + h) : h;
+            var minute = date.getMinutes();
+            minute = minute < 10 ? ('0' + minute) : minute;
+            var second = date.getSeconds();
+            second = second < 10 ? ('0' + second) : second;
+            return y + '-' + m + '-' + d + ' ' + h + ':' + minute + ':' + second;
+        };
+        var nowtime = formatDateTime(myDate)
 
         var isClick = false
         var TrendInfo = {}
         var textInfo = ''
         $scope.Province = {}
         $scope.viewTrend = function() {
-        $scope.loadingflag=true
+            $scope.loadingflag = true
 
-            if (($scope.Province.province == undefined) || ($scope.starttime == undefined) || ($scope.endtime == undefined) || ($scope.starttime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null) || ($scope.endtime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null)) {
+            if (($scope.Province.province == undefined) && ($scope.City == undefined) && (($scope.starttime == undefined) || ($scope.endtime == undefined))) {
                 $('#inputerror').modal('show')
                 $timeout(function() {
                     $('#inputerror').modal('hide')
                 }, 1000)
+                $scope.loadingflag = false
             } else {
-                var selectprovince = $scope.Province.province.name
-                var selectcity = $scope.City.city
-                var starttime = $scope.starttime + ' 00:00:00'
-                var endtime = $scope.endtime + ' 00:00:00'
-            }
-            if (selectcity == undefined) {
-                TrendInfo = {
-                    province: selectprovince,
-                    startTime: starttime,
-                    endTime: endtime,
-                    token: Storage.get('TOKEN')
+                if (!($scope.Province.province == undefined)) {
+                    if (($scope.starttime == undefined) && ($scope.endtime == undefined)) {
+                        if ($scope.City.city == undefined) {
+                            TrendInfo = {
+                                province: $scope.Province.province.name,
+                                // city: $scope.City.city.name,
+                                startTime: '2016-01-01  00:00:00',
+                                endTime: nowtime,
+                                token: Storage.get('TOKEN')
+                            }
+                            textInfo = $scope.Province.province.name + '医生注册变化趋势折线图'
+                        } else {
+                            TrendInfo = {
+                                province: $scope.Province.province.name,
+                                city: $scope.City.city.name,
+                                startTime: '2016-01-01  00:00:00',
+                                endTime: nowtime,
+                                token: Storage.get('TOKEN')
+                            }
+                            textInfo = $scope.Province.province.name + $scope.City.city.name + '医生注册变化趋势折线图'
+                        }
+                    } else if ($scope.City.city == undefined) {
+                        TrendInfo = {
+                            province: $scope.Province.province.name,
+                            // city: $scope.City.city.name,
+                            startTime: $scope.starttime + ' 00:00:00',
+                            endTime: $scope.endtime + ' 00:00:00',
+                            token: Storage.get('TOKEN')
+                        }
+                        textInfo = $scope.Province.province.name + '医生注册变化趋势折线图'
+                    } else {
+                        TrendInfo = {
+                            province: $scope.Province.province.name,
+                            city: $scope.City.city.name,
+                            startTime: $scope.starttime + ' 00:00:00',
+                            endTime: $scope.endtime + ' 00:00:00',
+                            token: Storage.get('TOKEN')
+                        }
+                        textInfo = $scope.Province.province.name +$scope.City.city.name+ '医生注册变化趋势折线图'
+                    }
+                } else if ((!($scope.City == undefined)) && (!($scope.starttime == undefined))) {
+                    TrendInfo = {
+                        // province:  $scope.Province.province.name,
+                        // city: $scope.City.city.name,
+                        startTime: $scope.starttime + ' 00:00:00',
+                        endTime: $scope.endtime + ' 00:00:00',
+                        token: Storage.get('TOKEN')
+                    }
+                    textInfo = '医生注册变化趋势折线图'
                 }
-                textInfo = selectprovince + '医生注册变化趋势折线图'
-            } else {
-                TrendInfo = {
-                    province: selectprovince,
-                    city: selectcity.name,
-                    startTime: starttime,
-                    endTime: endtime,
-                    token: Storage.get('TOKEN')
-                }
-                textInfo = selectprovince + selectcity.name + '医生注册变化趋势折线图'
+
+                isClick = true
+                showlinegraph()
             }
-            isClick = true
-            showlinegraph()
         }
+
 
         var showlinegraph = function() {
             if (isClick == false) {
                 TrendInfo = {
                     province: '浙江省',
                     city: '',
-                    startTime: '2017-01-01 00:00:00',
+                    startTime: '2016-01-01 00:00:00',
                     endTime: now,
                     token: Storage.get('TOKEN')
                 }
                 textInfo = '浙江省医生注册变化趋势折线图'
             }
             Monitor1.GetTrend(TrendInfo).then(function(data) {
-                    $scope.loadingflag=false
+                    $scope.loadingflag = false
                     if (data.results.length == 0) {
                         $('#nodata').modal('show')
                         $timeout(function() {
@@ -5836,8 +5923,8 @@ angular.module('controllers', ['ngResource', 'services'])
     // 数据监控——医生超时咨询统计
     .controller('overtimeCtrl', ['Dict', 'Monitor1', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Dict, Monitor1, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
         var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
-        
-        $scope.loadingflag=true
+
+        $scope.loadingflag = true
 
         $('.datetimepicker').datetimepicker({
             language: 'zh-CN',
@@ -5917,7 +6004,7 @@ angular.module('controllers', ['ngResource', 'services'])
             //获取搜索列表
             var promise = Monitor1.GetOvertime(Info)
             promise.then(function(data) {
-                $scope.loadingflag=false
+                $scope.loadingflag = false
                 $scope.overtimetableParams = new NgTableParams({
                     count: 20
                 }, {
@@ -5956,7 +6043,7 @@ angular.module('controllers', ['ngResource', 'services'])
         }
 
         $scope.searchList = function() {
-        $scope.loadingflag=true
+            $scope.loadingflag = true
 
             if (($scope.Province.province == undefined) || ($scope.starttime == undefined) || ($scope.endtime == undefined) || ($scope.starttime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null) || ($scope.endtime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null)) {
                 $('#inputerror').modal('show')
@@ -5983,7 +6070,7 @@ angular.module('controllers', ['ngResource', 'services'])
     .controller('evaluationCtrl', ['Dict', 'Monitor1', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Dict, Monitor1, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
         var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
 
-        $scope.loadingflag=true
+        $scope.loadingflag = true
 
         // 关闭modal控制
         $scope.modal_close = function(target) {
@@ -6068,7 +6155,7 @@ angular.module('controllers', ['ngResource', 'services'])
             //获取搜索列表
             var promise = Monitor1.GetEvaluation(Info)
             promise.then(function(data) {
-                $scope.loadingflag=false
+                $scope.loadingflag = false
                 $scope.scoretableParams = new NgTableParams({
                     count: 20
                 }, {
@@ -6107,7 +6194,7 @@ angular.module('controllers', ['ngResource', 'services'])
         }
 
         $scope.searchList = function() {
-        $scope.loadingflag=true
+            $scope.loadingflag = true
 
             if (($scope.Province.province == undefined) || ($scope.starttime == undefined) || ($scope.endtime == undefined) || ($scope.starttime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null) || ($scope.endtime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null)) {
                 $('#inputerror').modal('show')
@@ -6163,7 +6250,7 @@ angular.module('controllers', ['ngResource', 'services'])
     .controller('chargeCtrl', ['Dict', 'Monitor1', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Dict, Monitor1, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
         var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
 
-        $scope.loadingflag=true
+        $scope.loadingflag = true
 
         // 关闭modal控制
         $scope.modal_close = function(target) {
@@ -6247,7 +6334,7 @@ angular.module('controllers', ['ngResource', 'services'])
             //获取搜索列表
             var promise = Monitor1.GetCharge(Info)
             promise.then(function(data) {
-                $scope.loadingflag=false
+                $scope.loadingflag = false
                 $scope.chargetableParams = new NgTableParams({
                     count: 20
                 }, {
@@ -6286,7 +6373,7 @@ angular.module('controllers', ['ngResource', 'services'])
         }
 
         $scope.searchList = function() {
-        $scope.loadingflag=true
+            $scope.loadingflag = true
 
             if (($scope.Province.province == undefined) || ($scope.starttime == undefined) || ($scope.endtime == undefined) || ($scope.starttime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null) || ($scope.endtime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null)) {
                 $('#inputerror').modal('show')
@@ -6318,7 +6405,7 @@ angular.module('controllers', ['ngResource', 'services'])
     .controller('workloadCtrl', ['Dict', 'Monitor1', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Dict, Monitor1, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
         var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
 
-        $scope.loadingflag=true
+        $scope.loadingflag = true
 
         $('.datetimepicker').datetimepicker({
             language: 'zh-CN',
@@ -6398,7 +6485,7 @@ angular.module('controllers', ['ngResource', 'services'])
             //获取搜索列表
             var promise = Monitor1.GetWorkload(Info)
             promise.then(function(data) {
-                $scope.loadingflag=false
+                $scope.loadingflag = false
                 $scope.workloadtableParams = new NgTableParams({
                     count: 20
                 }, {
@@ -6437,7 +6524,7 @@ angular.module('controllers', ['ngResource', 'services'])
         }
 
         $scope.searchList = function() {
-        $scope.loadingflag=true
+            $scope.loadingflag = true
 
             if (($scope.Province.province == undefined) || ($scope.starttime == undefined) || ($scope.endtime == undefined) || ($scope.starttime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null) || ($scope.endtime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null)) {
                 $('#inputerror').modal('show')
@@ -6459,9 +6546,9 @@ angular.module('controllers', ['ngResource', 'services'])
             getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         }
 
-                
+
         //进度条控制  
-    
+
         // startProgerss()
         // function startProgerss() {
         //     $scope.length = 90;
@@ -6476,7 +6563,7 @@ angular.module('controllers', ['ngResource', 'services'])
     .controller('PatregionCtrl', ['Dict', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Dict, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
         var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
 
-        $scope.loadingflag=true
+        $scope.loadingflag = true
 
         $('.datetimepicker').datetimepicker({
             language: 'zh-CN',
@@ -6536,45 +6623,89 @@ angular.module('controllers', ['ngResource', 'services'])
         // 获取当前日期
         var myDate = new Date();
         var now = myDate.toLocaleDateString();
+        var formatDateTime = function(date) {
+            var y = date.getFullYear();
+            var m = date.getMonth() + 1;
+            m = m < 10 ? ('0' + m) : m;
+            var d = date.getDate();
+            d = d < 10 ? ('0' + d) : d;
+            var h = date.getHours();
+            h = h < 10 ? ('0' + h) : h;
+            var minute = date.getMinutes();
+            minute = minute < 10 ? ('0' + minute) : minute;
+            var second = date.getSeconds();
+            second = second < 10 ? ('0' + second) : second;
+            return y + '-' + m + '-' + d + ' ' + h + ':' + minute + ':' + second;
+        };
+        var nowtime = myDate.toLocaleDateString();
 
         var isClick = false
         var RegionInfo = {}
         var textInfo = ''
         $scope.Province = {}
         $scope.viewPatRegion = function() {
-        $scope.loadingflag=true
-
-            if (($scope.Province.province == undefined) || ($scope.starttime == undefined) || ($scope.endtime == undefined) || ($scope.starttime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null) || ($scope.endtime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null)) {
+            $scope.loadingflag = true
+            if (($scope.Province.province == undefined) && ($scope.City == undefined) && (($scope.starttime == undefined) || ($scope.endtime == undefined))) {
                 $('#inputerror').modal('show')
                 $timeout(function() {
                     $('#inputerror').modal('hide')
                 }, 1000)
+                $scope.loadingflag = false
             } else {
-                var selectprovince = $scope.Province.province.name
-                var selectcity = $scope.City.city
-                var starttime = $scope.starttime + ' 00:00:00'
-                var endtime = $scope.endtime + ' 00:00:00'
+
+                if (!($scope.Province.province == undefined)) {
+                    if (($scope.starttime == undefined) && ($scope.endtime == undefined)) {
+                        if ($scope.City.city == undefined) {
+                            RegionInfo = {
+                                province: $scope.Province.province.name,
+                                // city: $scope.City.city.name,
+                                startTime: '2016-01-01  00:00:00',
+                                endTime: nowtime,
+                                token: Storage.get('TOKEN')
+                            }
+                            textInfo = $scope.Province.province.name + '患者地区分布'
+                        } else {
+                            RegionInfo = {
+                                province: $scope.Province.province.name,
+                                city: $scope.City.city.name,
+                                startTime: '2016-01-01  00:00:00',
+                                endTime: nowtime,
+                                token: Storage.get('TOKEN')
+                            }
+                            textInfo = $scope.Province.province.name + $scope.City.city.name + '患者地区分布'
+                        }
+                    } else if ($scope.City.city == undefined) {
+                        RegionInfo = {
+                            province: $scope.Province.province.name,
+                            city: $scope.City.city.name,
+                            startTime: $scope.starttime + ' 00:00:00',
+                            endTime: $scope.endtime + ' 00:00:00',
+                            token: Storage.get('TOKEN')
+                        }
+                        textInfo = $scope.Province.province.name+  $scope.City.city.name+ '患者地区分布'
+                    } else {
+                        RegionInfo = {
+                            province: $scope.Province.province.name,
+                            // city: $scope.City.city.name,
+                            startTime: $scope.starttime + ' 00:00:00',
+                            endTime: $scope.endtime + ' 00:00:00',
+                            token: Storage.get('TOKEN')
+                        }
+                        textInfo = $scope.Province.province.name + '患者地区分布'
+                    }
+                } else if ((!($scope.City == undefined)) && (!($scope.starttime == undefined))) {
+                    RegionInfo = {
+                        // province:  $scope.Province.province.name,
+                        // city: $scope.City.city.name,
+                        startTime: $scope.starttime + ' 00:00:00',
+                        endTime: $scope.endtime + ' 00:00:00',
+                        token: Storage.get('TOKEN')
+                    }
+                    textInfo = '注册患者地区分布'
+                }
                 isClick = true
+                showpie()
             }
-            if (selectcity == undefined) {
-                RegionInfo = {
-                    province: selectprovince,
-                    startTime: starttime,
-                    endTime: endtime,
-                    token: Storage.get('TOKEN')
-                }
-                textInfo = selectprovince + '患者地区分布'
-            } else {
-                RegionInfo = {
-                    province: selectprovince,
-                    city: selectcity.name,
-                    startTime: starttime,
-                    endTime: endtime,
-                    token: Storage.get('TOKEN')
-                }
-                textInfo = selectprovince + selectcity.name + '患者地区分布'
-            }
-            showpie()
         }
 
         var showpie = function() {
@@ -6583,14 +6714,14 @@ angular.module('controllers', ['ngResource', 'services'])
                 RegionInfo = {
                     province: '浙江省',
                     city: '',
-                    startTime: '2017-01-01 00:00:00',
+                    startTime: '2016-01-01 00:00:00',
                     endTime: now,
                     token: Storage.get('TOKEN')
                 }
                 textInfo = '浙江省患者地区分布'
             }
             Monitor2.GetPatRegion(RegionInfo).then(function(data) {
-                $scope.loadingflag=false
+                    $scope.loadingflag = false
 
                     if (data.results.length == 0) {
                         $('#nodata').modal('show')
@@ -6647,7 +6778,7 @@ angular.module('controllers', ['ngResource', 'services'])
     .controller('PattrendCtrl', ['Dict', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Dict, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
         var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
 
-        $scope.loadingflag=true
+        $scope.loadingflag = true
 
         $('.datetimepicker').datetimepicker({
             language: 'zh-CN',
@@ -6705,63 +6836,107 @@ angular.module('controllers', ['ngResource', 'services'])
             showlinegraph()
         });
 
-        // 获取当前日期
+       // 获取当前日期
         var myDate = new Date();
         var now = myDate.toLocaleDateString();
+        var formatDateTime = function(date) {
+            var y = date.getFullYear();
+            var m = date.getMonth() + 1;
+            m = m < 10 ? ('0' + m) : m;
+            var d = date.getDate();
+            d = d < 10 ? ('0' + d) : d;
+            var h = date.getHours();
+            h = h < 10 ? ('0' + h) : h;
+            var minute = date.getMinutes();
+            minute = minute < 10 ? ('0' + minute) : minute;
+            var second = date.getSeconds();
+            second = second < 10 ? ('0' + second) : second;
+            return y + '-' + m + '-' + d + ' ' + h + ':' + minute + ':' + second;
+        };
+        var nowtime = formatDateTime(myDate)
 
         var isClick = false
         var Info = {}
         var textInfo = ''
         $scope.Province = {}
         $scope.viewPatTrend = function() {
-        $scope.loadingflag=true
+            $scope.loadingflag = true
 
-            if (($scope.Province.province == undefined) || ($scope.starttime == undefined) || ($scope.endtime == undefined) || ($scope.starttime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null) || ($scope.endtime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null)) {
+            if (($scope.Province.province == undefined) && ($scope.City == undefined) && (($scope.starttime == undefined) || ($scope.endtime == undefined))) {
                 $('#inputerror').modal('show')
                 $timeout(function() {
                     $('#inputerror').modal('hide')
                 }, 1000)
+                $scope.loadingflag = false
             } else {
-                var selectprovince = $scope.Province.province.name
-                var selectcity = $scope.City.city
-                var starttime = $scope.starttime + ' 00:00:00'
-                var endtime = $scope.endtime + ' 00:00:00'
-                isClick = true
-            }
-            if (selectcity == undefined) {
-                Info = {
-                    province: selectprovince,
-                    startTime: starttime,
-                    endTime: endtime,
-                    token: Storage.get('TOKEN')
+                if (!($scope.Province.province == undefined)) {
+                    if (($scope.starttime == undefined) && ($scope.endtime == undefined)) {
+                        if ($scope.City.city == undefined) {
+                            TrendInfo = {
+                                province: $scope.Province.province.name,
+                                // city: $scope.City.city.name,
+                                startTime: '2016-01-01  00:00:00',
+                                endTime: nowtime,
+                                token: Storage.get('TOKEN')
+                            }
+                            textInfo = $scope.Province.province.name + '患者注册变化趋势折线图'
+                        } else {
+                            TrendInfo = {
+                                province: $scope.Province.province.name,
+                                city: $scope.City.city.name,
+                                startTime: '2016-01-01  00:00:00',
+                                endTime: nowtime,
+                                token: Storage.get('TOKEN')
+                            }
+                            textInfo = $scope.Province.province.name + $scope.City.city.name + '患者注册变化趋势折线图'
+                        }
+                    } else if ($scope.City.city == undefined) {
+                        TrendInfo = {
+                            province: $scope.Province.province.name,
+                            // city: $scope.City.city.name,
+                            startTime: $scope.starttime + ' 00:00:00',
+                            endTime: $scope.endtime + ' 00:00:00',
+                            token: Storage.get('TOKEN')
+                        }
+                        textInfo = $scope.Province.province.name + '患者注册变化趋势折线图'
+                    } else {
+                        TrendInfo = {
+                            province: $scope.Province.province.name,
+                            city: $scope.City.city.name,
+                            startTime: $scope.starttime + ' 00:00:00',
+                            endTime: $scope.endtime + ' 00:00:00',
+                            token: Storage.get('TOKEN')
+                        }
+                        textInfo = $scope.Province.province.name +$scope.City.city.name+ '患者注册变化趋势折线图'
+                    }
+                } else if ((!($scope.City == undefined)) && (!($scope.starttime == undefined))) {
+                    TrendInfo = {
+                        // province:  $scope.Province.province.name,
+                        // city: $scope.City.city.name,
+                        startTime: $scope.starttime + ' 00:00:00',
+                        endTime: $scope.endtime + ' 00:00:00',
+                        token: Storage.get('TOKEN')
+                    }
+                    textInfo = '患者注册变化趋势折线图'
                 }
-                textInfo = selectprovince + '患者注册变化趋势折线图'
-            } else {
-                Info = {
-                    province: selectprovince,
-                    city: selectcity.name,
-                    startTime: starttime,
-                    endTime: endtime,
-                    token: Storage.get('TOKEN')
-                }
-                textInfo = selectprovince + selectcity.name + '患者注册变化趋势折线图'
-            }
-            showlinegraph()
-        }
 
+                isClick = true
+                showlinegraph()
+            }
+        }
         var showlinegraph = function() {
             if (isClick == false) {
                 Info = {
                     province: '浙江省',
                     city: '',
-                    startTime: '2017-01-01 00:00:00',
+                    startTime: '2016-01-01 00:00:00',
                     endTime: now,
                     token: Storage.get('TOKEN')
                 }
                 textInfo = '浙江省患者注册变化趋势折线图'
             }
             Monitor2.GetPatTrend(Info).then(function(data) {
-                $scope.loadingflag=false
+                    $scope.loadingflag = false
 
                     if (data.results.length == 0) {
                         $('#nodata').modal('show')
@@ -6839,7 +7014,7 @@ angular.module('controllers', ['ngResource', 'services'])
     .controller('PatinsuranceCtrl', ['Dict', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Dict, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
         var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
 
-        $scope.loadingflag=true
+        $scope.loadingflag = true
 
         $('.datetimepicker').datetimepicker({
             language: 'zh-CN',
@@ -6918,10 +7093,9 @@ angular.module('controllers', ['ngResource', 'services'])
             //获取搜索列表
             var promise = Monitor2.GetPatInsurance(Info)
             promise.then(function(data) {
-                $scope.loadingflag=false
+                $scope.loadingflag = false
 
-                $scope.insurancetableParams = new N
-                gTableParams({
+                $scope.insurancetableParams = new NgTableParams({
                     count: 20
                 }, {
                     counts: [],
@@ -6959,7 +7133,7 @@ angular.module('controllers', ['ngResource', 'services'])
         }
 
         $scope.searchList = function() {
-        $scope.loadingflag=true
+            $scope.loadingflag = true
 
             if (($scope.Province.province == undefined) || ($scope.starttime == undefined) || ($scope.endtime == undefined) || ($scope.starttime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null) || ($scope.endtime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null)) {
                 $('#inputerror').modal('show')
@@ -6984,7 +7158,7 @@ angular.module('controllers', ['ngResource', 'services'])
     .controller('PatgroupCtrl', ['Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
         var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
 
-        $scope.loadingflag=true
+        $scope.loadingflag = true
 
         // 患者分组显示--图表
         // var isClick = false
@@ -7034,7 +7208,7 @@ angular.module('controllers', ['ngResource', 'services'])
             //获取列表
             var promise = Monitor2.GetPatGroup(tempinfo)
             promise.then(function(data) {
-                $scope.loadingflag=false
+                $scope.loadingflag = false
 
                 console.log(data.results.length)
                 if (data.results.length == 0) {
@@ -7070,8 +7244,8 @@ angular.module('controllers', ['ngResource', 'services'])
         // }
 
         $scope.viewclass = function() {
-        $scope.loadingflag=true
-            
+            $scope.loadingflag = true
+
             // isClick = true
             var value = $scope.value
             type = 'class_' + value
@@ -7747,7 +7921,6 @@ angular.module('controllers', ['ngResource', 'services'])
                 console.log(data)
                 var datanew = []
                 for (var i = 0; i < data.data.length; i++) {
-                    console.log(i)
                     if ((data.data[i].perDiagObject.status == 9) || (data.data[i].perDiagObject.status == 8) || (data.data[i].perDiagObject.status == 7)) {
                         // console.log(data.data[i])
                         datanew.push(data.data[i])

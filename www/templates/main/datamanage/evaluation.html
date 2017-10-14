@@ -57,7 +57,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" ng-click="modal_close()">&times;</button>
+                <button type="button" class="close" ng-click="modal_close('#score_detail')">&times;</button>
                 <h3 class="modal-title" id="modal-title">评价详情</h3>
             </div>
             <div class="modal-body" id="modal-body">
@@ -75,7 +75,9 @@
                 </table>
             </div>
             <div class="form-group">
+                <div class="col-xs-offset-3">
                     <button type="button" class="btn btn-default" ng-click="modal_close('#score_detail')">关闭</button>
+                </div>
             </div>
         </div>
     </div>
