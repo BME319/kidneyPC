@@ -2619,30 +2619,35 @@ angular.module('controllers', ['ngResource', 'services'])
                     })
                 promise.then(function(data) {
                     console.log(data)
-                    if ((angular.isDefined($scope.TDCticket) != true)||($scope.TDCticket==null) ){
-                        var params = {
-                            'role': 'doctor',
-                            'userId': userdetail.userId,
-                            'postdata': {
-                                'action_name': 'QR_LIMIT_STR_SCENE',
-                                'action_info': {
-                                    'scene': {
-                                        'scene_str': userdetail.userId
-                                    }
-                                },
-                            },
-                            'token': Storage.get('TOKEN') 
-                        }
-                        Mywechat.createTDCticket(params).then(function(data) {
-                            $scope.TDCticket = 'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=' + data.results.TDCticket
-                        }, function(err) {
-                            console.log(err)
-                        })
+                    if (data.results.docTDCticket===undefined ){
+                        $('#NoQR').modal('show');
+                        $timeout(function() {
+                            $('#NoQR').modal('hide');
+                        }, 1000);
+                        // var params = {
+                        //     'role': 'patient',
+                        //     'userId': userdetail.userId,
+                        //     'postdata': {
+                        //         'action_name': 'QR_LIMIT_STR_SCENE',
+                        //         'action_info': {
+                        //             'scene': {
+                        //                 'scene_str': userdetail.userId
+                        //             }
+                        //         },
+                        //     },
+                        //     'token': Storage.get('TOKEN') 
+                        // }
+                        // Mywechat.createTDCticket(params).then(function(data) {
+                        //     $scope.TDCticket = 'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=' + data.results.TDCticket
+                        // }, function(err) {
+                        //     console.log(err)
+                        // })
                     } else {
-                        $scope.TDCticket = 'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=' + $scope.TDCticket
+                        $scope.TDCticket = 'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=' + data.results.docTDCticket
+                        $('#doctorQR').modal('show')
                     }
                 }, function(err) {})
-                $('#doctorQR').modal('show')
+                
 
             }
 
