@@ -60,7 +60,7 @@ angular.module('services', ['ngResource'])
 
         var Doctor = function() {
             return $resource(CONFIG.dictbaseUrl + ':path/:route', { path: 'doctor' }, {
-                getDoctorInfo: { method: 'GET', params: { route: 'detail'}, timeout: 100000 },
+                getDoctorInfo: { method: 'GET', params: { route: 'doctor',userId:'@userId',token:'@token'}, timeout: 100000 },
             })
         }
 
@@ -696,9 +696,9 @@ angular.module('services', ['ngResource'])
 
     .factory('Doctor', ['$q', 'Data', function($q, Data) {
         var self = this
-        self.getPatientList = function(params) {
+        self.getDoctorInfo = function(params) {
             var deferred = $q.defer()
-            Data.Doctor.getPatientList(
+            Data.Doctor.getDoctorInfo(
                 params,
                 function(data, headers) {
                     deferred.resolve(data)
