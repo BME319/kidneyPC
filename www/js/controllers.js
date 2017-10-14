@@ -2612,10 +2612,14 @@ angular.module('controllers', ['ngResource', 'services'])
 
             $scope.openQR = function(userdetail) {
                 $scope.TDCticket = undefined
-                var promise = Doctor.getDoctorInfo({ userId: userdetail.userId })
+                var promise = Doctor.getDoctorInfo(
+                    { 
+                        'userId': userdetail.userId,
+                        'token':Storage.get('TOKEN') 
+                    })
                 promise.then(function(data) {
                     console.log(data)
-                    if (angular.isDefined($scope.TDCticket) != true) {
+                    if ((angular.isDefined($scope.TDCticket) != true)||($scope.TDCticket==null) ){
                         var params = {
                             'role': 'doctor',
                             'userId': userdetail.userId,
@@ -2626,8 +2630,8 @@ angular.module('controllers', ['ngResource', 'services'])
                                         'scene_str': userdetail.userId
                                     }
                                 },
-                                'token': token
-                            }
+                            },
+                            'token': Storage.get('TOKEN') 
                         }
                         Mywechat.createTDCticket(params).then(function(data) {
                             $scope.TDCticket = 'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=' + data.results.TDCticket
