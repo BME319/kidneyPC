@@ -99,6 +99,14 @@ angular.module('filters', [])
             return name
         }
     }])
+         // 退款金额
+    .filter('chargemoney', [function() {
+        return function(type) {
+            var name
+            name = type/100
+            return name
+        }
+    }])
     // 退款状态
     .filter('refundstatus', [function() {
         return function(type) {
