@@ -41,9 +41,9 @@
         </td>
         <td title="'科室所在医院'" sortable="'hospital'">{{department.hospital}}
         </td>
-        <td title="'科室包含医生列表'">
+        <!-- <td title="'科室包含医生列表'">
             <button class="btn btn-link" style="text-decoration:none; outline:none; padding:0px; border:0px; font-size:10px;" ng-click="showdoctor(department)">查看医生列表</button>
-        </td>
+        </td> -->
         <td title="'操作'">
             <button class="btn btn-link" style="text-decoration:none; outline:none; padding:0px; border:0px; font-size:10px;" ng-click="openDetail(department)">查看详细信息</button>
             <button class="btn btn-link" style="text-decoration:none; outline:none; padding:0px; border:0px; font-size:10px;" ng-click="deletedepartment(department)">删除</button>
@@ -143,7 +143,7 @@
             <li class="list-group-item">所在地区：{{departmentInfo.district}}</li>
             <li class="list-group-item">所在地区负责人：{{departmentInfo.portleader|leadername}}</li>
             <li class="list-group-item">所在医院：{{departmentInfo.hospital}}</li>
-            <li class="list-group-item">包含医生：{{departmentInfo.doctor|leadername}}</li>
+            <li class="list-group-item">包含医生：{{departmentInfo.doctor|arraytostring}}</li>
         </ul>
     </div>
     <div class="modal-footer">

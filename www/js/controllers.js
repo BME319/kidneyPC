@@ -2612,14 +2612,13 @@ angular.module('controllers', ['ngResource', 'services'])
 
             $scope.openQR = function(userdetail) {
                 $scope.TDCticket = undefined
-                var promise = Doctor.getDoctorInfo(
-                    { 
-                        'userId': userdetail.userId,
-                        'token':Storage.get('TOKEN') 
-                    })
+                var promise = Doctor.getDoctorInfo({
+                    'userId': userdetail.userId,
+                    'token': Storage.get('TOKEN')
+                })
                 promise.then(function(data) {
                     console.log(data)
-                    if (data.results.docTDCticket===undefined ){
+                    if (data.results.docTDCticket === undefined) {
                         $('#NoQR').modal('show');
                         $timeout(function() {
                             $('#NoQR').modal('hide');
@@ -2647,7 +2646,7 @@ angular.module('controllers', ['ngResource', 'services'])
                         $('#doctorQR').modal('show')
                     }
                 }, function(err) {})
-                
+
 
             }
 
@@ -4646,6 +4645,9 @@ angular.module('controllers', ['ngResource', 'services'])
                 }
             }
         }
+
+
+
         // 监听事件(表单清空)
         $('#new_district').on('hidden.bs.modal', function() {
             // $('#registerForm').formValidation('resetForm', true)
@@ -4686,6 +4688,64 @@ angular.module('controllers', ['ngResource', 'services'])
             var mylabel = document.getElementById("editdistrict")
             mylabel.innerHTML = district.district
         }
+
+        $scope.openDetail = function(userdetail) {
+            var modalInstance = $uibModal.open({
+                animation: true,
+                ariaLabelledBy: 'modal-title',
+                ariaDescribedBy: 'modal-body',
+                templateUrl: 'detail_district.html',
+                controller: 'detail_districtCtrl',
+                resolve: {
+                    userdetail: function() {
+                        return userdetail
+                    }
+                }
+            })
+            modalInstance.result.then(function(con) {
+                if (con == '修改信息') {
+                    console.log(userdetail);
+                    // 修改用户信息方法的输入
+                    // $('#changeInfo').formValidation({
+                    //         framework: 'bootstrap',
+                    //         excluded: ':disabled',
+                    //         icon: {
+                    //             valid: 'glyphicon glyphicon-ok',
+                    //             invalid: 'glyphicon glyphicon-remove',
+                    //             validating: 'glyphicon glyphicon-refresh'
+                    //         }
+                    //     })
+                    //     .on('success.form.fv', function(e) {
+                    //         // Prevent form submission
+                    //         e.preventDefault();
+                    //     });
+                    //     $scope.changeInfo={}
+                    // $scope.changeInfo.newdepartment=userdetail.department
+
+                    // $('#newdepartLeader').tagEditor({
+                    //     autocomplete: { delay: 0, position: { collision: 'flip' }, source: ['ActionScript', 'AppleScript', 'Asp', 'BASIC', 'C', 'C++', 'CSS', 'Clojure', 'COBOL', 'ColdFusion', 'Erlang', 'Fortran', 'Groovy', 'Haskell', 'HTML', 'Java', 'JavaScript', 'Lisp', 'Perl', 'PHP', 'Python', 'Ruby', 'Scala', 'Scheme', "我是书", ] },
+                    //     forceLowercase: false,
+                    //     placeholder: '请输入新的科室负责人'
+                    // });
+
+                    // $scope.changeInfo.token = token
+                    // console.log($scope.changeInfo)
+                    var mylabel = document.getElementById("editdistrict")
+                    mylabel.innerHTML = userdetail.district
+                    var mylabel = document.getElementById("editportleader")
+                    mylabel.innerHTML = ""
+                    for (i = 0; i < userdetail.portleader.length; i++) {
+                        mylabel.innerHTML = mylabel.innerHTML + userdetail.portleader[i].name + ' ';
+                    }
+
+                    // 打开修改地区信息modal
+                    $scope.changeInfo = {}
+                    angular.copy(userdetail, $scope.changeInfo);
+                    $('#changeInfo').modal('show')
+                }
+            }, function() {})
+        }
+
 
         // 修改地区，增加确认标签
         $scope.addeditlabel = function(inputlabel) {
@@ -4851,6 +4911,48 @@ angular.module('controllers', ['ngResource', 'services'])
             }
         }
     }])
+
+    // 地区--详细信息modal
+    .controller('detail_districtCtrl', ['$scope', '$state', 'Storage', '$timeout', '$uibModal', 'Alluser', '$uibModalInstance', 'userdetail', 'Department',
+        function($scope, $state, Storage, $timeout, $uibModal, Alluser, $uibModalInstance, userdetail, Department) {
+
+            console.log(userdetail)
+            $scope.districtInfo = userdetail
+            // 获得该地区下属科室数据
+            var districtInfo = {}
+            districtInfo.district = userdetail.district
+            districtInfo.token = Storage.get('TOKEN')
+            var promise = Department.GetDepartmentInfo(districtInfo)
+            var thisdepartmentlist = []
+            var thishospital = []
+
+
+
+            promise.then(function(data) {
+                console.log(data.results)
+                for (i = 0; i < data.results.length; i++) {
+                    thisdepartmentlist.push(data.results[i].department)
+                    thishospital.push(data.results[i].hospital)
+
+                }
+                $scope.districtInfo.department = thisdepartmentlist
+                $scope.districtInfo.hospital = thishospital
+
+                console.log($scope.districtInfo.department)
+            }, function(err) {})
+
+
+
+            // 关闭modal
+            $scope.close = function() {
+                $uibModalInstance.dismiss()
+            }
+            // 修改信息
+            $scope.changeInfo = function() {
+                $uibModalInstance.close('修改信息')
+            }
+        }
+    ])
 
     // 地区--删除地区modal
     .controller('districtdeleteCtrl', ['$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', '$uibModalInstance', 'district',
@@ -5597,7 +5699,7 @@ angular.module('controllers', ['ngResource', 'services'])
                             endTime: $scope.endtime + ' 00:00:00',
                             token: Storage.get('TOKEN')
                         }
-                        textInfo = $scope.Province.province.name+  $scope.City.city.name+ '医生地区分布'
+                        textInfo = $scope.Province.province.name + $scope.City.city.name + '医生地区分布'
                     } else {
                         RegionInfo = {
                             province: $scope.Province.province.name,
@@ -5822,7 +5924,7 @@ angular.module('controllers', ['ngResource', 'services'])
                             endTime: $scope.endtime + ' 00:00:00',
                             token: Storage.get('TOKEN')
                         }
-                        textInfo = $scope.Province.province.name +$scope.City.city.name+ '医生注册变化趋势折线图'
+                        textInfo = $scope.Province.province.name + $scope.City.city.name + '医生注册变化趋势折线图'
                     }
                 } else if ((!($scope.City == undefined)) && (!($scope.starttime == undefined))) {
                     TrendInfo = {
@@ -6691,7 +6793,7 @@ angular.module('controllers', ['ngResource', 'services'])
                             endTime: $scope.endtime + ' 00:00:00',
                             token: Storage.get('TOKEN')
                         }
-                        textInfo = $scope.Province.province.name+  $scope.City.city.name+ '患者地区分布'
+                        textInfo = $scope.Province.province.name + $scope.City.city.name + '患者地区分布'
                     } else {
                         RegionInfo = {
                             province: $scope.Province.province.name,
@@ -6845,7 +6947,7 @@ angular.module('controllers', ['ngResource', 'services'])
             showlinegraph()
         });
 
-       // 获取当前日期
+        // 获取当前日期
         var myDate = new Date();
         var now = myDate.toLocaleDateString();
         var formatDateTime = function(date) {
@@ -6916,7 +7018,7 @@ angular.module('controllers', ['ngResource', 'services'])
                             endTime: $scope.endtime + ' 00:00:00',
                             token: Storage.get('TOKEN')
                         }
-                        textInfo = $scope.Province.province.name +$scope.City.city.name+ '患者注册变化趋势折线图'
+                        textInfo = $scope.Province.province.name + $scope.City.city.name + '患者注册变化趋势折线图'
                     }
                 } else if ((!($scope.City == undefined)) && (!($scope.starttime == undefined))) {
                     TrendInfo = {

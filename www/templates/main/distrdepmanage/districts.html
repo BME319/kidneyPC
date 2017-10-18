@@ -24,11 +24,14 @@
         </td>
         <td title="'地区负责人'" sortable="'portleader'">{{district.portleader|leadername}}
         </td>
-        <td title="'地区下设科室列表'">
+<!--         <td title="'地区下设科室列表'">
             <button class="btn btn-link" style="text-decoration:none; outline:none; padding:0px; border:0px; font-size:10px;" ng-click="showdepartment(district.district)">查看科室列表</button>
-        </td>
+        </td> -->
         <td title="'操作'">
-            <button class="btn btn-link" style="text-decoration:none; outline:none; padding:0px; border:0px; font-size:10px;" ng-click="editdistrict(district)">修改</button>
+
+            <!-- <button class="btn btn-link" style="text-decoration:none; outline:none; padding:0px; border:0px; font-size:10px;" ng-click="editdistrict(district)">修改</button> -->
+                        <button class="btn btn-link" style="text-decoration:none; outline:none; padding:0px; border:0px; font-size:10px;" ng-click="openDetail(district)">查看详细信息</button>
+
             <button class="btn btn-link" style="text-decoration:none; outline:none; padding:0px; border:0px; font-size:10px;" ng-click="deletedistrict(district.district)">删除</button>
         </td>
     </tr>
@@ -86,6 +89,25 @@
         </div>
     </div>
 </div>
+<!-- 查看科室详细信息modal（包括修改信息功能） -->
+<script type="text/ng-template" id="detail_district.html">
+    <div class="modal-header">
+        <button type="button" class="close" ng-click="close()">&times;</button>
+        <h3 class="modal-title" id="modal-title">地区信息</h3>
+    </div>
+    <div class="modal-body" id="modal-body">
+        <ul class="list-group">
+            <li class="list-group-item">名称：{{districtInfo.district}}</li>
+            <li class="list-group-item">负责人：{{districtInfo.portleader|leadername}}</li>
+            <li class="list-group-item">包含医院：{{districtInfo.hospital|realarraytostring}}</li>
+            <!-- <li class="list-group-item">包含科室：{{districtInfo.department|realarraytostring}}</li> -->
+        </ul>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" ng-click="changeInfo()">修改信息</button>
+        <button class="btn btn-primary" type="button" ng-click="close()">关闭</button>
+    </div>
+</script>
 <!-- 修改地区信息modal -->
 <div class="modal fade" id="changeInfo" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog">

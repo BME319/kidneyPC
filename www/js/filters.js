@@ -165,6 +165,7 @@ angular.module('filters', [])
     }])
     .filter('arraytostring', [function() {
         return function(type) {
+            console.log(type)
             var name = ""
             if (type == null) {
                 name = null
