@@ -4788,7 +4788,7 @@ angular.module('controllers', ['ngResource', 'services'])
             modalInstance.result.then(function() {
                 var deletedistrictinfo = {
                     'district': district,
-                    'token': token
+                    'token': Storage.get('TOKEN')
                 }
                 var promise = Department.DeleteRecord(deletedistrictinfo)
                 promise.then(function(data) {
