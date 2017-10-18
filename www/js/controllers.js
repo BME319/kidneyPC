@@ -4473,7 +4473,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 Storage.set('district.totalItems', data.results.length)
                 $scope.totalItems = Storage.get('district.totalItems')
                 $scope.tableParams = new NgTableParams({
-                    count: 10
+                    count: 20
                 }, {
                     counts: [],
                     dataset: data.results
