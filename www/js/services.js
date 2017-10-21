@@ -64,6 +64,13 @@ angular.module('services', ['ngResource'])
             })
         }
 
+        var Paitent = function() {
+            return $resource(CONFIG.dictbaseUrl + ':path/:route', { path: 'paitent' }, {
+                doctorsById: { method: 'GET', params: { route: 'doctorsById',userId:'@userId',token:'@token'}, timeout: 100000 },
+            })
+        }
+
+
         var Upload = function() {
             return $resource(CONFIG.baseUrl + ':path', { path: 'upload' }, {
                 uploadImg: { method: 'POST', params: { token:'@token' }, timeout: 100000 },
@@ -562,6 +569,7 @@ angular.module('services', ['ngResource'])
                 serve.Upload = Upload()
                 serve.Advice = Advice()
                 serve.Services = Services()
+                serve.Paitent = Paitent()
 
             }, 0, 1)
         }
@@ -580,6 +588,8 @@ angular.module('services', ['ngResource'])
         serve.Upload = Upload()
         serve.Advice = Advice()
         serve.Services = Services()
+        serve.Paitent = Paitent()
+
         return serve
     }])
 
@@ -594,6 +604,29 @@ angular.module('services', ['ngResource'])
         self.getDistrict = function(params) {
             var deferred = $q.defer()
             Data.Dict.getDistrict(
+                params,
+                function(data, headers) {
+                    deferred.resolve(data)
+                },
+                function(err) {
+                    deferred.reject(err)
+                })
+            return deferred.promise
+        }
+        return self
+    }])
+
+    .factory('Paitent', ['$q', 'Data', function($q, Data) {
+        var self = this
+        // params->{
+        //  level:'3',//1获取省份，2获取城市，3获取区县
+        //  province:"33", //定位到某个具体省份时需要输入
+        //  city:'01',  //定位到某个具体城市时需要输入
+        //  district:'02' //定位到某个具体区县时需要输入
+        // }
+        self.doctorsById = function(params) {
+            var deferred = $q.defer()
+            Data.Paitent.doctorsById(
                 params,
                 function(data, headers) {
                     deferred.resolve(data)

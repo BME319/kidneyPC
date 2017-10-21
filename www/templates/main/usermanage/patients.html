@@ -54,7 +54,7 @@
 		<td title="'体重'" sortable="'weight'">{{user.weight}}
 		</td>
 		<td title="'操作'">
-		  <button class="btn btn-link" style="text-decoration:none; outline:none; padding:0px; border:0px; font-size:10px;" ng-click="openDetail(user)">查看</button>
+		  <button class="btn btn-link" style="text-decoration:none; outline:none; padding:0px; border:0px; font-size:10px;" ng-click="openDetail(user)">查看详细信息</button>
 		</td>
 	</tr>
 </table>
@@ -104,8 +104,12 @@
 		  <li class="list-group-item">身高：{{patientInfo.height}}</li>
 		  <li class="list-group-item">体重：{{patientInfo.weight}}</li>
 		  <li class="list-group-item">疾病进程：<span ng-repeat="progressname in patientInfo.class_info">{{progressname|progressname}}&nbsp;</span></li>
-		  <li class="list-group-item">生日：{{patientInfo.birthday}}</li>
+		  <li class="list-group-item">生日：{{patientInfo.birthday|timeFormat:'YYYY-MM-DD'}}</li>
 		  <li class="list-group-item">过敏信息：{{patientInfo.allergic}}</li>
+		   <li class="list-group-item">主管医生：{{userinfo.DIC.doctorId.name}}</li>
+		  <li class="list-group-item">主管医生联系方式：{{userinfo.DIC.doctorId.phoneNo}}</li>
+		   <li class="list-group-item">关注医生：{{userinfo.FD|FDfilter}}</li>
+
 		</ul>
     </div>
     <div class="modal-footer">
