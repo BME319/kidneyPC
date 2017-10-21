@@ -13,6 +13,16 @@ angular.module('filters', [])
             }
         };
     })
+        .filter('numberfixed2', function() {
+        return function(type) {
+            var name
+             if (type == null) {
+                name = null
+            } else {
+            name=type.toFixed(2);}
+            return name
+        };
+    })
     .filter('bloodType', [function() {
         return function(type) {
             var name
@@ -163,20 +173,7 @@ angular.module('filters', [])
             return name
         }
     }])
-    .filter('arraytostring', [function() {
-        return function(type) {
-            console.log(type)
-            var name = ""
-            if (type == null) {
-                name = null
-            } else {
-                for (i = 0; i < type.length; i++) {
-                    name = name + type[i].name + ' ';
-                }
-            }
-            return name
-        }
-    }])
+
     .filter('realarraytostring', [function() {
         return function(type) {
             var name = ""
@@ -191,6 +188,21 @@ angular.module('filters', [])
             return name
         }
     }])
+
+    .filter('FDfilter', [function() {
+        return function(type) {
+            var name = ""
+            if (type == null) {
+                name = ''
+            } else {
+                for (i = 0; i < type.length; i++) {
+                    name = name + type[i].doctorId.name + ' ';
+                }
+            }
+            return name
+        }
+    }])
+
     .filter('filterAge', [function() {
         return function(date) {
             if (date == null) {

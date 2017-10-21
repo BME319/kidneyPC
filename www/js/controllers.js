@@ -43,16 +43,7 @@ angular.module('controllers', ['ngResource', 'services'])
                             Storage.set('USERID', data.results.userId)
                             var username = data.results.userName ? data.results.userName : data.results.userId
                             Storage.set('UName', username)
-                            var promise = Alluser.getUserList({ token: Storage.get('TOKEN') })
-                            promise.then(function(data) {
-                                for (var i = 0; i <= data.results.length; i++) {
-                                    if (data.results[i].userId == Storage.get('USERID')) {
-                                        Storage.set('ROLE', data.results[i].role)
-                                        break;
-                                    }
-                                }
-                            })
-
+                            Storage.set('ROLE', data.results.role)
                             // Storage.set('ROLE', userrole)
                             $state.go('homepage')
                             // if (userrole=='管理员'){                           
@@ -2686,7 +2677,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 // 注销用户输入
                 var cancelUserinfo = {
                     'userId': userdetail.userId,
-                    'token': token
+                    'token': Storage.get('TOKEN')
                 }
                 // 注销该用户
                 var promise = Alluser.cancelUser(cancelUserinfo)
@@ -2714,7 +2705,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 var removeInfo = {
                     'userId': userdetail.userId,
                     'roles': userdetail.role,
-                    'token': token
+                    'token': Storage.get('TOKEN')
                 }
                 // 去除该角色
                 var promise = Roles.removeRoles(removeInfo)
@@ -2879,7 +2870,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 // 注销用户输入
                 var cancelUserinfo = {
                     'userId': userdetail.userId,
-                    'token': token
+                    'token': Storage.get('TOKEN')
                 }
                 // 注销该用户
                 var promise = Alluser.cancelUser(cancelUserinfo)
@@ -2907,7 +2898,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 var removeInfo = {
                     'userId': userdetail.userId,
                     'roles': 'nurse',
-                    'token': token
+                    'token': Storage.get('TOKEN')
                 }
                 // 去除该角色
                 var promise = Roles.removeRoles(removeInfo)
@@ -2949,8 +2940,8 @@ angular.module('controllers', ['ngResource', 'services'])
         }
     ])
     // 患者--张桠童
-    .controller('patientsCtrl', ['$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', 'Roles',
-        function($scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, Roles) {
+    .controller('patientsCtrl', ['$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', 'Roles','Paitent',
+        function($scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, Roles,Paitent) {
             var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
 
             // -----------获取列表总条数------------------
@@ -2990,7 +2981,6 @@ angular.module('controllers', ['ngResource', 'services'])
                 console.log(userlist)
                 var promise = Alluser.getPatientList(userlist)
                 promise.then(function(data) {
-                    console.log(data.results)
                     $scope.tableParams = new NgTableParams({
                         count: 10000
                     }, {
@@ -3080,7 +3070,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 // 注销用户输入
                 var cancelUserinfo = {
                     'userId': userdetail.userId,
-                    'token': token
+                    'token': Storage.get('TOKEN')
                 }
                 // 注销该用户
                 var promise = Alluser.cancelUser(cancelUserinfo)
@@ -3108,7 +3098,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 var removeInfo = {
                     'userId': userdetail.userId,
                     'roles': 'patient',
-                    'token': token
+                    'token': Storage.get('TOKEN')
                 }
                 // 去除该角色
                 var promise = Roles.removeRoles(removeInfo)
@@ -3131,10 +3121,20 @@ angular.module('controllers', ['ngResource', 'services'])
         }
     ])
     // 患者--详细信息modal--张桠童
-    .controller('detail_patientCtrl', ['$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', '$uibModalInstance', 'userdetail',
-        function($scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, $uibModalInstance, userdetail) {
+    .controller('detail_patientCtrl', ['Paitent','$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', '$uibModalInstance', 'userdetail',
+        function(Paitent,$scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, $uibModalInstance, userdetail) {
             // console.log(userdetail);
+
             $scope.patientInfo = userdetail
+            var newpromise = Paitent.doctorsById({
+              userId: userdetail.userId,
+              token: Storage.get('TOKEN')
+              })
+
+            newpromise.then(function(data) {
+                $scope.userinfo = data.data
+             }, function(err) {})
+                     
             // 关闭modal
             $scope.close = function() {
                 $uibModalInstance.dismiss()
@@ -6088,6 +6088,9 @@ angular.module('controllers', ['ngResource', 'services'])
         // 获取当前日期
         var myDate = new Date();
         var now = myDate.toLocaleDateString();
+        var tempyesterday = new Date(new Date() - 24 * 60 * 60 * 1000);
+        var yesterday = tempyesterday.toLocaleDateString();
+        console.log(yesterday)
         var isClick = false
         var countInfo = {}
         var Info = {}
@@ -6101,12 +6104,14 @@ angular.module('controllers', ['ngResource', 'services'])
                 Info.skip = (currentPage - 1) * itemsPerPage
             if (isClick == false) {
                 countInfo = {
-                    // province: '浙江省',
-                    // city: '',
-                    startTime: '2017-01-01',
+                    province: '',
+                    city: '',
+                    startTime: yesterday,
                     endTime: now,
                     token: Storage.get('TOKEN')
                 }
+                $scope.starttime = yesterday
+                $scope.endtime = now
                 Info = Object.assign({}, countInfo),
                     Info.limit = itemsPerPage,
                     Info.skip = (currentPage - 1) * itemsPerPage
@@ -6139,7 +6144,7 @@ angular.module('controllers', ['ngResource', 'services'])
         // ---------------------------------------------------------------------
         //初始化列表
         $scope.currentPage = 1
-        $scope.itemsPerPage = 100
+        $scope.itemsPerPage = 10000
         getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         // 页面改变
         $scope.pageChanged = function() {
@@ -6153,28 +6158,52 @@ angular.module('controllers', ['ngResource', 'services'])
             getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         }
 
+        $scope.searchClear = function() {
+            isClick = false
+            countInfo = {}
+            $scope.doctor = ''
+            $scope.hospital = ''
+            getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
+
+        }
+
         $scope.searchList = function() {
             $scope.loadingflag = true
 
-            if (($scope.Province.province == undefined) || ($scope.starttime == undefined) || ($scope.endtime == undefined) || ($scope.starttime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null) || ($scope.endtime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null)) {
-                $('#inputerror').modal('show')
-                $timeout(function() {
-                    $('#inputerror').modal('hide')
-                }, 1000)
+            isClick = true
+
+            if (($scope.Province == undefined) || ($scope.Province == '')) {
+                countInfo.province = ''
             } else {
-                isClick = true
                 countInfo.province = $scope.Province.province.name
-                countInfo.startTime = $scope.starttime
-                countInfo.endTime = $scope.endtime
-                if ($scope.City.city == undefined) {
-                    countInfo.city = ''
-                } else {
-                    countInfo.city = $scope.City.city.name
-                }
             }
+
+            if (($scope.City == undefined) || ($scope.City == '')) {
+                countInfo.city = ''
+            } else {
+                countInfo.city = $scope.City.city.name
+            }
+
+            if ($scope.starttime == undefined) {
+                countInfo.startTime = '2016-01-01'
+            } else {
+                countInfo.startTime = $scope.starttime
+            }
+
+            if ($scope.endtime == undefined) {
+                countInfo.endTime = now
+            } else {
+                countInfo.endTime = $scope.endtime
+            }
+
+            countInfo.hospital = $scope.hospital
+            countInfo.doctor = $scope.doctor
+
             $scope.currentPage = 1
             getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         }
+
+
     }])
 
     // 数据监控——医生评分统计
@@ -6236,9 +6265,16 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.City = ''
         }
 
+        $scope.search_class = [
+            { id: 'all', name: '全部评价' },
+            { id: 'negative', name: '差评' },
+        ]
+
         // 获取当前日期
         var myDate = new Date();
         var now = myDate.toLocaleDateString();
+        var tempyesterday = new Date(new Date() - 24 * 60 * 60 * 1000);
+        var yesterday = tempyesterday.toLocaleDateString();
         var isClick = false
         var countInfo = {}
         var Info = {}
@@ -6253,11 +6289,13 @@ angular.module('controllers', ['ngResource', 'services'])
             if (isClick == false) {
                 countInfo = {
                     province: '浙江省',
-                    city: '',
-                    startTime: '2017-01-01',
+                    city: '杭州市',
+                    startTime: yesterday,
                     endTime: now,
                     token: Storage.get('TOKEN')
                 }
+                $scope.starttime = yesterday
+                $scope.endtime = now
                 Info = Object.assign({}, countInfo),
                     Info.limit = itemsPerPage,
                     Info.skip = (currentPage - 1) * itemsPerPage
@@ -6267,12 +6305,29 @@ angular.module('controllers', ['ngResource', 'services'])
             var promise = Monitor1.GetEvaluation(Info)
             promise.then(function(data) {
                 $scope.loadingflag = false
-                $scope.scoretableParams = new NgTableParams({
-                    count: 20
-                }, {
-                    counts: [],
-                    dataset: data.results
-                })
+                if ($scope.ifnegative == 'all') {
+                    $scope.scoretableParams = new NgTableParams({
+                        count: 20
+                    }, {
+                        counts: [],
+                        dataset: data.results
+                    })
+                } else if ($scope.ifnegative == 'negative') {
+                    var tempdata=new Array
+                    for (i=0;i<data.results.length;i++){
+                        if (data.results[i].score<=5) {
+                            tempdata.push(data.results[i])
+                        }
+                    }
+                    $scope.scoretableParams = new NgTableParams({
+                        count: 20
+                    }, {
+                        counts: [],
+                        dataset: tempdata
+                    })
+
+                }
+
                 if (data.results.length == 0) {
                     $('#nodata').modal('show')
                     $timeout(function() {
@@ -6289,8 +6344,9 @@ angular.module('controllers', ['ngResource', 'services'])
         }
         // ---------------------------------------------------------------------
         //初始化列表
+        $scope.ifnegative='negative'
         $scope.currentPage = 1
-        $scope.itemsPerPage = 100
+        $scope.itemsPerPage = 10000
         getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         // 页面改变
         $scope.pageChanged = function() {
@@ -6305,40 +6361,62 @@ angular.module('controllers', ['ngResource', 'services'])
         }
 
         $scope.searchList = function() {
+
             $scope.loadingflag = true
 
-            if (($scope.Province.province == undefined) || ($scope.starttime == undefined) || ($scope.endtime == undefined) || ($scope.starttime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null) || ($scope.endtime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null)) {
-                $('#inputerror').modal('show')
-                $timeout(function() {
-                    $('#inputerror').modal('hide')
-                }, 1000)
+            isClick = true
+            if (($scope.Province == undefined) || ($scope.Province == '')) {
+                countInfo.province = ''
             } else {
-                isClick = true
                 countInfo.province = $scope.Province.province.name
-                countInfo.startTime = $scope.starttime
-                countInfo.endTime = $scope.endtime
-                if ($scope.City.city == undefined) {
-                    countInfo.city = ''
-                } else {
-                    countInfo.city = $scope.City.city.name
-                }
             }
+
+            if (($scope.City == undefined) || ($scope.City == '')) {
+                countInfo.city = ''
+            } else {
+                countInfo.city = $scope.City.city.name
+            }
+
+            if ($scope.starttime == undefined) {
+                countInfo.startTime = '2016-01-01'
+            } else {
+                countInfo.startTime = $scope.starttime
+            }
+
+            if ($scope.endtime == undefined) {
+                countInfo.endTime = now
+            } else {
+                countInfo.endTime = $scope.endtime
+            }
+
+            countInfo.hospital = $scope.hospital
+            countInfo.doctor = $scope.doctor
+
             $scope.currentPage = 1
             getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         }
+        $scope.searchClear = function() {
+            isClick = false
+            countInfo = {}
+            $scope.doctor = ''
+            $scope.hospital = ''
+            getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
+
+        }
+
         $scope.toscoredetail = function(Id, starttime, endtime) {
             if (isClick == false) {
                 DetailInfo = {
                     doctoruserId: Id,
-                    startTime: '2017-01-01',
+                    startTime: '2016-01-01',
                     endTime: now,
                     token: Storage.get('TOKEN')
                 }
             } else {
                 DetailInfo = {
                     doctoruserId: Id,
-                    startTime: starttime,
-                    endTime: endtime,
+                    startTime: '2016-01-01',
+                    endTime: now,
                     token: Storage.get('TOKEN')
                 }
             }
@@ -6418,6 +6496,8 @@ angular.module('controllers', ['ngResource', 'services'])
         // 获取当前日期
         var myDate = new Date();
         var now = myDate.toLocaleDateString();
+        var tempyesterday = new Date(new Date() - 24 * 60 * 60 * 1000);
+        var yesterday = tempyesterday.toLocaleDateString();
         var isClick = false
         var countInfo = {}
         var Info = {}
@@ -6431,12 +6511,14 @@ angular.module('controllers', ['ngResource', 'services'])
                 Info.skip = (currentPage - 1) * itemsPerPage
             if (isClick == false) {
                 countInfo = {
-                    province: '浙江省',
+                    province: '',
                     city: '',
-                    startTime: '2017-01-01',
+                    startTime: yesterday,
                     endTime: now,
                     token: Storage.get('TOKEN')
                 }
+                $scope.starttime = yesterday
+                $scope.endtime = now
                 Info = Object.assign({}, countInfo),
                     Info.limit = itemsPerPage,
                     Info.skip = (currentPage - 1) * itemsPerPage
@@ -6469,7 +6551,7 @@ angular.module('controllers', ['ngResource', 'services'])
         // ---------------------------------------------------------------------
         //初始化列表
         $scope.currentPage = 1
-        $scope.itemsPerPage = 100
+        $scope.itemsPerPage = 10000
         getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         // 页面改变
         $scope.pageChanged = function() {
@@ -6483,25 +6565,46 @@ angular.module('controllers', ['ngResource', 'services'])
             getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         }
 
+        $scope.searchClear = function() {
+            isClick = false
+            countInfo = {}
+            $scope.doctor = ''
+            $scope.hospital = ''
+            getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
+
+        }
         $scope.searchList = function() {
             $scope.loadingflag = true
 
-            if (($scope.Province.province == undefined) || ($scope.starttime == undefined) || ($scope.endtime == undefined) || ($scope.starttime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null) || ($scope.endtime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null)) {
-                $('#inputerror').modal('show')
-                $timeout(function() {
-                    $('#inputerror').modal('hide')
-                }, 1000)
+            isClick = true
+
+            if (($scope.Province == undefined) || ($scope.Province == '')) {
+                countInfo.province = ''
             } else {
-                isClick = true
                 countInfo.province = $scope.Province.province.name
-                countInfo.startTime = $scope.starttime
-                countInfo.endTime = $scope.endtime
-                if ($scope.City.city == undefined) {
-                    countInfo.city = ''
-                } else {
-                    countInfo.city = $scope.City.city.name
-                }
             }
+
+            if (($scope.City == undefined) || ($scope.City == '')) {
+                countInfo.city = ''
+            } else {
+                countInfo.city = $scope.City.city.name
+            }
+
+            if ($scope.starttime == undefined) {
+                countInfo.startTime = '2016-01-01'
+            } else {
+                countInfo.startTime = $scope.starttime
+            }
+
+            if ($scope.endtime == undefined) {
+                countInfo.endTime = now
+            } else {
+                countInfo.endTime = $scope.endtime
+            }
+
+            countInfo.hospital = $scope.hospital
+            countInfo.doctor = $scope.doctor
+
             $scope.currentPage = 1
             getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         }
@@ -6569,6 +6672,8 @@ angular.module('controllers', ['ngResource', 'services'])
         // 获取当前日期
         var myDate = new Date();
         var now = myDate.toLocaleDateString();
+        var tempyesterday = new Date(new Date() - 24 * 60 * 60 * 1000);
+        var yesterday = tempyesterday.toLocaleDateString();
         var isClick = false
         var countInfo = {}
         var Info = {}
@@ -6576,6 +6681,7 @@ angular.module('controllers', ['ngResource', 'services'])
 
         // ---------------获取搜索(或未搜索)列表及列表数------------------------
         var getLists = function(currentPage, itemsPerPage, countInfo) {
+            console.log(now)
             countInfo.token = Storage.get('TOKEN'),
                 Info = Object.assign({}, countInfo)
             Info.limit = itemsPerPage,
@@ -6583,11 +6689,13 @@ angular.module('controllers', ['ngResource', 'services'])
             if (isClick == false) {
                 countInfo = {
                     province: '浙江省',
-                    city: '',
-                    startTime: now,
+                    city: '杭州市',
+                    startTime: yesterday,
                     endTime: now,
                     token: Storage.get('TOKEN')
                 }
+                $scope.starttime = yesterday
+                $scope.endtime = now
                 Info = Object.assign({}, countInfo),
                     Info.limit = itemsPerPage,
                     Info.skip = (currentPage - 1) * itemsPerPage
@@ -6614,13 +6722,12 @@ angular.module('controllers', ['ngResource', 'services'])
             var promise = Monitor1.GetWorkload(countInfo)
             promise.then(function(data) {
                 $scope.totalItems = data.results.length
-                console.log($scope.totalItems)
             }, function() {})
         }
         // ---------------------------------------------------------------------
         //初始化列表
         $scope.currentPage = 1
-        $scope.itemsPerPage = 100
+        $scope.itemsPerPage = 10000
         getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         // 页面改变
         $scope.pageChanged = function() {
@@ -6634,25 +6741,48 @@ angular.module('controllers', ['ngResource', 'services'])
             getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         }
 
+        $scope.searchClear = function() {
+            isClick = false
+            countInfo = {}
+            $scope.doctor = ''
+            $scope.hospital = ''
+            getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
+
+        }
+
         $scope.searchList = function() {
             $scope.loadingflag = true
 
-            if (($scope.Province.province == undefined) || ($scope.starttime == undefined) || ($scope.endtime == undefined) || ($scope.starttime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null) || ($scope.endtime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null)) {
-                $('#inputerror').modal('show')
-                $timeout(function() {
-                    $('#inputerror').modal('hide')
-                }, 1000)
+            isClick = true
+
+            if (($scope.Province == undefined) || ($scope.Province == '')) {
+                countInfo.province = ''
             } else {
-                isClick = true
                 countInfo.province = $scope.Province.province.name
-                countInfo.startTime = $scope.starttime
-                countInfo.endTime = $scope.endtime
-                if ($scope.City.city == undefined) {
-                    countInfo.city = ''
-                } else {
-                    countInfo.city = $scope.City.city.name
-                }
             }
+
+            if (($scope.City == undefined) || ($scope.City == '')) {
+                countInfo.city = ''
+            } else {
+                countInfo.city = $scope.City.city.name
+            }
+
+            if ($scope.starttime == undefined) {
+                countInfo.startTime = '2016-01-01'
+            } else {
+                countInfo.startTime = $scope.starttime
+            }
+
+            if ($scope.endtime == undefined) {
+                countInfo.endTime = now
+            } else {
+                countInfo.endTime = $scope.endtime
+            }
+
+            countInfo.hospital = $scope.hospital
+            countInfo.doctor = $scope.doctor
+
+            // }
             $scope.currentPage = 1
             getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         }
@@ -7976,6 +8106,26 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.flagadvice = false
 
         }
+        // else if  (tempuserrole.indexOf("Leader") != -1) {
+        //     $scope.flagdoctor = false
+        //     $scope.flaguser = false
+        //     $scope.flagdistrdp = true
+        //     $scope.flaghealth = false
+        //     $scope.flagdata = false
+        //     $scope.flaginsu = false
+        //     $scope.flagpatrefund = false
+        //     $scope.flagadvice = false
+        // } else if  (tempuserrole.indexOf("master") != -1) {
+        //     $scope.flagdoctor = false
+        //     $scope.flaguser = false
+        //     $scope.flagdistrdp = true
+        //     $scope.flaghealth = false
+        //     $scope.flagdata = false
+        //     $scope.flaginsu = false
+        //     $scope.flagpatrefund = false
+        //     $scope.flagadvice = false
+
+        // } 
 
         // $scope.tounchecked = function() {
         //     $state.go('main.checkornot.unchecked')
@@ -8005,6 +8155,7 @@ angular.module('controllers', ['ngResource', 'services'])
         //注销
         $scope.ifOut = function() {
             $state.go('login')
+            Storage.set('TOKEN', '')
         }
     }])
 
