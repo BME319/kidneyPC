@@ -237,6 +237,11 @@ angular.module('Kidney_Web', ['ui.router', 'ui.bootstrap', 'controllers', 'servi
                 templateUrl: 'templates/main/enterornot/unentered.html',
                 controller: 'UnenteredCtrl'
             })
+            .state('main.enterornot.all', {
+                url: '/all',
+                templateUrl: 'templates/main/enterornot/all.html',
+                controller: 'AllCtrl'
+            })
             .state('main.labinfo', {
                 url: '/labinfo',
                 templateUrl: 'templates/main/labinfo.html',
