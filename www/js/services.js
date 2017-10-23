@@ -67,11 +67,12 @@ angular.module('services', ['ngResource'])
         var HealthInfo = function() {
             return $resource(CONFIG.dictbaseUrl + ':path/:route', { path: 'healthInfo' }, {
                 allHealthInfos: { method: 'GET', params: { route: 'allHealthInfos' ,token:'@token',limit: '@limit',skip: '@skip',}, timeout: 100000 },
+                healthDetail: { method: 'GET', params: { route: 'healthDetail' ,token:'@token',insertTime: '@insertTime',patientId:'@patientId'}, timeout: 100000 },
                             })
         }
 
-        var Paitent = function() {
-            return $resource(CONFIG.dictbaseUrl + ':path/:route', { path: 'paitent' }, {
+        var Patient = function() {
+            return $resource(CONFIG.dictbaseUrl + ':path/:route', { path: 'patient' }, {
                 doctorsById: { method: 'GET', params: { route: 'doctorsById',userId:'@userId',token:'@token'}, timeout: 100000 },
             })
         }
@@ -575,7 +576,7 @@ angular.module('services', ['ngResource'])
                 serve.Upload = Upload()
                 serve.Advice = Advice()
                 serve.Services = Services()
-                serve.Paitent = Paitent()
+                serve.Patient = Patient()
                 serve.HealthInfo = HealthInfo()
 
 
@@ -596,7 +597,7 @@ angular.module('services', ['ngResource'])
         serve.Upload = Upload()
         serve.Advice = Advice()
         serve.Services = Services()
-        serve.Paitent = Paitent()
+        serve.Patient = Patient()
         serve.HealthInfo = HealthInfo()
 
 
@@ -626,11 +627,11 @@ angular.module('services', ['ngResource'])
         return self
     }])
 
-    .factory('Paitent', ['$q', 'Data', function($q, Data) {
+    .factory('Patient', ['$q', 'Data', function($q, Data) {
         var self = this
         self.doctorsById = function(params) {
             var deferred = $q.defer()
-            Data.Paitent.doctorsById(
+            Data.Patient.doctorsById(
                 params,
                 function(data, headers) {
                     deferred.resolve(data)
@@ -657,6 +658,22 @@ angular.module('services', ['ngResource'])
                 })
             return deferred.promise
         }
+
+        self.healthDetail = function(params) {
+            var deferred = $q.defer()
+            Data.HealthInfo.healthDetail(
+                params,
+                function(data, headers) {
+                    deferred.resolve(data)
+                },
+                function(err) {
+                    deferred.reject(err)
+                })
+            return deferred.promise
+        }
+        
+
+
         return self
     }])
 

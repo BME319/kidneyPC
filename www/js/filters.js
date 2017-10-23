@@ -13,6 +13,20 @@ angular.module('filters', [])
             }
         };
     })
+    .filter('healthinfoimport', function() {
+        return function(input) {
+            switch (input) {
+                case 1:
+                    return '已录入';
+                    break;
+                case 0:
+                    return '未录入';
+                    break;
+                default:
+                    return '未知';
+            }
+        };
+    })
         .filter('numberfixed2', function() {
         return function(type) {
             var name
