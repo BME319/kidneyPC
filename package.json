@@ -3,7 +3,10 @@
   "private": true,
   "version": "0.0.0",
   "description": "",
-  "repository": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Joooooooye/kidneyPC.git"
+  },
   "license": "MIT",
   "scripts": {
     "postinstall": "bower install",
@@ -17,5 +20,12 @@
   "dependencies": {
     "express": "^4.15.4",
     "multer": "^1.3.0"
-  }
+  },
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "bugs": {
+    "url": "https://github.com/Joooooooye/kidneyPC/issues"
+  },
+  "homepage": "https://github.com/Joooooooye/kidneyPC#readme"
 }

@@ -1,6 +1,6 @@
 <h4 style="font-size: 15px;margin-top: -10px;font-weight: bold;">当前健康信息共{{totalNums}}条</h4>
 <form class="form-inline">
-<!--   <div class="form-group">
+    <!--   <div class="form-group">
 <div class="dropdown">
 	<button type="button" class="btn btn-default dropdown-toggle" id="dropdownMenu1" 
 			data-toggle="dropdown" style="background:#347ab6;color:white">新建<span class="caret"></span>
@@ -15,8 +15,8 @@
 	</ul>
 </div>
 </div> -->
-<!-- 搜索 -->
-<!--   <div class="form-group">
+    <!-- 搜索 -->
+    <!--   <div class="form-group">
     <label class="sr-only">用户ID</label>
     <input type="text" class="form-control" ng-model="userlist.userId" placeholder="请输入用户ID">
   </div>
@@ -43,26 +43,30 @@
   <button type="submit" class="btn btn-default" ng-click="searchList()">搜索</button>
   <button type="button" class="btn btn-default" ng-click="searchClear()">清空搜索</button> -->
 </form>
-
 <!-- 保险人员列表 -->
 <table ng-table="tableParams" class="table table-condensed table-bordered table-striped" style="margin-top: 10px">
-	<tr ng-repeat="user in $data" style="text-align: center;">
-		<td title="'用户ID'" sortable="'userId'">{{user.userId}}
-		</td>
-		<td title="'检查类型'" sortable="'type'">{{user.type}}
-		</td>
-		<td title="'检查时间'" sortable="'time'">{{user.time|timeFormat:'YYYY-MM-DD'}}
-		</td>
-		<td title="'录入时间'" sortable="'insertTime'">{{user.insertTime|timeFormat:'YYYY-MM-DD'}}
-		</td>
-		<td title="'检查标签'" sortable="'label'">{{user.label}}
-		</td>
-		<td title="'检查描述'" sortable="'description'">{{user.description}}
-		</td>
-		<td title="'检查图片'">
-		  <button class="btn btn-link" style="text-decoration:none; outline:none; padding:0px; border:0px; font-size:10px;" ng-click="openDetail(user)">查看图片</button>
-		</td>
-	</tr>
+    <tr ng-repeat="user in $data" style="text-align: center;">
+        <td title="'用户ID'" sortable="'userId'" style="width: 110px">{{user.userId}}
+        </td>
+        <td title="'检查时间'" sortable="'time'"  style="width: 110px">{{user.time|timeFormat:'YYYY-MM-DD'}}
+        </td>
+        <td title="'上传时间'" sortable="'insertTime'"  style="width: 110px">{{user.insertTime|timeFormat:'YYYY-MM-DD'}}
+        </td>
+        <td title="'类型'" sortable="'label'"  style="width: 60px">{{user.label}}
+        </td>
+        <td title="'检查描述'" sortable="'description'" style="width: 30%">{{user.description}}
+        </td>
+        <td title="'录入状态'" sortable="'description'" style="width: 90px">{{user.importStatus|healthinfoimport}}
+        </td>
+        <td title="'检查图片'">
+                <div id="photo"  class="col col-33" ng-repeat="img in user.url">
+            <img ng-src="{{img.photo}}" style="height:33%; width:33%;" ng-click="showbigger(img.photo)" >
+          </div>
+
+         
+            <!-- <button class="btn btn-link" style="text-decoration:none; outline:none; padding:0px; border:0px; font-size:10px;" ng-click="openDetail(user)">查看图片</button> -->
+        </td>
+    </tr>
 </table>
 <!-- 每页数量 -->
 <div class="btn-group  btn-group-sm pull-right" style="margin-top: 18px">
@@ -72,23 +76,23 @@
     <button type="button" class="btn btn-default" ng-click="changeLimit(100)">100</button>
 </div>
 <!-- 分页条 -->
-<ul uib-pagination  
-	max-size="10" 
-	class="pagination" 
-	boundary-links="true" 
-	boundary-link-numbers="true"
-	direction-links="true"
-	first-text="首页"
-	last-text="末页"
-	previous-text="上一页"
-	next-text="下一页"
-	force-ellipses="true"
-	rotate="true" 
-	total-items="totalNums"
-	items-per-page="itemsPerPage"
-	ng-change="pageChanged()"
-	ng-model="currentPage"
-	>
+<ul uib-pagination max-size="10" class="pagination" boundary-links="true" boundary-link-numbers="true" direction-links="true" first-text="首页" last-text="末页" previous-text="上一页" next-text="下一页" force-ellipses="true" rotate="true" total-items="totalNums" items-per-page="itemsPerPage" ng-change="pageChanged()" ng-model="currentPage">
 </ul>
-
-
+<!--  -->
+<div class="modal fade" id="HealthInfoPhoto" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" ng-click="modal_close('#HealthInfoPhoto')">&times;</button>
+                <h3 class="modal-title" id="modal-title">健康信息图</h3>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <img style="width:350px;margin-left: 20%;margin-right: 20%;" ng-src="{{photourl}}">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" type="button" ng-click="modal_close('#HealthInfoPhoto')">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+</div>

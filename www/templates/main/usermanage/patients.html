@@ -53,6 +53,10 @@
 		</td>
 		<td title="'体重'" sortable="'weight'">{{user.weight}}
 		</td>
+		<td title="'关注医生'" >{{user.doctorInCharge.name}}
+		</td>
+		<td title="'医生联系方式'" >{{user.doctorInCharge.phoneNo}}
+		</td>
 		<td title="'操作'">
 		  <button class="btn btn-link" style="text-decoration:none; outline:none; padding:0px; border:0px; font-size:10px;" ng-click="openDetail(user)">查看详细信息</button>
 		</td>

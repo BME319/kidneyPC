@@ -1173,7 +1173,6 @@ angular.module('controllers', ['ngResource', 'services'])
                 console.log(countInfo)
                 var promise = HealthInfo.allHealthInfos(countInfo)
                 promise.then(function(data) {
-                    console.log(data.data.count)
                     $scope.totalNums = data.data.count
                     $scope.tableParams = new NgTableParams({
                         count: 10000
@@ -1186,7 +1185,7 @@ angular.module('controllers', ['ngResource', 'services'])
             // ---------------------------------------------------------------------
 
             $scope.currentPage = 1
-            $scope.itemsPerPage = 50
+            $scope.itemsPerPage = 10
             $scope.userlist = {}
             getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 5)
 
@@ -1217,7 +1216,34 @@ angular.module('controllers', ['ngResource', 'services'])
                 $(target).modal('hide')
             
             }
-    }])
+
+            $scope.openDetail = function(userdetail) {
+                var promise = HealthInfo.healthDetail({
+                    'patientId': userdetail.userId,
+                    'insertTime':userdetail.insertTime,
+                    'token': Storage.get('TOKEN')
+                })
+                promise.then(function(data) {
+                    console.log(data.results.url)
+                    var eachtempslides={}
+                    var tempslides=[]
+                    for (i=0;i<data.results.url.length;i++){
+                        eachtempslides.photo=data.results.url[i]
+                        eachtempslides.resizedphoto=data.results.url[i].replace("resized", "");
+                        tempslides.push(eachtempslides)
+                    }
+                    console.log(tempslides)
+                    $scope.slides=tempslides
+                    $('#HealthInfoPhoto').modal('show')
+                }, function(err) {})
+        }
+
+            $scope.showbigger=function(url){
+                $scope.photourl=url.replace("resized", "")
+                $('#HealthInfoPhoto').modal('show')
+            }
+        }])
+
 
     .controller('LabInfoCtrl', ['$scope', '$state', 'Storage', 'LabtestImport', 'NgTableParams', '$uibModal', '$timeout', function($scope, $state, Storage, LabtestImport, NgTableParams, $uibModal, $timeout) {
         var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
@@ -3010,8 +3036,8 @@ angular.module('controllers', ['ngResource', 'services'])
         }
     ])
     // 患者--张桠童
-    .controller('patientsCtrl', ['$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', 'Roles','Paitent',
-        function($scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, Roles,Paitent) {
+    .controller('patientsCtrl', ['$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', 'Roles','Patient',
+        function($scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, Roles,Patient) {
             var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
 
             // -----------获取列表总条数------------------
@@ -3191,12 +3217,12 @@ angular.module('controllers', ['ngResource', 'services'])
         }
     ])
     // 患者--详细信息modal--张桠童
-    .controller('detail_patientCtrl', ['Paitent','$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', '$uibModalInstance', 'userdetail',
-        function(Paitent,$scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, $uibModalInstance, userdetail) {
+    .controller('detail_patientCtrl', ['Patient','$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', '$uibModalInstance', 'userdetail',
+        function(Patient,$scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, $uibModalInstance, userdetail) {
             // console.log(userdetail);
 
             $scope.patientInfo = userdetail
-            var newpromise = Paitent.doctorsById({
+            var newpromise = Patient.doctorsById({
               userId: userdetail.userId,
               token: Storage.get('TOKEN')
               })
