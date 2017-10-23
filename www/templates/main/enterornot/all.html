@@ -59,8 +59,8 @@
         <td title="'录入状态'" sortable="'description'" style="width: 90px">{{user.importStatus|healthinfoimport}}
         </td>
         <td title="'检查图片'">
-                <div id="photo"  class="col col-33" ng-repeat="img in user.url">
-            <img ng-src="{{img.photo}}" style="height:33%; width:33%;" ng-click="showbigger(img.photo)" >
+                <div id="photo"  class="col-lg-4" ng-repeat="img in user.url">
+            <img ng-src="{{img.photo}}" style="height:95%; width:95%;" ng-click="showbigger(img.photo)" >
           </div>
 
          

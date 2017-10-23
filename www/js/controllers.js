@@ -206,8 +206,7 @@ angular.module('controllers', ['ngResource', 'services'])
     }])
 
     // 未审核-LZN
-    .controller('UncheckedCtrl', ['$scope', '$state', 'Review', 'Alluser', 'Storage', '$timeout', 'NgTableParams', '$uibModal', function($scope, $state, Review, Alluser, Storage, $timeout, NgTableParams, $uibModal) {
-        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
+    .controller('UncheckedCtrl', ['$scope', '$state', 'Review', 'Alluser', 'Storage', '$timeout', 'NgTableParams', '$uibModal','Patient','Department', function($scope, $state, Review, Alluser, Storage, $timeout, NgTableParams, $uibModal,Patient,Department) {
 
         // 获取列表
         var getLists = function(currentPage, itemsPerPage) {
@@ -292,6 +291,7 @@ angular.module('controllers', ['ngResource', 'services'])
                                 "smsType": 3,
                                 "token": Storage.get('TOKEN')
                             }
+                            //给通过的医生发短信
                             Alluser.sms(sms).then(
                                 function(data) {
                                     Review.GetReviewInfo($scope.review).then(
@@ -305,19 +305,80 @@ angular.module('controllers', ['ngResource', 'services'])
                                                 dataset: $scope.doctorinfos
                                             });
                                         },
-                                        function(e) {
-
-                                        });
+                                        function(e) {});
                                 },
-                                function(e) {
+                                function(e) {})
 
+                            //获得该医生地域、科室信息
+                            Patient.doctors({
+                                'userId':Storage.get('docId'),
+                                "token": Storage.get('TOKEN')
+                            }).then(
+                            function(data){
+                                // 预备材料
+                                var tempworkunit=data.results.workUnit;
+                                var tempdistrict=data.results.city;
+                                var _changeInfo={}
+                                var _newInfo={}
+                                _changeInfo.department=data.results.workUnit;
+                                _changeInfo.hospital=data.results.workUnit;
+                                _changeInfo.district=data.results.city.replace("市", "");
+                                _changeInfo.token=Storage.get('TOKEN')
+                                _newInfo.newdepartment=_oldInfo.department;
+                                _newInfo.newdepartLeader=_oldInfo.departLeader;
+                                _newInfo.newdoctors=_oldInfo.doctor.push(data.results.userId)
+                                _changeInfo.new=_newInfo
+
+
+                                // 获得已有科室信息
+                                var promise1 = Department.GetDepartmentInfo({
+                                    'department':data.results.workUnit,
+                                    "token": Storage.get('TOKEN')
                                 })
-                        })
-                    }
-                },
-                function(e) {
+                                promise1.then(function(data1) {
+                                    var _oldInfo={}
+                                    _oldInfo.department=data1.results.department;
+                                    _oldInfo.departLeader=data1.results.departLeader;
+                                }, function(err) {})
 
-                })
+
+                                // 获得已有科室医生信息
+                                var promise2 = Department.GetDoctorList({
+                                    'department':data.results.workUnit,
+                                    'hospital':data.results.workUnit,
+                                    'district':_changeInfo.district,
+                                    "token": Storage.get('TOKEN')
+                                })
+                                promise2.then(function(data2) {
+                                    _oldInfo.doctor=data2.results;
+                                }, function(err) {})
+
+
+                                // 更新
+                                console.log(_changeInfo)
+                                var promise3 = Department.UpdateDepartment(_changeInfo)
+                                promise3.then(function(data3) {
+                                    // console.log(data.msg);
+                                    if (data[0] == "更") {
+                                        // 显示成功提示
+                                        $('#changeSuccess').modal('show')
+                                        $timeout(function() {
+                                            $('#changeSuccess').modal('hide')
+                                            $('#changeInfo').modal('hide')
+                                            // 提示完毕，刷新列表
+                                            var newlist = {}
+                                            getLists(newlist)
+                                        }, 1000)
+                                    }
+                                }, function(err) {})
+                            },
+                                function(e) {});
+
+                            })
+                        }
+                },
+                function(e) {})
+
         }
         $scope.docId = '';
         // 获取拒绝原因
@@ -417,8 +478,7 @@ angular.module('controllers', ['ngResource', 'services'])
         }
     }])
     // 查看医生资质证书-LZN
-    .controller('DoctorLicenseCtrl', ['$scope', '$state', 'Review', 'Alluser', 'Storage', '$timeout', function($scope, $state, Review, Alluser, Storage, $timeout) {
-        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
+    .controller('DoctorLicenseCtrl', ['$scope', '$state', 'Review', 'Alluser', 'Storage', '$timeout','Department','Patient', function($scope, $state, Review, Alluser, Storage, $timeout,Department,Patient) {
         var id = Storage.get('docId');
 
         // 循环轮播到某个特定的帧 
@@ -502,7 +562,6 @@ angular.module('controllers', ['ngResource', 'services'])
             }
             Review.PostReviewInfo(postreview).then(
                 function(data) {
-                    console.log(data.results);
                     if (data.results == "审核信息保存成功") {
                         $('#accepted').modal('show');
                         $timeout(function() {
@@ -514,14 +573,79 @@ angular.module('controllers', ['ngResource', 'services'])
                                 "smsType": 3,
                                 "token": Storage.get('TOKEN')
                             }
+
+                            // 给通过的医生发短信
                             Alluser.sms(sms).then(
                                 function(data) {
                                     $state.go('main.checkornot.unchecked');
                                 },
-                                function(e) {
+                                 function(e) {})
 
+
+                           //获得该医生地域、科室信息
+                            Patient.doctors({
+                                'userId':Storage.get('docId'),
+                                "token": Storage.get('TOKEN')
+                            }).then(
+                            function(data){
+                                // 预备材料
+                                var tempworkunit=data.results.workUnit;
+                                var tempdistrict=data.results.city;
+                                var _changeInfo={}
+                                var _newInfo={}
+                                _changeInfo.department=data.results.workUnit;
+                                _changeInfo.hospital=data.results.workUnit;
+                                _changeInfo.district=data.results.city.replace("市", "");
+                                _changeInfo.token=Storage.get('TOKEN')
+                                _newInfo.newdepartment=_oldInfo.department;
+                                _newInfo.newdepartLeader=_oldInfo.departLeader;
+                                _newInfo.newdoctors=_oldInfo.doctor.push(data.results.userId)
+                                _changeInfo.new=_newInfo
+
+
+                                // 获得已有科室信息
+                                var promise1 = Department.GetDepartmentInfo({
+                                    'department':data.results.workUnit,
+                                    "token": Storage.get('TOKEN')
                                 })
+                                promise1.then(function(data1) {
+                                    var _oldInfo={}
+                                    _oldInfo.department=data1.results.department;
+                                    _oldInfo.departLeader=data1.results.departLeader;
+                                }, function(err) {})
 
+
+                                // 获得已有科室医生信息
+                                var promise2 = Department.GetDoctorList({
+                                    'department':data.results.workUnit,
+                                    'hospital':data.results.workUnit,
+                                    'district':_changeInfo.district,
+                                    "token": Storage.get('TOKEN')
+                                })
+                                promise2.then(function(data2) {
+                                    _oldInfo.doctor=data2.results;
+                                }, function(err) {})
+
+
+                                // 更新
+                                console.log(_changeInfo)
+                                var promise3 = Department.UpdateDepartment(_changeInfo)
+                                promise3.then(function(data3) {
+                                    // console.log(data.msg);
+                                    if (data[0] == "更") {
+                                        // 显示成功提示
+                                        $('#changeSuccess').modal('show')
+                                        $timeout(function() {
+                                            $('#changeSuccess').modal('hide')
+                                            $('#changeInfo').modal('hide')
+                                            // 提示完毕，刷新列表
+                                            var newlist = {}
+                                            getLists(newlist)
+                                        }, 1000)
+                                    }
+                                }, function(err) {})
+                            },
+                                function(e) {});
                         })
                     }
                 },
@@ -1242,6 +1366,11 @@ angular.module('controllers', ['ngResource', 'services'])
                 $scope.photourl=url.replace("resized", "")
                 $('#HealthInfoPhoto').modal('show')
             }
+
+            // 监听事件(表单清空)
+            $('#HealthInfoPhoto').on('hidden.bs.modal', function() {
+                $scope.photourl=''
+                          })
         }])
 
 
@@ -8175,6 +8304,9 @@ angular.module('controllers', ['ngResource', 'services'])
                     break
                 case 'admin':
                     roles[i] = '管理员'
+                    break
+                case 'guest':
+                    roles[i] = '游客'
                     break
             }
         }
