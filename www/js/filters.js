@@ -367,6 +367,9 @@ angular.module('filters', [])
                 case 'admin':
                     name = '管理员'
                     break
+                case 'guest':
+                    name = '游客'
+                    break
             }
             return name
         }
