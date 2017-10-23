@@ -814,6 +814,9 @@ angular.module('controllers', ['ngResource', 'services'])
         $scope.tounentered = function() {
             $state.go('main.enterornot.unentered');
         }
+        $scope.toall = function() {
+            $state.go('main.enterornot.all');
+        }
     }])
     // 未录入-LZN
     .controller('UnenteredCtrl', ['$scope', '$state', 'Storage', 'LabtestImport', 'NgTableParams', '$timeout', function($scope, $state, Storage, LabtestImport, NgTableParams, $timeout) {
@@ -976,6 +979,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 })
         }
     }])
+
     // 已录入-LZN
     .controller('EnteredCtrl', ['$scope', '$state', 'Storage', 'LabtestImport', 'NgTableParams', '$timeout', function($scope, $state, Storage, LabtestImport, NgTableParams, $timeout) {
         var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
@@ -1149,6 +1153,72 @@ angular.module('controllers', ['ngResource', 'services'])
                 })
         }
     }])
+
+// 全部健康信息--RH
+    .controller('AllCtrl', ['$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', 'HealthInfo',
+        function($scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, HealthInfo) {
+
+            // ---------------获取搜索(或未搜索)列表及列表数------------------------
+            var getLists = function(currentPage, itemsPerPage, _userlist, role_count) {
+                // 完善userlist
+                var userlist = _userlist
+                userlist.token = Storage.get('TOKEN')
+                userlist.limit = itemsPerPage
+                userlist.skip = (currentPage - 1) * itemsPerPage
+                // 完善countInfo
+                var countInfo = userlist
+                countInfo.role1 = role_count
+                if (userlist.role != undefined) countInfo.role2 = userlist.role
+                // 获取总条目数
+                console.log(countInfo)
+                var promise = HealthInfo.allHealthInfos(countInfo)
+                promise.then(function(data) {
+                    console.log(data.data.count)
+                    $scope.totalNums = data.data.count
+                    $scope.tableParams = new NgTableParams({
+                        count: 10000
+                    }, {
+                        counts: [],
+                        dataset: data.data.healthInfoList
+                    })
+                }, function(err) {})
+            }
+            // ---------------------------------------------------------------------
+
+            $scope.currentPage = 1
+            $scope.itemsPerPage = 50
+            $scope.userlist = {}
+            getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 5)
+
+            // 页面改变
+            $scope.pageChanged = function() {
+                console.log($scope.currentPage)
+                getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 5)
+            }
+            // 当前页面的总条目数改变
+            $scope.changeLimit = function(num) {
+                $scope.itemsPerPage = num
+                $scope.currentPage = 1
+                getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 5)
+            }
+            
+            $scope.searchList = function() {
+                console.log($scope.userlist)
+                getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 5)
+            }
+            // 清空搜索
+            $scope.searchClear = function() {
+                $scope.userlist = {}
+                getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 5)
+            }
+            
+            // 关闭modal控制
+            $scope.modal_close = function(target) {
+                $(target).modal('hide')
+            
+            }
+    }])
+
     .controller('LabInfoCtrl', ['$scope', '$state', 'Storage', 'LabtestImport', 'NgTableParams', '$uibModal', '$timeout', function($scope, $state, Storage, LabtestImport, NgTableParams, $uibModal, $timeout) {
         var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
 
