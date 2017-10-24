@@ -6071,21 +6071,10 @@ angular.module('controllers', ['ngResource', 'services'])
         // 获取当前日期
         var myDate = new Date();
         var now = myDate.toLocaleDateString();
-        var formatDateTime = function(date) {
-            var y = date.getFullYear();
-            var m = date.getMonth() + 1;
-            m = m < 10 ? ('0' + m) : m;
-            var d = date.getDate();
-            d = d < 10 ? ('0' + d) : d;
-            var h = date.getHours();
-            h = h < 10 ? ('0' + h) : h;
-            var minute = date.getMinutes();
-            minute = minute < 10 ? ('0' + minute) : minute;
-            var second = date.getSeconds();
-            second = second < 10 ? ('0' + second) : second;
-            return y + '-' + m + '-' + d + ' ' + h + ':' + minute + ':' + second;
-        };
-        var nowtime = formatDateTime(myDate)
+        var tempyesterday = new Date(new Date() - 24 * 60 * 60 * 1000);
+        var yesterday = tempyesterday.toLocaleDateString();
+        var nowtime=now+' 00:00:00'
+        var yesterdaytime=yesterday+' 00:00:00'
 
         var isClick = false
         var TrendInfo = {}
@@ -6164,7 +6153,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     province: '浙江省',
                     city: '',
                     startTime: '2016-01-01 00:00:00',
-                    endTime: now,
+                    endTime: nowtime,
                     token: Storage.get('TOKEN')
                 }
                 textInfo = '浙江省医生注册变化趋势折线图'
@@ -6181,6 +6170,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     var time = new Array()
                     var sum = 0
                     var array = data.results
+                    var sumtoday=0
                     var timecount = new Array()
                     for (var i = 0; i < array.length; i++) {
                         count[i] = array[i].count
@@ -6200,11 +6190,22 @@ angular.module('controllers', ['ngResource', 'services'])
                         _count[i] = timecount[i].c
                         _time[i] = timecount[i].t
                     }
+
+                    Monitor1.GetTrend({
+                    province: '浙江省',
+                    city: '',
+                    startTime:yesterdaytime,
+                    endTime: nowtime,
+                    token: Storage.get('TOKEN')
+                    }).then(function(data1) {
+                        sumtoday=data1.results.length
+                    })
+
                     var myTrend = echarts.init(document.getElementById('trend'))
                     var option = {
                         title: {
                             text: textInfo,
-                            subtext: '新增注册医生' + sum + '人',
+                            subtext: '今日新增注册医生' + sumtoday + '人',
                             x: 'center'
                         },
                         tooltip: {
@@ -7295,21 +7296,10 @@ angular.module('controllers', ['ngResource', 'services'])
         // 获取当前日期
         var myDate = new Date();
         var now = myDate.toLocaleDateString();
-        var formatDateTime = function(date) {
-            var y = date.getFullYear();
-            var m = date.getMonth() + 1;
-            m = m < 10 ? ('0' + m) : m;
-            var d = date.getDate();
-            d = d < 10 ? ('0' + d) : d;
-            var h = date.getHours();
-            h = h < 10 ? ('0' + h) : h;
-            var minute = date.getMinutes();
-            minute = minute < 10 ? ('0' + minute) : minute;
-            var second = date.getSeconds();
-            second = second < 10 ? ('0' + second) : second;
-            return y + '-' + m + '-' + d + ' ' + h + ':' + minute + ':' + second;
-        };
-        var nowtime = formatDateTime(myDate)
+        var tempyesterday = new Date(new Date() - 24 * 60 * 60 * 1000);
+        var yesterday = tempyesterday.toLocaleDateString();
+        var nowtime=now+' 00:00:00'
+        var yesterdaytime=yesterday+' 00:00:00'
 
         var isClick = false
         var Info = {}
@@ -7386,7 +7376,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     province: '浙江省',
                     city: '',
                     startTime: '2016-01-01 00:00:00',
-                    endTime: now,
+                    endTime: nowtime,
                     token: Storage.get('TOKEN')
                 }
                 textInfo = '浙江省患者注册变化趋势折线图'
@@ -7403,6 +7393,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     var count = new Array()
                     var time = new Array()
                     var sum = 0
+                    var sumtoday = 0
                     var array = data.results
                     var timecount = new Array()
                     for (var i = 0; i < array.length; i++) {
@@ -7423,11 +7414,23 @@ angular.module('controllers', ['ngResource', 'services'])
                         _count[i] = timecount[i].c
                         _time[i] = timecount[i].t
                     }
+
+                    Monitor2.GetPatTrend({
+                    province: '浙江省',
+                    city: '',
+                    startTime:yesterdaytime,
+                    endTime: nowtime,
+                    token: Storage.get('TOKEN')
+                    }).then(function(data1) {
+                        sumtoday=data1.results.length
+                    })
+
+
                     var PatTrend = echarts.init(document.getElementById('Pattrend'))
                     var option = {
                         title: {
                             text: textInfo,
-                            subtext: '新增注册患者' + sum + '人',
+                            subtext: '今日新增注册患者' + sumtoday + '人',
                             x: 'center'
                         },
                         tooltip: {

@@ -16,10 +16,8 @@ angular.module('services', ['ngResource'])
         }
     }])
     .constant('CONFIG', {
-        baseUrl: 'http://docker2.haihonghospitalmanagement.com/api/v2/',
-        dictbaseUrl: 'http://docker2.haihonghospitalmanagement.com/api/v2/',
-        imgThumbUrl: 'http://df2.haihonghospitalmanagement.com/api/v2/uploads/photos/resize',
-        imgLargeUrl: 'http://df2.haihonghospitalmanagement.com/api/v2/uploads/photos/',
+        baseUrl: 'http://application.haihonghospitalmanagement.com/api/v2/',
+        dictbaseUrl: 'http://application.haihonghospitalmanagement.com/api/v2/',
     })
 
     .factory('Data', ['$resource', '$q', '$interval', 'CONFIG', 'Storage', function($resource, $q, $interval, CONFIG, Storage) {
