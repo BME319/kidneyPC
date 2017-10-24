@@ -74,7 +74,7 @@ angular.module('services', ['ngResource'])
         var Patient = function() {
             return $resource(CONFIG.dictbaseUrl + ':path/:route', { path: 'patient' }, {
                 doctorsById: { method: 'GET', params: { route: 'doctorsById', userId: '@userId', token: '@token' }, timeout: 100000 },
-                doctors: { method: 'GET', params: { route: 'doctors', userId: '@userId', token: '@token' }, timeout: 100000 },
+                doctors: { method: 'GET', params: { route: 'doctors', doctorId: '@doctorId', token: '@token' }, timeout: 100000 },
             })
         }
 
