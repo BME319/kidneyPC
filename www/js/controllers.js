@@ -206,7 +206,7 @@ angular.module('controllers', ['ngResource', 'services'])
     }])
 
     // 未审核-LZN
-    .controller('UncheckedCtrl', ['$scope', '$state', 'Review', 'Alluser', 'Storage', '$timeout', 'NgTableParams', '$uibModal','Patient','Department', function($scope, $state, Review, Alluser, Storage, $timeout, NgTableParams, $uibModal,Patient,Department) {
+    .controller('UncheckedCtrl', ['$scope', '$state', 'Review', 'Alluser', 'Storage', '$timeout', 'NgTableParams', '$uibModal', 'Patient', 'Department', function($scope, $state, Review, Alluser, Storage, $timeout, NgTableParams, $uibModal, Patient, Department) {
 
         // 获取列表
         var getLists = function(currentPage, itemsPerPage) {
@@ -291,91 +291,82 @@ angular.module('controllers', ['ngResource', 'services'])
                                 "smsType": 3,
                                 "token": Storage.get('TOKEN')
                             }
-                            //给通过的医生发短信
-                            Alluser.sms(sms).then(
-                                function(data) {
-                                    Review.GetReviewInfo($scope.review).then(
-                                        function(data) {
-                                            $scope.doctorinfos = data.results;
-                                            console.log($scope.doctorinfos);
-                                            $scope.tableParams = new NgTableParams({
-                                                count: 15
-                                            }, {
-                                                counts: [],
-                                                dataset: $scope.doctorinfos
-                                            });
-                                        },
-                                        function(e) {});
-                                },
-                                function(e) {})
+                            // //给通过的医生发短信
+                            // Alluser.sms(sms).then(
+                            //     function(data) {
+                            //         Review.GetReviewInfo($scope.review).then(
+                            //             function(data) {
+                            //                 $scope.doctorinfos = data.results;
+                            //                 console.log($scope.doctorinfos);
+                            //                 $scope.tableParams = new NgTableParams({
+                            //                     count: 15
+                            //                 }, {
+                            //                     counts: [],
+                            //                     dataset: $scope.doctorinfos
+                            //                 });
+                            //             },
+                            //             function(e) {});
+                            //     },
+                            //     function(e) {})
 
                             //获得该医生地域、科室信息
                             Patient.doctors({
-                                'userId':Storage.get('docId'),
+                                'doctorId': Storage.get('docId'),
                                 "token": Storage.get('TOKEN')
                             }).then(
-                            function(data){
-                                // 预备材料
-                                var tempworkunit=data.results.workUnit;
-                                var tempdistrict=data.results.city;
-                                var _changeInfo={}
-                                var _newInfo={}
-                                _changeInfo.department=data.results.workUnit;
-                                _changeInfo.hospital=data.results.workUnit;
-                                _changeInfo.district=data.results.city.replace("市", "");
-                                _changeInfo.token=Storage.get('TOKEN')
-                                _newInfo.newdepartment=_oldInfo.department;
-                                _newInfo.newdepartLeader=_oldInfo.departLeader;
-                                _newInfo.newdoctors=_oldInfo.doctor.push(data.results.userId)
-                                _changeInfo.new=_newInfo
+                                function(data) {
+                                    // 预备材料
+                                    var tempworkunit = data.results[0].workUnit;
+                                    var tempdistrict = data.results[0].city;
+                                    var _changeInfo = {}
+                                    var _newInfo = {}
+                                    var _oldInfo = {}
+                                    _oldInfo.doctor = []
+                                    _changeInfo.department = data.results[0].workUnit;
+                                    _changeInfo.hospital = data.results[0].workUnit;
+                                    _changeInfo.district = data.results[0].city.replace("市", "");
+                                    _changeInfo.token = Storage.get('TOKEN')
+                                    _newInfo.newdepartment = _oldInfo.department;
+                                    _newInfo.newdepartLeader = _oldInfo.departLeader;
+                                    _oldInfo.doctor.push(data.results[0]._id)
+                                    _newInfo.newdoctors = _oldInfo.doctor
+                                    _changeInfo.new = _newInfo
 
 
-                                // 获得已有科室信息
-                                var promise1 = Department.GetDepartmentInfo({
-                                    'department':data.results.workUnit,
-                                    "token": Storage.get('TOKEN')
-                                })
-                                promise1.then(function(data1) {
-                                    var _oldInfo={}
-                                    _oldInfo.department=data1.results.department;
-                                    _oldInfo.departLeader=data1.results.departLeader;
-                                }, function(err) {})
+                                    // 获得已有科室信息
+                                    var promise1 = Department.GetDepartmentInfo({
+                                        'department': data.results[0].workUnit,
+                                        "token": Storage.get('TOKEN')
+                                    })
+                                    promise1.then(function(data1) {
+                                        _oldInfo.department = data1.results.department;
+                                        _oldInfo.departLeader = data1.results.departLeader;
+                                    }, function(err) {})
 
 
-                                // 获得已有科室医生信息
-                                var promise2 = Department.GetDoctorList({
-                                    'department':data.results.workUnit,
-                                    'hospital':data.results.workUnit,
-                                    'district':_changeInfo.district,
-                                    "token": Storage.get('TOKEN')
-                                })
-                                promise2.then(function(data2) {
-                                    _oldInfo.doctor=data2.results;
-                                }, function(err) {})
+                                    // 获得已有科室医生信息
+                                    var promise2 = Department.GetDoctorList({
+                                        'department': data.results[0].workUnit,
+                                        'hospital': data.results[0].workUnit,
+                                        'district': _changeInfo.district,
+                                        "token": Storage.get('TOKEN')
+                                    })
+                                    promise2.then(function(data2) {
+                                        _oldInfo.doctor = data2.results;
+                                    }, function(err) {})
 
 
-                                // 更新
-                                console.log(_changeInfo)
-                                var promise3 = Department.UpdateDepartment(_changeInfo)
-                                promise3.then(function(data3) {
-                                    // console.log(data.msg);
-                                    if (data[0] == "更") {
-                                        // 显示成功提示
-                                        $('#changeSuccess').modal('show')
-                                        $timeout(function() {
-                                            $('#changeSuccess').modal('hide')
-                                            $('#changeInfo').modal('hide')
-                                            // 提示完毕，刷新列表
-                                            var newlist = {}
-                                            getLists(newlist)
-                                        }, 1000)
-                                    }
-                                }, function(err) {})
-                            },
+                                    // 更新
+                                    console.log(_changeInfo)
+                                    var promise3 = Department.UpdateDepartment(_changeInfo)
+                                    promise3.then(function(data3) {
+                                        console.log(data3)
+                                    }, function(err) {})
+                                },
                                 function(e) {});
 
-                            })
-                        }
+                        })
+                    }
                 },
                 function(e) {})
 
@@ -478,7 +469,7 @@ angular.module('controllers', ['ngResource', 'services'])
         }
     }])
     // 查看医生资质证书-LZN
-    .controller('DoctorLicenseCtrl', ['$scope', '$state', 'Review', 'Alluser', 'Storage', '$timeout','Department','Patient', function($scope, $state, Review, Alluser, Storage, $timeout,Department,Patient) {
+    .controller('DoctorLicenseCtrl', ['$scope', '$state', 'Review', 'Alluser', 'Storage', '$timeout', 'Department', 'Patient', function($scope, $state, Review, Alluser, Storage, $timeout, Department, Patient) {
         var id = Storage.get('docId');
 
         // 循环轮播到某个特定的帧 
@@ -575,77 +566,85 @@ angular.module('controllers', ['ngResource', 'services'])
                             }
 
                             // 给通过的医生发短信
-                            Alluser.sms(sms).then(
-                                function(data) {
-                                    $state.go('main.checkornot.unchecked');
-                                },
-                                 function(e) {})
+                            // Alluser.sms(sms).then(
+                            //     function(data) {
+                            //         $state.go('main.checkornot.unchecked');
+                            //     },
+                            //      function(e) {})
 
-
-                           //获得该医生地域、科室信息
+                            //获得该医生地域、科室信息
+                            console.log('获得该医生地域、科室信息')
+                            console.log({
+                                'doctorId': Storage.get('docId'),
+                                "token": Storage.get('TOKEN')
+                            })
                             Patient.doctors({
-                                'userId':Storage.get('docId'),
+                                'doctorId': Storage.get('docId'),
                                 "token": Storage.get('TOKEN')
                             }).then(
-                            function(data){
-                                // 预备材料
-                                var tempworkunit=data.results.workUnit;
-                                var tempdistrict=data.results.city;
-                                var _changeInfo={}
-                                var _newInfo={}
-                                _changeInfo.department=data.results.workUnit;
-                                _changeInfo.hospital=data.results.workUnit;
-                                _changeInfo.district=data.results.city.replace("市", "");
-                                _changeInfo.token=Storage.get('TOKEN')
-                                _newInfo.newdepartment=_oldInfo.department;
-                                _newInfo.newdepartLeader=_oldInfo.departLeader;
-                                _newInfo.newdoctors=_oldInfo.doctor.push(data.results.userId)
-                                _changeInfo.new=_newInfo
+                                function(data) {
+                                    // 预备材料
+                                    var tempworkunit = data.results[0].workUnit;
+                                    var tempdistrict = data.results[0].city;
+                                    var _changeInfo = {}
+                                    var _newInfo = {}
+                                    var _oldInfo = {}
+                                    _oldInfo.doctor = []
+                                    _changeInfo.department = data.results[0].workUnit;
+                                    _changeInfo.hospital = data.results[0].workUnit;
+                                    _changeInfo.district = data.results[0].city.replace("市", "");
+                                    _changeInfo.token = Storage.get('TOKEN')
+                                    _newInfo.newdepartment = _oldInfo.department;
+                                    _newInfo.newdepartLeader = _oldInfo.departLeader;
+                                    _oldInfo.doctor.push(data.results[0]._id)
+                                    _newInfo.newdoctors = _oldInfo.doctor
+                                    _changeInfo.new = _newInfo
 
 
-                                // 获得已有科室信息
-                                var promise1 = Department.GetDepartmentInfo({
-                                    'department':data.results.workUnit,
-                                    "token": Storage.get('TOKEN')
-                                })
-                                promise1.then(function(data1) {
-                                    var _oldInfo={}
-                                    _oldInfo.department=data1.results.department;
-                                    _oldInfo.departLeader=data1.results.departLeader;
-                                }, function(err) {})
+                                    // 获得已有科室信息
+                                    console.log('获得已有科室信息')
+                                    console.log({
+                                        'department': data.results[0].workUnit,
+                                        "token": Storage.get('TOKEN')
+                                    })
+                                    var promise1 = Department.GetDepartmentInfo({
+                                        'department': data.results[0].workUnit,
+                                        "token": Storage.get('TOKEN')
+                                    })
+                                    promise1.then(function(data1) {
+                                        _oldInfo.department = data1.results.department;
+                                        _oldInfo.departLeader = data1.results.departLeader;
+                                    }, function(err) {})
 
 
-                                // 获得已有科室医生信息
-                                var promise2 = Department.GetDoctorList({
-                                    'department':data.results.workUnit,
-                                    'hospital':data.results.workUnit,
-                                    'district':_changeInfo.district,
-                                    "token": Storage.get('TOKEN')
-                                })
-                                promise2.then(function(data2) {
-                                    _oldInfo.doctor=data2.results;
-                                }, function(err) {})
+                                    // 获得已有科室医生信息
+                                    console.log('获得已有科室医生信息')
+                                    console.log({
+                                        'department': data.results[0].workUnit,
+                                        'hospital': data.results[0].workUnit,
+                                        'district': _changeInfo.district,
+                                        "token": Storage.get('TOKEN')
+                                    })
+                                    var promise2 = Department.GetDoctorList({
+                                        'department': data.results[0].workUnit,
+                                        'hospital': data.results[0].workUnit,
+                                        'district': _changeInfo.district,
+                                        "token": Storage.get('TOKEN')
+                                    })
+                                    promise2.then(function(data2) {
+                                        _oldInfo.doctor = data2.results;
+                                    }, function(err) {})
 
-
-                                // 更新
-                                console.log(_changeInfo)
-                                var promise3 = Department.UpdateDepartment(_changeInfo)
-                                promise3.then(function(data3) {
-                                    // console.log(data.msg);
-                                    if (data[0] == "更") {
-                                        // 显示成功提示
-                                        $('#changeSuccess').modal('show')
-                                        $timeout(function() {
-                                            $('#changeSuccess').modal('hide')
-                                            $('#changeInfo').modal('hide')
-                                            // 提示完毕，刷新列表
-                                            var newlist = {}
-                                            getLists(newlist)
-                                        }, 1000)
-                                    }
-                                }, function(err) {})
-                            },
+                                },
                                 function(e) {});
+
+                            // 更新
+                            console.log('更新')
+                            console.log(_changeInfo)
+                            var promise3 = Department.UpdateDepartment(_changeInfo)
+                            promise3.then(function(data3) {
+                                console.log(data3)
+                            }, function(err) {})
                         })
                     }
                 },
@@ -1278,7 +1277,7 @@ angular.module('controllers', ['ngResource', 'services'])
         }
     }])
 
-// 全部健康信息--RH
+    // 全部健康信息--RH
     .controller('AllCtrl', ['$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', 'HealthInfo',
         function($scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, HealthInfo) {
 
@@ -1324,7 +1323,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 $scope.currentPage = 1
                 getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 5)
             }
-            
+
             $scope.searchList = function() {
                 console.log($scope.userlist)
                 getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 5)
@@ -1334,44 +1333,45 @@ angular.module('controllers', ['ngResource', 'services'])
                 $scope.userlist = {}
                 getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 5)
             }
-            
+
             // 关闭modal控制
             $scope.modal_close = function(target) {
                 $(target).modal('hide')
-            
+
             }
 
             $scope.openDetail = function(userdetail) {
                 var promise = HealthInfo.healthDetail({
                     'patientId': userdetail.userId,
-                    'insertTime':userdetail.insertTime,
+                    'insertTime': userdetail.insertTime,
                     'token': Storage.get('TOKEN')
                 })
                 promise.then(function(data) {
                     console.log(data.results.url)
-                    var eachtempslides={}
-                    var tempslides=[]
-                    for (i=0;i<data.results.url.length;i++){
-                        eachtempslides.photo=data.results.url[i]
-                        eachtempslides.resizedphoto=data.results.url[i].replace("resized", "");
+                    var eachtempslides = {}
+                    var tempslides = []
+                    for (i = 0; i < data.results.url.length; i++) {
+                        eachtempslides.photo = data.results.url[i]
+                        eachtempslides.resizedphoto = data.results.url[i].replace("resized", "");
                         tempslides.push(eachtempslides)
                     }
                     console.log(tempslides)
-                    $scope.slides=tempslides
+                    $scope.slides = tempslides
                     $('#HealthInfoPhoto').modal('show')
                 }, function(err) {})
-        }
+            }
 
-            $scope.showbigger=function(url){
-                $scope.photourl=url.replace("resized", "")
+            $scope.showbigger = function(url) {
+                $scope.photourl = url.replace("resized", "")
                 $('#HealthInfoPhoto').modal('show')
             }
 
             // 监听事件(表单清空)
             $('#HealthInfoPhoto').on('hidden.bs.modal', function() {
-                $scope.photourl=''
-                          })
-        }])
+                $scope.photourl = ''
+            })
+        }
+    ])
 
 
     .controller('LabInfoCtrl', ['$scope', '$state', 'Storage', 'LabtestImport', 'NgTableParams', '$uibModal', '$timeout', function($scope, $state, Storage, LabtestImport, NgTableParams, $uibModal, $timeout) {
@@ -2525,7 +2525,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 modalInstance.result.then(function() {
                     var cancelUserinfo = {
                         'userId': userID,
-                        'token': token
+                        'token': Storage.get('TOKEN')
                     }
                     var promise = Alluser.cancelUser(cancelUserinfo)
                     promise.then(function(data) {
@@ -3165,8 +3165,8 @@ angular.module('controllers', ['ngResource', 'services'])
         }
     ])
     // 患者--张桠童
-    .controller('patientsCtrl', ['$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', 'Roles','Patient',
-        function($scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, Roles,Patient) {
+    .controller('patientsCtrl', ['$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', 'Roles', 'Patient',
+        function($scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, Roles, Patient) {
             var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
 
             // -----------获取列表总条数------------------
@@ -3346,20 +3346,20 @@ angular.module('controllers', ['ngResource', 'services'])
         }
     ])
     // 患者--详细信息modal--张桠童
-    .controller('detail_patientCtrl', ['Patient','$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', '$uibModalInstance', 'userdetail',
-        function(Patient,$scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, $uibModalInstance, userdetail) {
+    .controller('detail_patientCtrl', ['Patient', '$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', '$uibModalInstance', 'userdetail',
+        function(Patient, $scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, $uibModalInstance, userdetail) {
             // console.log(userdetail);
 
             $scope.patientInfo = userdetail
             var newpromise = Patient.doctorsById({
-              userId: userdetail.userId,
-              token: Storage.get('TOKEN')
-              })
+                userId: userdetail.userId,
+                token: Storage.get('TOKEN')
+            })
 
             newpromise.then(function(data) {
                 $scope.userinfo = data.data
-             }, function(err) {})
-                     
+            }, function(err) {})
+
             // 关闭modal
             $scope.close = function() {
                 $uibModalInstance.dismiss()
@@ -3717,7 +3717,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 // 删除用户输入
                 var cancelUserinfo = {
                     'userId': userdetail.userId,
-                    'token': token
+                    'token': Storage.get('TOKEN')
                 }
                 // 删除该用户
                 var promise = Alluser.cancelUser(cancelUserinfo)
@@ -3745,7 +3745,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 var removeInfo = {
                     'userId': userdetail.userId,
                     'roles': userdetail.role,
-                    'token': token
+                    'token': Storage.get('TOKEN')
                 }
                 // 去除该角色
                 var promise = Roles.removeRoles(removeInfo)
@@ -4139,7 +4139,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 // 删除用户输入
                 var cancelUserinfo = {
                     'userId': userdetail.userId,
-                    'token': token
+                    'token': Storage.get('TOKEN')
                 }
                 // 删除该用户
                 var promise = Alluser.cancelUser(cancelUserinfo)
@@ -4167,7 +4167,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 var removeInfo = {
                     'userId': userdetail.userId,
                     'roles': 'health',
-                    'token': token
+                    'token': Storage.get('TOKEN')
                 }
                 // 去除该角色
                 var promise = Roles.removeRoles(removeInfo)
@@ -4560,7 +4560,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 // 删除用户输入
                 var cancelUserinfo = {
                     'userId': userdetail.userId,
-                    'token': token
+                    'token': Storage.get('TOKEN')
                 }
                 // 删除该用户
                 var promise = Alluser.cancelUser(cancelUserinfo)
@@ -4588,7 +4588,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 var removeInfo = {
                     'userId': userdetail.userId,
                     'roles': 'admin',
-                    'token': token
+                    'token': Storage.get('TOKEN')
                 }
                 // 去除该角色
                 var promise = Roles.removeRoles(removeInfo)
@@ -4896,23 +4896,7 @@ angular.module('controllers', ['ngResource', 'services'])
         })
 
         var _changeInfo = {}
-        $scope.editdistrict = function(district) {
-            _changeInfo.new = {}
-            _changeInfo.new.newportleader = []
-            $scope.editflag = false;
-            console.log(district)
-            _changeInfo.district = district.district;
-            // 显示修改信息modal
-            $('#changeInfo').modal('show')
-            // 显示已有信息
-            var mylabel = document.getElementById("editportleader")
-            mylabel.innerHTML = ""
-            for (i = 0; i < district.portleader.length; i++) {
-                mylabel.innerHTML = mylabel.innerHTML + " " + district.portleader[i].name;
-            }
-            var mylabel = document.getElementById("editdistrict")
-            mylabel.innerHTML = district.district
-        }
+
 
         $scope.openDetail = function(userdetail) {
             var modalInstance = $uibModal.open({
@@ -4931,6 +4915,12 @@ angular.module('controllers', ['ngResource', 'services'])
                 if (con == '修改信息') {
                     console.log(userdetail);
                     // 修改用户信息方法的输入
+                    _changeInfo.new = {}
+                    _changeInfo.new.newportleader = []
+                    $scope.editflag = false;
+                    _changeInfo.district = userdetail.district;
+                    // 显示修改信息modal
+
                     // $('#changeInfo').formValidation({
                     //         framework: 'bootstrap',
                     //         excluded: ':disabled',
@@ -5215,7 +5205,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 console.log(data.results)
                 $scope.totalItems = data.results.length;
                 $scope.tableParams = new NgTableParams({
-                    count: 10000
+                    count: 20
                 }, {
                     counts: [],
                     dataset: data.results
@@ -5652,7 +5642,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     'district': department.district,
                     'hospital': department.hospital,
                     'department': department.department,
-                    'token': token
+                    'token': Storage.get('TOKEN')
                 }
                 var promise = Department.DeleteRecord(deletedepartmentinfo)
                 promise.then(function(data) {
@@ -6538,9 +6528,9 @@ angular.module('controllers', ['ngResource', 'services'])
                         dataset: data.results
                     })
                 } else if ($scope.ifnegative == 'negative') {
-                    var tempdata=new Array
-                    for (i=0;i<data.results.length;i++){
-                        if (data.results[i].score<=5) {
+                    var tempdata = new Array
+                    for (i = 0; i < data.results.length; i++) {
+                        if (data.results[i].score <= 5) {
                             tempdata.push(data.results[i])
                         }
                     }
@@ -6569,7 +6559,7 @@ angular.module('controllers', ['ngResource', 'services'])
         }
         // ---------------------------------------------------------------------
         //初始化列表
-        $scope.ifnegative='negative'
+        $scope.ifnegative = 'negative'
         $scope.currentPage = 1
         $scope.itemsPerPage = 10000
         getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
