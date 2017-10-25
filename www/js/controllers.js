@@ -4754,6 +4754,9 @@ angular.module('controllers', ['ngResource', 'services'])
 
         // 新建地区，增加确认标签
         $scope.addnewlabel = function(inputlabel) {
+            districtInfo = {}
+             $scope.registerInfo = {}
+            $scope.registerInfo.newportleader = []
             if (inputlabel == undefined) {
                 $('#districtUndefined').modal('show')
                 $timeout(function() {
