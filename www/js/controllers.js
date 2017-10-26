@@ -2468,7 +2468,7 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.currentPage = 1
             $scope.itemsPerPage = 50
             $scope.userlist = {}
-            getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 0)
+            // getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 0)
 
             // 页面改变
             $scope.pageChanged = function() {
@@ -2505,7 +2505,7 @@ angular.module('controllers', ['ngResource', 'services'])
             // 清空搜索
             $scope.searchClear = function() {
                 $scope.userlist = {}
-                getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 0)
+                // getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 0)
             }
             // 注销modal
             $scope.confirm = function(userID) {
@@ -2790,7 +2790,7 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.currentPage = 1
             $scope.itemsPerPage = 50
             $scope.userlist = {}
-            getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 1)
+            // getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 1)
             // 页面改变
             $scope.pageChanged = function() {
                 console.log($scope.currentPage)
@@ -2819,7 +2819,7 @@ angular.module('controllers', ['ngResource', 'services'])
             // 清空搜索
             $scope.searchClear = function() {
                 $scope.userlist = {}
-                getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 1)
+                // getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 1)
             }
             // 关闭modal控制
             $scope.modal_close = function(target) {
@@ -3029,7 +3029,7 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.currentPage = 1
             $scope.itemsPerPage = 50
             $scope.userlist = {}
-            getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 3)
+            // getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 3)
             // 页面改变
             $scope.pageChanged = function() {
                 console.log($scope.currentPage)
@@ -3053,7 +3053,7 @@ angular.module('controllers', ['ngResource', 'services'])
             // 清空搜索
             $scope.searchClear = function() {
                 $scope.userlist = {}
-                getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 3)
+                // getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 3)
             }
             // 关闭modal控制
             $scope.modal_close = function(target) {
@@ -3221,7 +3221,7 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.currentPage = 1
             $scope.itemsPerPage = 50
             $scope.userlist = {}
-            getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 2)
+            // getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 2)
             // 页面改变
             $scope.pageChanged = function() {
                 console.log($scope.currentPage)
@@ -3253,7 +3253,7 @@ angular.module('controllers', ['ngResource', 'services'])
             // 清空搜索
             $scope.searchClear = function() {
                 $scope.userlist = {}
-                getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 2)
+                // getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 2)
             }
             // 关闭modal控制
             $scope.modal_close = function(target) {
@@ -3444,7 +3444,7 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.currentPage = 1
             $scope.itemsPerPage = 50
             $scope.userlist = {}
-            getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 4)
+            // getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 4)
 
             // 页面改变
             $scope.pageChanged = function() {
@@ -3474,7 +3474,7 @@ angular.module('controllers', ['ngResource', 'services'])
             // 清空搜索
             $scope.searchClear = function() {
                 $scope.userlist = {}
-                getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 4)
+                // getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 4)
             }
             // 监听事件(表单清空)
             $('#new_register').on('hidden.bs.modal', function() {
@@ -3875,7 +3875,7 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.currentPage = 1
             $scope.itemsPerPage = 50
             $scope.userlist = {}
-            getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 5)
+            // getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 5)
 
             // 页面改变
             $scope.pageChanged = function() {
@@ -3900,7 +3900,7 @@ angular.module('controllers', ['ngResource', 'services'])
             // 清空搜索
             $scope.searchClear = function() {
                 $scope.userlist = {}
-                getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 5)
+                // getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 5)
             }
             // 监听事件(表单清空)
             $('#new_register').on('hidden.bs.modal', function() {
@@ -4297,7 +4297,7 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.currentPage = 1
             $scope.itemsPerPage = 50
             $scope.userlist = {}
-            getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 6)
+            // getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 6)
 
             // 页面改变
             $scope.pageChanged = function() {
@@ -4322,7 +4322,7 @@ angular.module('controllers', ['ngResource', 'services'])
             // 清空搜索
             $scope.searchClear = function() {
                 $scope.userlist = {}
-                getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 6)
+                // getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 6)
             }
             // 监听事件(表单清空)
             $('#new_register').on('hidden.bs.modal', function() {
