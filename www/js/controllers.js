@@ -181,7 +181,13 @@ angular.module('controllers', ['ngResource', 'services'])
             $state.go('main.enterornot.unentered')
         }
         $scope.todata = function() {
-            $state.go('main.datamanage.region')
+            if ((Storage.get('ROLE').indexOf("admin") != -1) || (Storage.get('ROLE').indexOf("Leader") != -1)) {
+                console.log(1)
+                $state.go('main.datamanage.region')
+            } else if (Storage.get('ROLE').indexOf("master") != -1) {
+                console.log(2)
+                $state.go('main.datamanage.workload')
+            }
         }
         $scope.toinsurance = function() {
             $state.go('main.insumanage')
@@ -5782,6 +5788,7 @@ angular.module('controllers', ['ngResource', 'services'])
             $state.go('main.datamanage.Pattrend')
         }
         $scope.toregion = function() {
+            console.log(100)
             $state.go('main.datamanage.region')
         }
         $scope.totrend = function() {
@@ -5832,10 +5839,18 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.ifPatinsurance = false
             $scope.ifgroup = false
         }
+         if ((Storage.get('ROLE').indexOf("admin") != -1) || (Storage.get('ROLE').indexOf("Leader") != -1)) {
+               $scope.myindex=1
+            } else if (Storage.get('ROLE').indexOf("master") != -1) {
+                  $scope.myindex=3
+            
+        }
+
     }])
 
     // 数据监控——医生地区分布
     .controller('regionCtrl', ['Dict', 'Monitor1', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', 'Department', function(Dict, Monitor1, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams, Department) {
+
 
         $scope.loadingflag = true
 
@@ -5870,6 +5885,9 @@ angular.module('controllers', ['ngResource', 'services'])
                 console.log(err)
             }
         )
+
+
+
         $scope.$on('$viewContentLoaded', function() {
             if (Storage.get('ROLE').indexOf("admin") != -1) {
                 $scope.ifprovince = true
@@ -5900,6 +5918,7 @@ angular.module('controllers', ['ngResource', 'services'])
 
 
             } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
+
                 $scope.ifprovince = false
                 $scope.Cities = []
                 Department.getinfo({
@@ -6526,7 +6545,7 @@ angular.module('controllers', ['ngResource', 'services'])
         } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
             $scope.ifprovince = false
             $scope.ifcity = true
-            
+
             $scope.Cities = []
             Department.getinfo({
                 token: Storage.get('TOKEN'),
@@ -6663,13 +6682,12 @@ angular.module('controllers', ['ngResource', 'services'])
                     countInfo.endTime = $scope.endtime
                 }
 
-                if (($scope.City == undefined) || ($scope.City == '')||($scope.Hospital == undefined) || ($scope.Hospital == '')) {
+                if (($scope.Hospital == undefined) || ($scope.Hospital == '')) {
                     countInfo.hospital = $scope.Hospitals[0].name
                     countInfo.city = $scope.Hospitals[0].district
                 } else {
                     countInfo.hospital = $scope.Hospital.hospital.name
-                    countInfo.hospital = $scope.Hospital.hospital.district
-
+                    countInfo.city = $scope.Hospital.hospital.district
                 }
                 console.log(countInfo)
 
@@ -6733,7 +6751,7 @@ angular.module('controllers', ['ngResource', 'services'])
             Info.limit = itemsPerPage,
                 Info.skip = (currentPage - 1) * itemsPerPage
 
-             if (isClick == false) {
+            if (isClick == false) {
 
                 if (Storage.get('ROLE').indexOf("admin") != -1) {
                     countInfo = {
@@ -6867,7 +6885,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     console.log(err)
                 })
 
-        }else if (Storage.get('ROLE').indexOf("master") != -1) {
+        } else if (Storage.get('ROLE').indexOf("master") != -1) {
             $scope.ifcity = false
             $scope.ifprovince = false
             $scope.ifhospitalinput = false
@@ -6945,7 +6963,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 countInfo.hospital = $scope.hospital
                 countInfo.doctor = $scope.doctor
 
-            }else if (Storage.get('ROLE').indexOf("master") != -1) {
+            } else if (Storage.get('ROLE').indexOf("master") != -1) {
                 if ($scope.starttime == undefined) {
                     countInfo.startTime = '2016-01-01'
                 } else {
@@ -6958,13 +6976,12 @@ angular.module('controllers', ['ngResource', 'services'])
                     countInfo.endTime = $scope.endtime
                 }
 
-                if (($scope.City == undefined) || ($scope.City == '')||($scope.Hospital == undefined) || ($scope.Hospital == '')) {
+                if (($scope.Hospital == undefined) || ($scope.Hospital == '')) {
                     countInfo.hospital = $scope.Hospitals[0].name
                     countInfo.city = $scope.Hospitals[0].district
                 } else {
                     countInfo.hospital = $scope.Hospital.hospital.name
-                    countInfo.hospital = $scope.Hospital.hospital.district
-
+                    countInfo.city = $scope.Hospital.hospital.district
                 }
                 console.log(countInfo)
 
@@ -7181,7 +7198,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     console.log(err)
                 })
 
-        }else if (Storage.get('ROLE').indexOf("master") != -1) {
+        } else if (Storage.get('ROLE').indexOf("master") != -1) {
             $scope.ifcity = false
             $scope.ifprovince = false
             $scope.ifhospitalinput = false
@@ -7288,7 +7305,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 countInfo.hospital = $scope.hospital
                 countInfo.doctor = $scope.doctor
                 console.log(countInfo)
-            }else if (Storage.get('ROLE').indexOf("master") != -1) {
+            } else if (Storage.get('ROLE').indexOf("master") != -1) {
                 if ($scope.starttime == undefined) {
                     countInfo.startTime = '2016-01-01'
                 } else {
@@ -7301,13 +7318,12 @@ angular.module('controllers', ['ngResource', 'services'])
                     countInfo.endTime = $scope.endtime
                 }
 
-                if (($scope.City == undefined) || ($scope.City == '')||($scope.Hospital == undefined) || ($scope.Hospital == '')) {
+                if (($scope.Hospital == undefined) || ($scope.Hospital == '')) {
                     countInfo.hospital = $scope.Hospitals[0].name
                     countInfo.city = $scope.Hospitals[0].district
                 } else {
                     countInfo.hospital = $scope.Hospital.hospital.name
-                    countInfo.hospital = $scope.Hospital.hospital.district
-
+                    countInfo.city = $scope.Hospital.hospital.district
                 }
                 console.log(countInfo)
 
@@ -7370,7 +7386,7 @@ angular.module('controllers', ['ngResource', 'services'])
             Info = Object.assign({}, countInfo)
             Info.limit = itemsPerPage
             Info.skip = (currentPage - 1) * itemsPerPage
-                       if (isClick == false) {
+            if (isClick == false) {
 
                 if (Storage.get('ROLE').indexOf("admin") != -1) {
                     countInfo = {
@@ -7484,7 +7500,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     console.log(err)
                 })
 
-        }else if (Storage.get('ROLE').indexOf("master") != -1) {
+        } else if (Storage.get('ROLE').indexOf("master") != -1) {
             $scope.ifcity = false
             $scope.ifprovince = false
             $scope.ifhospitalinput = false
@@ -7586,7 +7602,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 countInfo.hospital = $scope.hospital
                 countInfo.doctor = $scope.doctor
                 console.log(countInfo)
-            }else if (Storage.get('ROLE').indexOf("master") != -1) {
+            } else if (Storage.get('ROLE').indexOf("master") != -1) {
                 if ($scope.starttime == undefined) {
                     countInfo.startTime = '2016-01-01'
                 } else {
@@ -7599,13 +7615,12 @@ angular.module('controllers', ['ngResource', 'services'])
                     countInfo.endTime = $scope.endtime
                 }
 
-                if (($scope.City == undefined) || ($scope.City == '')||($scope.Hospital == undefined) || ($scope.Hospital == '')) {
+                if (($scope.Hospital == undefined) || ($scope.Hospital == '')) {
                     countInfo.hospital = $scope.Hospitals[0].name
                     countInfo.city = $scope.Hospitals[0].district
                 } else {
                     countInfo.hospital = $scope.Hospital.hospital.name
-                    countInfo.hospital = $scope.Hospital.hospital.district
-
+                    countInfo.city = $scope.Hospital.hospital.district
                 }
                 console.log(countInfo)
 
@@ -9136,27 +9151,16 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.flagadvice = false
 
         }
-        // else if  (tempuserrole.indexOf("Leader") != -1) {
-        //     $scope.flagdoctor = false
-        //     $scope.flaguser = false
-        //     $scope.flagdistrdp = true
-        //     $scope.flaghealth = false
-        //     $scope.flagdata = false
-        //     $scope.flaginsu = false
-        //     $scope.flagpatrefund = false
-        //     $scope.flagadvice = false
-        // } else if  (tempuserrole.indexOf("master") != -1) {
-        //     $scope.flagdoctor = false
-        //     $scope.flaguser = false
-        //     $scope.flagdistrdp = true
-        //     $scope.flaghealth = false
-        //     $scope.flagdata = false
-        //     $scope.flaginsu = false
-        //     $scope.flagpatrefund = false
-        //     $scope.flagadvice = false
-
-        // } 
-
+        // $scope.godata = function() {
+        //     // debugger
+        //     if ((Storage.get('ROLE').indexOf("admin") != -1) || (Storage.get('ROLE').indexOf("Leader") != -1)) {
+        //         console.log(1)
+        //         $state.go('main.datamanage.region')
+        //     } else if (Storage.get('ROLE').indexOf("master") != -1) {
+        //         console.log(2)
+        //         $state.go('main.datamanage.workload')
+        //     }
+        // }
         // $scope.tounchecked = function() {
         //     $state.go('main.checkornot.unchecked')
         // }
