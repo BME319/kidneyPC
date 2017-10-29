@@ -6525,6 +6525,8 @@ angular.module('controllers', ['ngResource', 'services'])
             getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
             $scope.ifprovince = false
+            $scope.ifcity = true
+            
             $scope.Cities = []
             Department.getinfo({
                 token: Storage.get('TOKEN'),
@@ -6842,6 +6844,8 @@ angular.module('controllers', ['ngResource', 'services'])
             getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
             $scope.ifprovince = false
+            $scope.ifcity = true
+
             $scope.Cities = []
             Department.getinfo({
                 token: Storage.get('TOKEN'),
@@ -7155,6 +7159,8 @@ angular.module('controllers', ['ngResource', 'services'])
             getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
             $scope.ifprovince = false
+            $scope.ifcity = true
+
             $scope.Cities = []
             Department.getinfo({
                 token: Storage.get('TOKEN'),
@@ -7456,6 +7462,8 @@ angular.module('controllers', ['ngResource', 'services'])
             getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
             $scope.ifprovince = false
+            $scope.ifcity = true
+
             $scope.Cities = []
             Department.getinfo({
                 token: Storage.get('TOKEN'),
