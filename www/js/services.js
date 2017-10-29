@@ -17,7 +17,6 @@ angular.module('services', ['ngResource'])
     }])
     .constant('CONFIG', {
         baseUrl: 'http://application.haihonghospitalmanagement.com/api/v2/',
-        dictbaseUrl: 'http://application.haihonghospitalmanagement.com/api/v2/',
     })
 
     .factory('Data', ['$resource', '$q', '$interval', 'CONFIG', 'Storage', function($resource, $q, $interval, CONFIG, Storage) {
@@ -25,7 +24,7 @@ angular.module('services', ['ngResource'])
         var abort = $q.defer
 
         var Dict = function() {
-            return $resource(CONFIG.dictbaseUrl + ':path/:route', {
+            return $resource(CONFIG.baseUrl + ':path/:route', {
                 path: 'dict'
             }, {
                 getDistrict: {
@@ -38,39 +37,39 @@ angular.module('services', ['ngResource'])
             })
         }
         var Advice = function() {
-            return $resource(CONFIG.dictbaseUrl + ':path/:route', { path: 'advice' }, {
+            return $resource(CONFIG.baseUrl + ':path/:route', { path: 'advice' }, {
                 getadvices: { method: 'GET', params: { route: 'advices', token: '@token' }, timeout: 100000 }
             })
         }
 
         var Services = function() {
-            return $resource(CONFIG.dictbaseUrl + ':path/:route', { path: 'services' }, {
+            return $resource(CONFIG.baseUrl + ':path/:route', { path: 'services' }, {
                 getmanualRefundList: { method: 'GET', params: { route: 'manualRefundList', token: '@token', status: '@status' }, timeout: 100000 },
                 manualRefund: { method: 'POST', params: { route: 'manualRefund', token: '@token', reviewResult: '@reviewResult', diagId: '@diagId' }, timeout: 100000 }
             })
         }
 
         var Mywechat = function() {
-            return $resource(CONFIG.dictbaseUrl + ':path/:route', { path: 'wechat' }, {
+            return $resource(CONFIG.baseUrl + ':path/:route', { path: 'wechat' }, {
                 createTDCticket: { method: 'POST', params: { route: 'createTDCticket' }, timeout: 100000 }
             })
         }
 
         var Doctor = function() {
-            return $resource(CONFIG.dictbaseUrl + ':path/:route', { path: 'doctor' }, {
+            return $resource(CONFIG.baseUrl + ':path/:route', { path: 'doctor' }, {
                 getDoctorInfo: { method: 'GET', params: { route: 'doctor', userId: '@userId', token: '@token' }, timeout: 100000 },
             })
         }
 
         var HealthInfo = function() {
-            return $resource(CONFIG.dictbaseUrl + ':path/:route', { path: 'healthInfo' }, {
+            return $resource(CONFIG.baseUrl + ':path/:route', { path: 'healthInfo' }, {
                 allHealthInfos: { method: 'GET', params: { route: 'allHealthInfos', token: '@token', limit: '@limit', skip: '@skip', }, timeout: 100000 },
                 healthDetail: { method: 'GET', params: { route: 'healthDetail', token: '@token', insertTime: '@insertTime', patientId: '@patientId' }, timeout: 100000 },
             })
         }
 
         var Patient = function() {
-            return $resource(CONFIG.dictbaseUrl + ':path/:route', { path: 'patient' }, {
+            return $resource(CONFIG.baseUrl + ':path/:route', { path: 'patient' }, {
                 doctorsById: { method: 'GET', params: { route: 'doctorsById', userId: '@userId', token: '@token' }, timeout: 100000 },
                 doctors: { method: 'GET', params: { route: 'doctors', doctorId: '@doctorId', token: '@token' }, timeout: 100000 },
             })
@@ -84,7 +83,7 @@ angular.module('services', ['ngResource'])
         }
 
         var Policy = function() {
-            return $resource(CONFIG.dictbaseUrl + ':path/:route', { path: 'policy' }, {
+            return $resource(CONFIG.baseUrl + ':path/:route', { path: 'policy' }, {
                 getPatientList: { method: 'GET', params: { route: 'patients', token: '@token' }, timeout: 100000 },
                 getAgentList: { method: 'GET', params: { route: 'agents', token: '@token' }, timeout: 100000 },
                 getFollowupHis: { method: 'GET', params: { route: 'history', patientId: '@patientId', token: '@token' }, timeout: 100000 },
@@ -163,7 +162,7 @@ angular.module('services', ['ngResource'])
         }
 
         var Dict = function() {
-            return $resource(CONFIG.dictbaseUrl + ':path/:route', {
+            return $resource(CONFIG.baseUrl + ':path/:route', {
                 path: 'dict'
             }, {
                 getDistrict: {
@@ -549,6 +548,16 @@ angular.module('services', ['ngResource'])
                         district: '@district',
                         portleader: '@portleader',
                         new: '@new',
+                        token: '@token'
+                    },
+                    timeout: 100000
+                },
+                getinfo: {
+                    method: 'GET',
+                    params: {
+                        route: 'getinfo',
+                        departLeaderId: '@departLeaderId',
+                        portleaderId: '@portleaderId',
                         token: '@token'
                     },
                     timeout: 100000
@@ -1344,6 +1353,15 @@ angular.module('services', ['ngResource'])
         self.UpdateDepartment = function(params) {
             var deferred = $q.defer()
             Data.Department.UpdateDepartment(params, function(data, headers) {
+                deferred.resolve(data)
+            }, function(err) {
+                deferred.reject(err)
+            })
+            return deferred.promise
+        }
+        self.getinfo = function(params) {
+            var deferred = $q.defer()
+            Data.Department.getinfo(params, function(data, headers) {
                 deferred.resolve(data)
             }, function(err) {
                 deferred.reject(err)

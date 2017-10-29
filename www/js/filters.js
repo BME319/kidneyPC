@@ -176,6 +176,7 @@ angular.module('filters', [])
     }])
     .filter('leadername', [function() {
         return function(type) {
+            console.log(type)
             var name = ""
             if (type == null) {
                 name = null

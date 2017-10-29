@@ -28,17 +28,17 @@
       <div class="col-xs-2" style="text-align: center;font-size: 15px;margin-top:10px;margin-left:10px;width:auto;">
           <uib-tabset active="1" vertical="true" type="pills">
             <uib-tab index="0" heading="医生数据" style="font-size:18px;font-weight:bold;" ></uib-tab>
-            <uib-tab index="1" heading="地区分布" select="toregion()"></uib-tab>
-            <uib-tab index="2" heading="变化趋势" select="totrend()"></uib-tab>
-            <uib-tab index="3" heading="工作量统计" select="toworkload()"></uib-tab>
-            <uib-tab index="4" heading="超时咨询统计" select="toovertime()"></uib-tab>
-            <uib-tab index="5" heading="评价统计" select="toevaluation()"></uib-tab>
-            <uib-tab index="6" heading="收费统计" select="tocharge()"></uib-tab>
-            <uib-tab index="7" heading="患者数据" style="font-size:18px;font-weight:bold" ></uib-tab> 
-            <uib-tab index="8" heading="地区分布" select="toPatregion()"></uib-tab>
-            <uib-tab index="9" heading="变化趋势" select="toPattrend()"></uib-tab>
-            <uib-tab index="10" heading="肾病保险" select="toPatinsurance()"></uib-tab>
-            <uib-tab index="11" heading="分组查看" select="toPatgroup()"></uib-tab>
+            <uib-tab index="1" ng-show="ifregion" heading="地区分布" select="toregion()"></uib-tab>
+            <uib-tab index="2" ng-show="iftrend" heading="变化趋势" select="totrend()"></uib-tab>
+            <uib-tab index="3" ng-show="ifworkload" heading="工作量统计" select="toworkload()"></uib-tab>
+            <uib-tab index="4" ng-show="ifovertime" heading="超时咨询统计" select="toovertime()"></uib-tab>
+            <uib-tab index="5" ng-show="ifevaluation" heading="评价统计" select="toevaluation()"></uib-tab>
+            <uib-tab index="6" ng-show="ifcharge" heading="收费统计" select="tocharge()"></uib-tab>
+            <uib-tab index="7" ng-show="ifPat" heading="患者数据" style="font-size:18px;font-weight:bold" ></uib-tab> 
+            <uib-tab index="8" ng-show="ifPatregion" heading="地区分布" select="toPatregion()"></uib-tab>
+            <uib-tab index="9" ng-show="ifPattrend" heading="变化趋势" select="toPattrend()"></uib-tab>
+            <uib-tab index="10" ng-show="ifPatinsurance" heading="肾病保险" select="toPatinsurance()"></uib-tab>
+            <uib-tab index="11" ng-show="ifgroup" heading="分组查看" select="toPatgroup()"></uib-tab>
           </uib-tabset>
       </div>
       <div class="col-xs-10" style="margin-top:30px">
