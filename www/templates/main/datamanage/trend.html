@@ -1,10 +1,10 @@
 <div class="panel-body">
     <form class="form-inline" style="margin-top: -30px">
         <div class="form-group">
-            <select style="width:120px;height: 34px;font-size: 14px;border: 1px solid #ccc;border-radius: 4px;background-color: white;" ng-options="Province.name for Province in Provinces track by Province.province" style="width:40%" ng-change="getCity(Province.province)" ng-model="Province.province">
+            <select style="width:120px;height: 34px;font-size: 14px;border: 1px solid #ccc;border-radius: 4px;background-color: white;" ng-options="Province.name for Province in Provinces track by Province.province" style="width:40%"  ng-show="ifprovince" ng-change="getCity(Province.province)" ng-model="Province.province">
                 <option selected value="">省份</option>
             </select>
-            <select style="width:120px;height: 34px;font-size: 14px;border: 1px solid #ccc;border-radius: 4px;background-color: white;" ng-options="City.name for City in Cities track by City.city" style="width:40%" ng-model="City.city">
+            <select style="width:120px;height: 34px;font-size: 14px;border: 1px solid #ccc;border-radius: 4px;background-color: white;" ng-options="City.name for City in Cities track by City.city" style="width:40%"  ng-model="City.city">
                 <option selected value="">城市</option>
             </select>
         </div>

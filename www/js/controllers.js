@@ -44,6 +44,7 @@ angular.module('controllers', ['ngResource', 'services'])
                             var username = data.results.userName ? data.results.userName : data.results.userId
                             Storage.set('UName', username)
                             Storage.set('ROLE', data.results.role)
+                            Storage.set('_id', data.results._id)
                             // Storage.set('ROLE', userrole)
                             $state.go('homepage')
                             // if (userrole=='管理员'){                           
@@ -156,6 +157,15 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.flagpatrefund = false
             $scope.flagadvice = false
 
+        } else if ((tempuserrole.indexOf("master") != -1) || (tempuserrole.indexOf("Leader") != -1)) {
+            $scope.flagdoctor = false
+            $scope.flaguser = false
+            $scope.flagdistrdp = false
+            $scope.flaghealth = false
+            $scope.flagdata = true
+            $scope.flaginsu = false
+            $scope.flagpatrefund = false
+            $scope.flagadvice = false
         }
 
         $scope.tounchecked = function() {
@@ -4723,7 +4733,9 @@ angular.module('controllers', ['ngResource', 'services'])
 
         $scope.createdistrict = function() {
             $scope.newflag = false;
-
+            districtInfo = {}
+            $scope.registerInfo = {}
+            $scope.registerInfo.newportleader = []
             $('#new_district').modal('show')
         }
 
@@ -4754,9 +4766,6 @@ angular.module('controllers', ['ngResource', 'services'])
 
         // 新建地区，增加确认标签
         $scope.addnewlabel = function(inputlabel) {
-            districtInfo = {}
-             $scope.registerInfo = {}
-            $scope.registerInfo.newportleader = []
             if (inputlabel == undefined) {
                 $('#districtUndefined').modal('show')
                 $timeout(function() {
@@ -4803,7 +4812,7 @@ angular.module('controllers', ['ngResource', 'services'])
         $scope.addInfo = {}
         $scope.addInfo.roles = 'Leader'
         $scope.addRole = function() {
-            console.log($scope.registerInfo._id)
+            // console.log($scope.registerInfo._id)
             if (($scope.registerInfo._id == undefined) && ($scope.changeInfo._id == undefined)) {
                 $('#userIdUndefined').modal('show')
                 $timeout(function() {
@@ -5234,6 +5243,12 @@ angular.module('controllers', ['ngResource', 'services'])
         $scope.createdepartment = function() {
             $scope.newflagleader = false;
             $scope.newflagdoctor = false;
+            $scope.registerInfo = {} //新地区包含信息（temp）
+            $scope.registerInfo.newdepartleader = []
+            $scope.registerInfo.newdoctor = []
+            departmentInfo.new = {}
+            departmentInfo.new.newdepartLeader = []
+            departmentInfo.new.newdoctors = []
             $('#new_department').modal('show')
         }
 
@@ -5379,12 +5394,7 @@ angular.module('controllers', ['ngResource', 'services'])
 
         // 新建科室
         var departmentInfo = {} //新建方法输入参数
-        $scope.registerInfo = {} //新地区包含信息（temp）
-        $scope.registerInfo.newdepartleader = []
-        $scope.registerInfo.newdoctor = []
-        departmentInfo.new = {}
-        departmentInfo.new.newdepartLeader = []
-        departmentInfo.new.newdoctors = []
+
         // 新建科室
         $scope.register = function() {
             departmentInfo.district = $scope.registerInfo.district
@@ -5780,11 +5790,52 @@ angular.module('controllers', ['ngResource', 'services'])
         $scope.toworkload = function() {
             $state.go('main.datamanage.workload')
         }
+
+        console.log(Storage.get('ROLE'))
+        if (Storage.get('ROLE').indexOf("admin") != -1) {
+
+            $scope.ifregion = true
+            $scope.iftrend = true
+            $scope.ifworkload = true
+            $scope.ifovertime = true
+            $scope.ifevaluation = true
+            $scope.ifcharge = true
+            $scope.ifPat = true
+            $scope.ifPatregion = true
+            $scope.ifPattrend = true
+            $scope.ifPatinsurance = true
+            $scope.ifgroup = true
+        } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
+
+            $scope.ifregion = true
+            $scope.iftrend = true
+            $scope.ifworkload = true
+            $scope.ifovertime = true
+            $scope.ifevaluation = true
+            $scope.ifcharge = true
+            $scope.ifPat = true
+            $scope.ifPatregion = true
+            $scope.ifPattrend = true
+            $scope.ifPatinsurance = true
+            $scope.ifgroup = false
+        } else if (Storage.get('ROLE').indexOf("master") != -1) {
+
+            $scope.ifregion = false
+            $scope.iftrend = false
+            $scope.ifworkload = true
+            $scope.ifovertime = true
+            $scope.ifevaluation = true
+            $scope.ifcharge = true
+            $scope.ifPat = false
+            $scope.ifPatregion = false
+            $scope.ifPattrend = false
+            $scope.ifPatinsurance = false
+            $scope.ifgroup = false
+        }
     }])
 
     // 数据监控——医生地区分布
-    .controller('regionCtrl', ['Dict', 'Monitor1', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Dict, Monitor1, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
-        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
+    .controller('regionCtrl', ['Dict', 'Monitor1', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', 'Department', function(Dict, Monitor1, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams, Department) {
 
         $scope.loadingflag = true
 
@@ -5819,51 +5870,61 @@ angular.module('controllers', ['ngResource', 'services'])
                 console.log(err)
             }
         )
-        $scope.getCity = function(province) {
-            if (province != null) {
-                Dict.getDistrict({
-                    level: '2',
-                    province: province.province,
-                    city: ''
+        $scope.$on('$viewContentLoaded', function() {
+            if (Storage.get('ROLE').indexOf("admin") != -1) {
+                $scope.ifprovince = true
+                $scope.getCity = function(province) {
+                    if (province != null) {
+                        Dict.getDistrict({
+                            level: '2',
+                            province: province.province,
+                            city: ''
 
-                }).then(
-                    function(data) {
-                        $scope.Cities = data.results
-                        // console.log($scope.Cities);
+                        }).then(
+                            function(data) {
+                                $scope.Cities = data.results
+                                console.log($scope.Cities);
+                            },
+                            function(err) {
+                                console.log(err)
+                            }
+                        )
+                    } else {
+                        $scope.Cities = {}
+                        // $scope.Districts ={};
+                    }
+                    $scope.City = ''
+                }
+                console.log($scope.City)
+                showpie()
+
+
+            } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
+                $scope.ifprovince = false
+                $scope.Cities = []
+                Department.getinfo({
+                    token: Storage.get('TOKEN'),
+                    portleaderId: Storage.get('_id')
+                }).then(function(data) {
+                        for (i = 0; i < data.results.length; i++) {
+
+                            $scope.Cities.push({ city: i, name: data.results[i].district })
+                        }
+                        console.log($scope.Cities)
+                        showpie()
                     },
                     function(err) {
                         console.log(err)
-                    }
-                )
-            } else {
-                $scope.Cities = {}
-                // $scope.Districts ={};
-            }
-            $scope.City = ''
-        }
+                    })
 
-        $scope.$on('$viewContentLoaded', function() {
-            showpie()
+            }
         });
+
+
 
         // 获取当前日期
         var myDate = new Date();
         var now = myDate.toLocaleDateString();
-        var formatDateTime = function(date) {
-            var y = date.getFullYear();
-            var m = date.getMonth() + 1;
-            m = m < 10 ? ('0' + m) : m;
-            var d = date.getDate();
-            d = d < 10 ? ('0' + d) : d;
-            var h = date.getHours();
-            h = h < 10 ? ('0' + h) : h;
-            var minute = date.getMinutes();
-            minute = minute < 10 ? ('0' + minute) : minute;
-            var second = date.getSeconds();
-            second = second < 10 ? ('0' + second) : second;
-            return y + '-' + m + '-' + d + ' ' + h + ':' + minute + ':' + second;
-        };
-        var nowtime = formatDateTime(myDate)
 
         var isClick = false
         var RegionInfo = {}
@@ -5871,88 +5932,113 @@ angular.module('controllers', ['ngResource', 'services'])
         $scope.Province = {}
         $scope.viewRegion = function() {
             $scope.loadingflag = true
-            console.log($scope.Province.province)
-            if (($scope.Province.province == undefined) && ($scope.City == undefined) && (($scope.starttime == undefined) || ($scope.endtime == undefined))) {
-                $('#inputerror').modal('show')
-                $timeout(function() {
-                    $('#inputerror').modal('hide')
-                }, 1000)
-                $scope.loadingflag = false
-            } else {
-                // console.log($scope.selectprovince)
-                // console.log($scope.selectcity)
-                // console.log($scope.starttime + ' 00:00:00')
-                // console.log($scope.endtime + ' 00:00:00')
-                // console.log(selectprovince)
-                // console.log(selectcity)
-                // console.log(starttime)
-                // console.log(endtime)
 
-                if (!($scope.Province.province == undefined)) {
-                    if (($scope.starttime == undefined) && ($scope.endtime == undefined)) {
-                        if ($scope.City.city == undefined) {
-                            RegionInfo = {
-                                province: $scope.Province.province.name,
-                                // city: $scope.City.city.name,
-                                startTime: '2016-01-01  00:00:00',
-                                endTime: nowtime,
-                                token: Storage.get('TOKEN')
+            if (Storage.get('ROLE').indexOf("admin") != -1) {
+                if (($scope.Province.province == undefined) && ($scope.City == undefined) && (($scope.starttime == undefined) || ($scope.endtime == undefined))) {
+                    $('#inputerror').modal('show')
+                    $timeout(function() {
+                        $('#inputerror').modal('hide')
+                    }, 1000)
+                    $scope.loadingflag = false
+                } else {
+                    if (!($scope.Province.province == undefined)) {
+                        if (($scope.starttime == undefined) && ($scope.endtime == undefined)) {
+                            if ($scope.City.city == undefined) {
+                                RegionInfo = {
+                                    province: $scope.Province.province.name,
+                                    // city: $scope.City.city.name,
+                                    startTime: '2016-01-01',
+                                    endTime: now,
+                                    token: Storage.get('TOKEN')
+                                }
+                                textInfo = $scope.Province.province.name + '医生地区分布'
+                            } else {
+                                RegionInfo = {
+                                    province: $scope.Province.province.name,
+                                    city: $scope.City.city.name,
+                                    startTime: '2016-01-01',
+                                    endTime: now,
+                                    token: Storage.get('TOKEN')
+                                }
+                                textInfo = $scope.Province.province.name + $scope.City.city.name + '医生地区分布'
                             }
-                            textInfo = $scope.Province.province.name + '医生地区分布'
-                        } else {
+                        } else if ($scope.City.city == undefined) {
                             RegionInfo = {
                                 province: $scope.Province.province.name,
                                 city: $scope.City.city.name,
-                                startTime: '2016-01-01  00:00:00',
-                                endTime: nowtime,
+                                startTime: $scope.starttime,
+                                endTime: $scope.endtime,
                                 token: Storage.get('TOKEN')
                             }
                             textInfo = $scope.Province.province.name + $scope.City.city.name + '医生地区分布'
+                        } else {
+                            RegionInfo = {
+                                province: $scope.Province.province.name,
+                                // city: $scope.City.city.name,
+                                startTime: $scope.starttime,
+                                endTime: $scope.endtime,
+                                token: Storage.get('TOKEN')
+                            }
+                            textInfo = $scope.Province.province.name + '医生地区分布'
                         }
-                    } else if ($scope.City.city == undefined) {
+                    } else if ((!($scope.City == undefined)) && (!($scope.starttime == undefined))) {
                         RegionInfo = {
-                            province: $scope.Province.province.name,
-                            city: $scope.City.city.name,
-                            startTime: $scope.starttime + ' 00:00:00',
-                            endTime: $scope.endtime + ' 00:00:00',
-                            token: Storage.get('TOKEN')
-                        }
-                        textInfo = $scope.Province.province.name + $scope.City.city.name + '医生地区分布'
-                    } else {
-                        RegionInfo = {
-                            province: $scope.Province.province.name,
+                            // province:  $scope.Province.province.name,
                             // city: $scope.City.city.name,
-                            startTime: $scope.starttime + ' 00:00:00',
-                            endTime: $scope.endtime + ' 00:00:00',
+                            startTime: $scope.starttime,
+                            endTime: $scope.endtime,
                             token: Storage.get('TOKEN')
                         }
-                        textInfo = $scope.Province.province.name + '医生地区分布'
+                        textInfo = '注册医生地区分布'
                     }
-                } else if ((!($scope.City == undefined)) && (!($scope.starttime == undefined))) {
+                }
+            } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
+                if (($scope.starttime == undefined) && ($scope.endtime == undefined)) {
                     RegionInfo = {
-                        // province:  $scope.Province.province.name,
-                        // city: $scope.City.city.name,
-                        startTime: $scope.starttime + ' 00:00:00',
-                        endTime: $scope.endtime + ' 00:00:00',
+                        city: $scope.City.city.name,
+                        startTime: '2016-01-01',
+                        endTime: now,
                         token: Storage.get('TOKEN')
                     }
-                    textInfo = '注册医生地区分布'
+                } else {
+                    RegionInfo = {
+                        city: $scope.City.city.name,
+                        startTime: $scope.starttime,
+                        endTime: $scope.endtime,
+                        token: Storage.get('TOKEN')
+                    }
                 }
-                isClick = true
-                showpie()
+                textInfo = $scope.City.city.name + '医生地区分布'
+
             }
+
+            isClick = true
+            showpie()
         }
 
+
         var showpie = function() {
+            console.log($scope.Cities)
             if (isClick == false) {
-                RegionInfo = {
-                    province: '浙江省',
-                    city: '',
-                    startTime: '2016-01-01  00:00:00',
-                    endTime: nowtime,
-                    token: Storage.get('TOKEN')
+                if (Storage.get('ROLE').indexOf("admin") != -1) {
+                    RegionInfo = {
+                        province: '浙江省',
+                        city: '',
+                        startTime: '2016-01-01',
+                        endTime: now,
+                        token: Storage.get('TOKEN')
+                    }
+                    textInfo = '浙江省医生地区分布'
+                } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
+                    RegionInfo = {
+                        city: $scope.Cities[0].name,
+                        startTime: '2016-01-01',
+                        endTime: now,
+                        token: Storage.get('TOKEN')
+                    }
+                    textInfo = $scope.Cities[0].name + '注册医生地区分布'
+
                 }
-                textInfo = '浙江省医生地区分布'
             }
             Monitor1.GetRegion(RegionInfo).then(function(data) {
                     $scope.loadingflag = false
@@ -6004,13 +6090,10 @@ angular.module('controllers', ['ngResource', 'services'])
                     console.log(err)
                 }
         }
-
-
     }])
 
     // 数据监控——医生变化趋势
-    .controller('trendCtrl', ['Dict', 'Monitor1', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Dict, Monitor1, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
-        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
+    .controller('trendCtrl', ['Dict', 'Monitor1', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', 'Department', function(Dict, Monitor1, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams, Department) {
 
         $scope.loadingflag = true
 
@@ -6044,40 +6127,60 @@ angular.module('controllers', ['ngResource', 'services'])
                 console.log(err)
             }
         )
-        $scope.getCity = function(province) {
-            if (province != null) {
-                Dict.getDistrict({
-                    level: '2',
-                    province: province.province,
-                    city: ''
 
-                }).then(
-                    function(data) {
-                        $scope.Cities = data.results
-                        // console.log($scope.Cities);
+
+        $scope.$on('$viewContentLoaded', function() {
+            if (Storage.get('ROLE').indexOf("admin") != -1) {
+                $scope.ifprovince = true
+                $scope.getCity = function(province) {
+                    if (province != null) {
+                        Dict.getDistrict({
+                            level: '2',
+                            province: province.province,
+                            city: ''
+
+                        }).then(
+                            function(data) {
+                                $scope.Cities = data.results
+                            },
+                            function(err) {
+                                console.log(err)
+                            }
+                        )
+                    } else {
+                        $scope.Cities = {}
+                        // $scope.Districts ={};
+                    }
+                    $scope.City = ''
+                }
+                showlinegraph()
+
+
+            } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
+                $scope.ifprovince = false
+                $scope.Cities = []
+                Department.getinfo({
+                    token: Storage.get('TOKEN'),
+                    portleaderId: Storage.get('_id')
+                }).then(function(data) {
+                        for (i = 0; i < data.results.length; i++) {
+                            $scope.Cities.push({ city: i, name: data.results[i].district })
+                        }
+                        showlinegraph()
                     },
                     function(err) {
                         console.log(err)
-                    }
-                )
-            } else {
-                $scope.Cities = {}
-                // $scope.Districts ={};
-            }
-            $scope.City = ''
-        }
+                    })
 
-        $scope.$on('$viewContentLoaded', function() {
-            showlinegraph()
+            }
         });
+
 
         // 获取当前日期
         var myDate = new Date();
         var now = myDate.toLocaleDateString();
         var tempyesterday = new Date(new Date() - 24 * 60 * 60 * 1000);
         var yesterday = tempyesterday.toLocaleDateString();
-        var nowtime=now+' 00:00:00'
-        var yesterdaytime=yesterday+' 00:00:00'
 
         var isClick = false
         var TrendInfo = {}
@@ -6085,81 +6188,111 @@ angular.module('controllers', ['ngResource', 'services'])
         $scope.Province = {}
         $scope.viewTrend = function() {
             $scope.loadingflag = true
-
-            if (($scope.Province.province == undefined) && ($scope.City == undefined) && (($scope.starttime == undefined) || ($scope.endtime == undefined))) {
-                $('#inputerror').modal('show')
-                $timeout(function() {
-                    $('#inputerror').modal('hide')
-                }, 1000)
-                $scope.loadingflag = false
-            } else {
-                if (!($scope.Province.province == undefined)) {
-                    if (($scope.starttime == undefined) && ($scope.endtime == undefined)) {
-                        if ($scope.City.city == undefined) {
-                            TrendInfo = {
-                                province: $scope.Province.province.name,
-                                // city: $scope.City.city.name,
-                                startTime: '2016-01-01  00:00:00',
-                                endTime: nowtime,
-                                token: Storage.get('TOKEN')
+            if (Storage.get('ROLE').indexOf("admin") != -1) {
+                if (($scope.Province.province == undefined) && ($scope.City == undefined) && (($scope.starttime == undefined) || ($scope.endtime == undefined))) {
+                    $('#inputerror').modal('show')
+                    $timeout(function() {
+                        $('#inputerror').modal('hide')
+                    }, 1000)
+                    $scope.loadingflag = false
+                } else {
+                    if (!($scope.Province.province == undefined)) {
+                        if (($scope.starttime == undefined) && ($scope.endtime == undefined)) {
+                            if ($scope.City.city == undefined) {
+                                TrendInfo = {
+                                    province: $scope.Province.province.name,
+                                    // city: $scope.City.city.name,
+                                    startTime: '2016-01-01',
+                                    endTime: now,
+                                    token: Storage.get('TOKEN')
+                                }
+                                textInfo = $scope.Province.province.name + '医生注册变化趋势折线图'
+                            } else {
+                                TrendInfo = {
+                                    province: $scope.Province.province.name,
+                                    city: $scope.City.city.name,
+                                    startTime: '2016-01-01',
+                                    endTime: now,
+                                    token: Storage.get('TOKEN')
+                                }
+                                textInfo = $scope.Province.province.name + $scope.City.city.name + '医生注册变化趋势折线图'
                             }
-                            textInfo = $scope.Province.province.name + '医生注册变化趋势折线图'
-                        } else {
+                        } else if ($scope.City.city == undefined) {
                             TrendInfo = {
                                 province: $scope.Province.province.name,
                                 city: $scope.City.city.name,
-                                startTime: '2016-01-01  00:00:00',
-                                endTime: nowtime,
+                                startTime: $scope.starttime,
+                                endTime: $scope.endtime,
                                 token: Storage.get('TOKEN')
                             }
                             textInfo = $scope.Province.province.name + $scope.City.city.name + '医生注册变化趋势折线图'
+                        } else {
+                            TrendInfo = {
+                                province: $scope.Province.province.name,
+                                // city: $scope.City.city.name,
+                                startTime: $scope.starttime,
+                                endTime: $scope.endtime,
+                                token: Storage.get('TOKEN')
+                            }
+                            textInfo = $scope.Province.province.name + '医生注册变化趋势折线图'
                         }
-                    } else if ($scope.City.city == undefined) {
+                    } else if ((!($scope.City == undefined)) && (!($scope.starttime == undefined))) {
                         TrendInfo = {
-                            province: $scope.Province.province.name,
+                            // province:  $scope.Province.province.name,
                             // city: $scope.City.city.name,
-                            startTime: $scope.starttime + ' 00:00:00',
-                            endTime: $scope.endtime + ' 00:00:00',
+                            startTime: $scope.starttime,
+                            endTime: $scope.endtime,
                             token: Storage.get('TOKEN')
                         }
-                        textInfo = $scope.Province.province.name + '医生注册变化趋势折线图'
-                    } else {
-                        TrendInfo = {
-                            province: $scope.Province.province.name,
-                            city: $scope.City.city.name,
-                            startTime: $scope.starttime + ' 00:00:00',
-                            endTime: $scope.endtime + ' 00:00:00',
-                            token: Storage.get('TOKEN')
-                        }
-                        textInfo = $scope.Province.province.name + $scope.City.city.name + '医生注册变化趋势折线图'
+                        textInfo = '医生注册变化趋势折线图'
                     }
-                } else if ((!($scope.City == undefined)) && (!($scope.starttime == undefined))) {
+                }
+            } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
+                if (($scope.starttime == undefined) && ($scope.endtime == undefined)) {
                     TrendInfo = {
-                        // province:  $scope.Province.province.name,
-                        // city: $scope.City.city.name,
-                        startTime: $scope.starttime + ' 00:00:00',
-                        endTime: $scope.endtime + ' 00:00:00',
+                        city: $scope.City.city.name,
+                        startTime: '2016-01-01',
+                        endTime: now,
                         token: Storage.get('TOKEN')
                     }
-                    textInfo = '医生注册变化趋势折线图'
+                } else {
+                    TrendInfo = {
+                        city: $scope.City.city.name,
+                        startTime: $scope.starttime,
+                        endTime: $scope.endtime,
+                        token: Storage.get('TOKEN')
+                    }
                 }
+                textInfo = $scope.City.city.name + '医生注册变化趋势折线图'
 
-                isClick = true
-                showlinegraph()
             }
+
+            isClick = true
+            showlinegraph()
         }
 
 
         var showlinegraph = function() {
             if (isClick == false) {
-                TrendInfo = {
-                    province: '浙江省',
-                    city: '',
-                    startTime: '2016-01-01 00:00:00',
-                    endTime: nowtime,
-                    token: Storage.get('TOKEN')
+                if (Storage.get('ROLE').indexOf("admin") != -1) {
+                    TrendInfo = {
+                        province: '浙江省',
+                        city: '',
+                        startTime: '2016-01-01',
+                        endTime: now,
+                        token: Storage.get('TOKEN')
+                    }
+                    textInfo = '浙江省医生注册变化趋势折线图'
+                } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
+                    TrendInfo = {
+                        city: $scope.Cities[0].name,
+                        startTime: '2016-01-01',
+                        endTime: now,
+                        token: Storage.get('TOKEN')
+                    }
+                    textInfo = $scope.Cities[0].name + '医生注册变化趋势折线图'
+
                 }
-                textInfo = '浙江省医生注册变化趋势折线图'
             }
             Monitor1.GetTrend(TrendInfo).then(function(data) {
                     $scope.loadingflag = false
@@ -6173,7 +6306,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     var time = new Array()
                     var sum = 0
                     var array = data.results
-                    var sumtoday=0
+                    var sumtoday = 0
                     var timecount = new Array()
                     for (var i = 0; i < array.length; i++) {
                         count[i] = array[i].count
@@ -6195,13 +6328,13 @@ angular.module('controllers', ['ngResource', 'services'])
                     }
 
                     Monitor1.GetTrend({
-                    province: '浙江省',
-                    city: '',
-                    startTime:yesterdaytime,
-                    endTime: nowtime,
-                    token: Storage.get('TOKEN')
+                        province: '浙江省',
+                        city: '',
+                        startTime: yesterday,
+                        endTime: now,
+                        token: Storage.get('TOKEN')
                     }).then(function(data1) {
-                        sumtoday=data1.results.length
+                        sumtoday = data1.results.length
                     })
 
                     var myTrend = echarts.init(document.getElementById('trend'))
@@ -6251,8 +6384,7 @@ angular.module('controllers', ['ngResource', 'services'])
     }])
 
     // 数据监控——医生超时咨询统计
-    .controller('overtimeCtrl', ['Dict', 'Monitor1', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Dict, Monitor1, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
-        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
+    .controller('overtimeCtrl', ['Dict', 'Monitor1', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', 'Department', function(Dict, Monitor1, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams, Department) {
 
         $scope.loadingflag = true
 
@@ -6281,60 +6413,60 @@ angular.module('controllers', ['ngResource', 'services'])
                 console.log(err)
             }
         )
-        $scope.getCity = function(province) {
-            if (province != null) {
-                Dict.getDistrict({
-                    level: '2',
-                    province: province.province,
-                    city: ''
 
-                }).then(
-                    function(data) {
-                        $scope.Cities = data.results
-                        // console.log($scope.Cities);
-                    },
-                    function(err) {
-                        console.log(err)
-                    }
-                )
-            } else {
-                $scope.Cities = {}
-                // $scope.Districts ={};
-            }
-            $scope.City = ''
-        }
 
         // 获取当前日期
         var myDate = new Date();
         var now = myDate.toLocaleDateString();
         var tempyesterday = new Date(new Date() - 24 * 60 * 60 * 1000);
         var yesterday = tempyesterday.toLocaleDateString();
-        console.log(yesterday)
+
         var isClick = false
-        var countInfo = {}
-        var Info = {}
+
         Storage.set('Tab', 1)
 
         // ---------------获取搜索(或未搜索)列表及列表数------------------------
         var getLists = function(currentPage, itemsPerPage, countInfo) {
             countInfo.token = Storage.get('TOKEN'),
                 Info = Object.assign({}, countInfo)
-            Info.limit = itemsPerPage,
-                Info.skip = (currentPage - 1) * itemsPerPage
+            Info.limit = itemsPerPage
+            Info.skip = (currentPage - 1) * itemsPerPage
+
             if (isClick == false) {
-                countInfo = {
-                    province: '',
-                    city: '',
-                    startTime: yesterday,
-                    endTime: now,
-                    token: Storage.get('TOKEN')
+
+                if (Storage.get('ROLE').indexOf("admin") != -1) {
+                    countInfo = {
+                        province: '',
+                        city: '',
+                        startTime: yesterday,
+                        endTime: now,
+                        token: Storage.get('TOKEN')
+                    }
+
+                } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
+                    countInfo = {
+                        city: $scope.Cities[0].name,
+                        startTime: yesterday,
+                        endTime: now,
+                        token: Storage.get('TOKEN')
+                    }
+                } else if (Storage.get('ROLE').indexOf("master") != -1) {
+                    console.log($scope.Hospitals)
+                    countInfo = {
+                        city: $scope.Hospitals[0].district,
+                        hospital: $scope.Hospitals[0].name,
+                        startTime: yesterday,
+                        endTime: now,
+                        token: Storage.get('TOKEN')
+                    }
                 }
                 $scope.starttime = yesterday
                 $scope.endtime = now
-                Info = Object.assign({}, countInfo),
-                    Info.limit = itemsPerPage,
-                    Info.skip = (currentPage - 1) * itemsPerPage
+                Info = Object.assign({}, countInfo)
+                Info.limit = itemsPerPage
+                Info.skip = (currentPage - 1) * itemsPerPage
             }
+
             console.log(Info);
             //获取搜索列表
             var promise = Monitor1.GetOvertime(Info)
@@ -6360,11 +6492,87 @@ angular.module('controllers', ['ngResource', 'services'])
                 console.log($scope.totalItems)
             }, function() {})
         }
+
+
+        if (Storage.get('ROLE').indexOf("admin") != -1) {
+            $scope.ifprovince = true
+            $scope.getCity = function(province) {
+                if (province != null) {
+                    Dict.getDistrict({
+                        level: '2',
+                        province: province.province,
+                        city: ''
+
+                    }).then(
+                        function(data) {
+                            $scope.Cities = data.results
+                        },
+                        function(err) {
+                            console.log(err)
+                        }
+                    )
+                } else {
+                    $scope.Cities = {}
+                    // $scope.Districts ={};
+                }
+                $scope.City = ''
+            }
+            //初始化列表
+            var countInfo = {}
+            var Info = {}
+            $scope.currentPage = 1
+            $scope.itemsPerPage = 10000
+            getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
+        } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
+            $scope.ifprovince = false
+            $scope.Cities = []
+            Department.getinfo({
+                token: Storage.get('TOKEN'),
+                portleaderId: Storage.get('_id')
+            }).then(function(data) {
+                    for (i = 0; i < data.results.length; i++) {
+
+                        $scope.Cities.push({ city: i, name: data.results[i].district })
+                    }
+                    //初始化列表
+                    var countInfo = {}
+                    var Info = {}
+                    $scope.currentPage = 1
+                    $scope.itemsPerPage = 10000
+                    getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
+                },
+                function(err) {
+                    console.log(err)
+                })
+
+        } else if (Storage.get('ROLE').indexOf("master") != -1) {
+            $scope.ifcity = false
+            $scope.ifprovince = false
+            $scope.ifhospitalinput = false
+            $scope.ifhospitalselect = true
+            $scope.Hospitals = []
+            Department.getinfo({
+                token: Storage.get('TOKEN'),
+                departLeaderId: Storage.get('_id')
+            }).then(function(data) {
+                    for (i = 0; i < data.results.length; i++) {
+                        $scope.Hospitals.push({ hospital: i, name: data.results[i].hospital, district: data.results[i].district })
+                    }
+                    console.log($scope.Hospitals)
+                    //初始化列表
+                    var countInfo = {}
+                    var Info = {}
+                    $scope.currentPage = 1
+                    $scope.itemsPerPage = 10000
+                    getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
+                },
+                function(err) {
+                    console.log(err)
+                })
+        }
+
         // ---------------------------------------------------------------------
-        //初始化列表
-        $scope.currentPage = 1
-        $scope.itemsPerPage = 10000
-        getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
+
         // 页面改变
         $scope.pageChanged = function() {
             console.log($scope.currentPage)
@@ -6383,51 +6591,94 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.doctor = ''
             $scope.hospital = ''
             getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
-
         }
 
         $scope.searchList = function() {
             $scope.loadingflag = true
-
+            countInfo = {}
             isClick = true
+            if (Storage.get('ROLE').indexOf("admin") != -1) {
+                if (($scope.Province == undefined) || ($scope.Province == '')) {
+                    countInfo.province = ''
+                } else {
+                    countInfo.province = $scope.Province.province.name
+                }
 
-            if (($scope.Province == undefined) || ($scope.Province == '')) {
-                countInfo.province = ''
-            } else {
-                countInfo.province = $scope.Province.province.name
+                if (($scope.City == undefined) || ($scope.City == '')) {
+                    countInfo.city = ''
+                } else {
+                    countInfo.city = $scope.City.city.name
+                }
+
+                if ($scope.starttime == undefined) {
+                    countInfo.startTime = '2016-01-01'
+                } else {
+                    countInfo.startTime = $scope.starttime
+                }
+
+                if ($scope.endtime == undefined) {
+                    countInfo.endTime = now
+                } else {
+                    countInfo.endTime = $scope.endtime
+                }
+
+                countInfo.hospital = $scope.hospital
+                countInfo.doctor = $scope.doctor
+
+            } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
+
+                if (($scope.City == undefined) || ($scope.City == '')) {
+                    countInfo.city = ''
+                } else {
+                    countInfo.city = $scope.City.city.name
+                }
+
+                if ($scope.starttime == undefined) {
+                    countInfo.startTime = '2016-01-01'
+                } else {
+                    countInfo.startTime = $scope.starttime
+                }
+
+                if ($scope.endtime == undefined) {
+                    countInfo.endTime = now
+                } else {
+                    countInfo.endTime = $scope.endtime
+                }
+
+                countInfo.hospital = $scope.hospital
+                countInfo.doctor = $scope.doctor
+                console.log(countInfo)
+            } else if (Storage.get('ROLE').indexOf("master") != -1) {
+                if ($scope.starttime == undefined) {
+                    countInfo.startTime = '2016-01-01'
+                } else {
+                    countInfo.startTime = $scope.starttime
+                }
+
+                if ($scope.endtime == undefined) {
+                    countInfo.endTime = now
+                } else {
+                    countInfo.endTime = $scope.endtime
+                }
+
+                if (($scope.City == undefined) || ($scope.City == '')||($scope.Hospital == undefined) || ($scope.Hospital == '')) {
+                    countInfo.hospital = $scope.Hospitals[0].name
+                    countInfo.city = $scope.Hospitals[0].district
+                } else {
+                    countInfo.hospital = $scope.Hospital.hospital.name
+                    countInfo.hospital = $scope.Hospital.hospital.district
+
+                }
+                console.log(countInfo)
+
             }
-
-            if (($scope.City == undefined) || ($scope.City == '')) {
-                countInfo.city = ''
-            } else {
-                countInfo.city = $scope.City.city.name
-            }
-
-            if ($scope.starttime == undefined) {
-                countInfo.startTime = '2016-01-01'
-            } else {
-                countInfo.startTime = $scope.starttime
-            }
-
-            if ($scope.endtime == undefined) {
-                countInfo.endTime = now
-            } else {
-                countInfo.endTime = $scope.endtime
-            }
-
-            countInfo.hospital = $scope.hospital
-            countInfo.doctor = $scope.doctor
-
             $scope.currentPage = 1
             getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         }
-
-
     }])
 
     // 数据监控——医生评分统计
-    .controller('evaluationCtrl', ['Dict', 'Monitor1', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Dict, Monitor1, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
-        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
+    .controller('evaluationCtrl', ['Dict', 'Monitor1', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', 'Department', function(Dict, Monitor1, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams, Department) {
 
         $scope.loadingflag = true
 
@@ -6461,33 +6712,8 @@ angular.module('controllers', ['ngResource', 'services'])
                 console.log(err)
             }
         )
-        $scope.getCity = function(province) {
-            if (province != null) {
-                Dict.getDistrict({
-                    level: '2',
-                    province: province.province,
-                    city: ''
 
-                }).then(
-                    function(data) {
-                        $scope.Cities = data.results
-                        // console.log($scope.Cities);
-                    },
-                    function(err) {
-                        console.log(err)
-                    }
-                )
-            } else {
-                $scope.Cities = {}
-                // $scope.Districts ={};
-            }
-            $scope.City = ''
-        }
 
-        $scope.search_class = [
-            { id: 'all', name: '全部评价' },
-            { id: 'negative', name: '差评' },
-        ]
 
         // 获取当前日期
         var myDate = new Date();
@@ -6495,30 +6721,51 @@ angular.module('controllers', ['ngResource', 'services'])
         var tempyesterday = new Date(new Date() - 24 * 60 * 60 * 1000);
         var yesterday = tempyesterday.toLocaleDateString();
         var isClick = false
-        var countInfo = {}
-        var Info = {}
         Storage.set('Tab', 1)
 
         // ---------------获取搜索(或未搜索)列表及列表数------------------------
         var getLists = function(currentPage, itemsPerPage, countInfo) {
+            console.log(countInfo)
             countInfo.token = Storage.get('TOKEN'),
                 Info = Object.assign({}, countInfo)
             Info.limit = itemsPerPage,
                 Info.skip = (currentPage - 1) * itemsPerPage
-            if (isClick == false) {
-                countInfo = {
-                    province: '浙江省',
-                    city: '杭州市',
-                    startTime: yesterday,
-                    endTime: now,
-                    token: Storage.get('TOKEN')
+
+             if (isClick == false) {
+
+                if (Storage.get('ROLE').indexOf("admin") != -1) {
+                    countInfo = {
+                        province: '',
+                        city: '',
+                        startTime: yesterday,
+                        endTime: now,
+                        token: Storage.get('TOKEN')
+                    }
+
+                } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
+                    countInfo = {
+                        city: $scope.Cities[0].name,
+                        startTime: yesterday,
+                        endTime: now,
+                        token: Storage.get('TOKEN')
+                    }
+                } else if (Storage.get('ROLE').indexOf("master") != -1) {
+                    console.log($scope.Hospitals)
+                    countInfo = {
+                        city: $scope.Hospitals[0].district,
+                        hospital: $scope.Hospitals[0].name,
+                        startTime: yesterday,
+                        endTime: now,
+                        token: Storage.get('TOKEN')
+                    }
                 }
                 $scope.starttime = yesterday
                 $scope.endtime = now
-                Info = Object.assign({}, countInfo),
-                    Info.limit = itemsPerPage,
-                    Info.skip = (currentPage - 1) * itemsPerPage
+                Info = Object.assign({}, countInfo)
+                Info.limit = itemsPerPage
+                Info.skip = (currentPage - 1) * itemsPerPage
             }
+
             console.log(Info);
             //获取搜索列表
             var promise = Monitor1.GetEvaluation(Info)
@@ -6561,12 +6808,94 @@ angular.module('controllers', ['ngResource', 'services'])
                 console.log($scope.totalItems)
             }, function() {})
         }
-        // ---------------------------------------------------------------------
-        //初始化列表
-        $scope.ifnegative = 'negative'
-        $scope.currentPage = 1
-        $scope.itemsPerPage = 10000
-        getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
+
+
+        if (Storage.get('ROLE').indexOf("admin") != -1) {
+            $scope.ifprovince = true
+            $scope.getCity = function(province) {
+                if (province != null) {
+                    Dict.getDistrict({
+                        level: '2',
+                        province: province.province,
+                        city: ''
+
+                    }).then(
+                        function(data) {
+                            $scope.Cities = data.results
+                        },
+                        function(err) {
+                            console.log(err)
+                        }
+                    )
+                } else {
+                    $scope.Cities = {}
+                    // $scope.Districts ={};
+                }
+                $scope.City = ''
+            }
+            //初始化列表
+            var countInfo = {}
+            var Info = {}
+            $scope.ifnegative = 'negative'
+            $scope.currentPage = 1
+            $scope.itemsPerPage = 10000
+            getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
+        } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
+            $scope.ifprovince = false
+            $scope.Cities = []
+            Department.getinfo({
+                token: Storage.get('TOKEN'),
+                portleaderId: Storage.get('_id')
+            }).then(function(data) {
+                    for (i = 0; i < data.results.length; i++) {
+
+                        $scope.Cities.push({ city: i, name: data.results[i].district })
+                    }
+                    //初始化列表
+                    var countInfo = {}
+                    var Info = {}
+                    $scope.ifnegative = 'negative'
+                    $scope.currentPage = 1
+                    $scope.itemsPerPage = 10000
+                    getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
+                },
+                function(err) {
+                    console.log(err)
+                })
+
+        }else if (Storage.get('ROLE').indexOf("master") != -1) {
+            $scope.ifcity = false
+            $scope.ifprovince = false
+            $scope.ifhospitalinput = false
+            $scope.ifhospitalselect = true
+            $scope.Hospitals = []
+            Department.getinfo({
+                token: Storage.get('TOKEN'),
+                departLeaderId: Storage.get('_id')
+            }).then(function(data) {
+                    for (i = 0; i < data.results.length; i++) {
+                        $scope.Hospitals.push({ hospital: i, name: data.results[i].hospital, district: data.results[i].district })
+                    }
+                    console.log($scope.Hospitals)
+                    //初始化列表
+                    var countInfo = {}
+                    var Info = {}
+                    $scope.ifnegative = 'negative'
+                    $scope.currentPage = 1
+                    $scope.itemsPerPage = 10000
+                    getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
+                },
+                function(err) {
+                    console.log(err)
+                })
+        }
+
+        $scope.search_class = [
+            { id: 'all', name: '全部评价' },
+            { id: 'negative', name: '差评' },
+        ]
+
+
         // 页面改变
         $scope.pageChanged = function() {
             console.log($scope.currentPage)
@@ -6582,34 +6911,61 @@ angular.module('controllers', ['ngResource', 'services'])
         $scope.searchList = function() {
 
             $scope.loadingflag = true
-
+            countInfo = {}
             isClick = true
-            if (($scope.Province == undefined) || ($scope.Province == '')) {
-                countInfo.province = ''
-            } else {
-                countInfo.province = $scope.Province.province.name
+            if (Storage.get('ROLE').indexOf("admin") != -1) {
+                if (($scope.Province == undefined) || ($scope.Province == '')) {
+                    countInfo.province = ''
+                } else {
+                    countInfo.province = $scope.Province.province.name
+                }
+
+                if (($scope.City == undefined) || ($scope.City == '')) {
+                    countInfo.city = ''
+                } else {
+                    countInfo.city = $scope.City.city.name
+                }
+
+                if ($scope.starttime == undefined) {
+                    countInfo.startTime = '2016-01-01'
+                } else {
+                    countInfo.startTime = $scope.starttime
+                }
+
+                if ($scope.endtime == undefined) {
+                    countInfo.endTime = now
+                } else {
+                    countInfo.endTime = $scope.endtime
+                }
+
+                countInfo.hospital = $scope.hospital
+                countInfo.doctor = $scope.doctor
+
+            }else if (Storage.get('ROLE').indexOf("master") != -1) {
+                if ($scope.starttime == undefined) {
+                    countInfo.startTime = '2016-01-01'
+                } else {
+                    countInfo.startTime = $scope.starttime
+                }
+
+                if ($scope.endtime == undefined) {
+                    countInfo.endTime = now
+                } else {
+                    countInfo.endTime = $scope.endtime
+                }
+
+                if (($scope.City == undefined) || ($scope.City == '')||($scope.Hospital == undefined) || ($scope.Hospital == '')) {
+                    countInfo.hospital = $scope.Hospitals[0].name
+                    countInfo.city = $scope.Hospitals[0].district
+                } else {
+                    countInfo.hospital = $scope.Hospital.hospital.name
+                    countInfo.hospital = $scope.Hospital.hospital.district
+
+                }
+                console.log(countInfo)
+
             }
 
-            if (($scope.City == undefined) || ($scope.City == '')) {
-                countInfo.city = ''
-            } else {
-                countInfo.city = $scope.City.city.name
-            }
-
-            if ($scope.starttime == undefined) {
-                countInfo.startTime = '2016-01-01'
-            } else {
-                countInfo.startTime = $scope.starttime
-            }
-
-            if ($scope.endtime == undefined) {
-                countInfo.endTime = now
-            } else {
-                countInfo.endTime = $scope.endtime
-            }
-
-            countInfo.hospital = $scope.hospital
-            countInfo.doctor = $scope.doctor
 
             $scope.currentPage = 1
             getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
@@ -6655,8 +7011,7 @@ angular.module('controllers', ['ngResource', 'services'])
     }])
 
     // 数据监控——医生收费统计
-    .controller('chargeCtrl', ['Dict', 'Monitor1', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Dict, Monitor1, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
-        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
+    .controller('chargeCtrl', ['Dict', 'Monitor1', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', 'Department', function(Dict, Monitor1, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams, Department) {
 
         $scope.loadingflag = true
 
@@ -6690,36 +7045,13 @@ angular.module('controllers', ['ngResource', 'services'])
                 console.log(err)
             }
         )
-        $scope.getCity = function(province) {
-            if (province != null) {
-                Dict.getDistrict({
-                    level: '2',
-                    province: province.province,
-                    city: ''
 
-                }).then(
-                    function(data) {
-                        $scope.Cities = data.results
-                        // console.log($scope.Cities);
-                    },
-                    function(err) {
-                        console.log(err)
-                    }
-                )
-            } else {
-                $scope.Cities = {}
-                // $scope.Districts ={};
-            }
-            $scope.City = ''
-        }
         // 获取当前日期
         var myDate = new Date();
         var now = myDate.toLocaleDateString();
         var tempyesterday = new Date(new Date() - 24 * 60 * 60 * 1000);
         var yesterday = tempyesterday.toLocaleDateString();
         var isClick = false
-        var countInfo = {}
-        var Info = {}
         Storage.set('Tab', 1)
 
         // ---------------获取搜索(或未搜索)列表及列表数------------------------
@@ -6728,20 +7060,43 @@ angular.module('controllers', ['ngResource', 'services'])
                 Info = Object.assign({}, countInfo)
             Info.limit = itemsPerPage,
                 Info.skip = (currentPage - 1) * itemsPerPage
+
             if (isClick == false) {
-                countInfo = {
-                    province: '',
-                    city: '',
-                    startTime: yesterday,
-                    endTime: now,
-                    token: Storage.get('TOKEN')
+
+                if (Storage.get('ROLE').indexOf("admin") != -1) {
+                    countInfo = {
+                        province: '',
+                        city: '',
+                        startTime: yesterday,
+                        endTime: now,
+                        token: Storage.get('TOKEN')
+                    }
+
+                } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
+                    countInfo = {
+                        city: $scope.Cities[0].name,
+                        startTime: yesterday,
+                        endTime: now,
+                        token: Storage.get('TOKEN')
+                    }
+                } else if (Storage.get('ROLE').indexOf("master") != -1) {
+                    console.log($scope.Hospitals)
+                    countInfo = {
+                        city: $scope.Hospitals[0].district,
+                        hospital: $scope.Hospitals[0].name,
+                        startTime: yesterday,
+                        endTime: now,
+                        token: Storage.get('TOKEN')
+                    }
                 }
                 $scope.starttime = yesterday
                 $scope.endtime = now
-                Info = Object.assign({}, countInfo),
-                    Info.limit = itemsPerPage,
-                    Info.skip = (currentPage - 1) * itemsPerPage
+                Info = Object.assign({}, countInfo)
+                Info.limit = itemsPerPage
+                Info.skip = (currentPage - 1) * itemsPerPage
             }
+
+
             console.log(Info);
             //获取搜索列表
             var promise = Monitor1.GetCharge(Info)
@@ -6767,11 +7122,91 @@ angular.module('controllers', ['ngResource', 'services'])
                 console.log($scope.totalItems)
             }, function() {})
         }
-        // ---------------------------------------------------------------------
-        //初始化列表
-        $scope.currentPage = 1
-        $scope.itemsPerPage = 10000
-        getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
+
+
+        if (Storage.get('ROLE').indexOf("admin") != -1) {
+            $scope.ifprovince = true
+            $scope.getCity = function(province) {
+                if (province != null) {
+                    Dict.getDistrict({
+                        level: '2',
+                        province: province.province,
+                        city: ''
+
+                    }).then(
+                        function(data) {
+                            $scope.Cities = data.results
+                        },
+                        function(err) {
+                            console.log(err)
+                        }
+                    )
+                } else {
+                    $scope.Cities = {}
+                    // $scope.Districts ={};
+                }
+                $scope.City = ''
+            }
+            //初始化列表
+            var countInfo = {}
+            var Info = {}
+            $scope.currentPage = 1
+            $scope.itemsPerPage = 10000
+            getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
+        } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
+            $scope.ifprovince = false
+            $scope.Cities = []
+            Department.getinfo({
+                token: Storage.get('TOKEN'),
+                portleaderId: Storage.get('_id')
+            }).then(function(data) {
+                    for (i = 0; i < data.results.length; i++) {
+
+                        $scope.Cities.push({ city: i, name: data.results[i].district })
+                    }
+                    //初始化列表
+                    var countInfo = {}
+                    var Info = {}
+                    $scope.currentPage = 1
+                    $scope.itemsPerPage = 10000
+                    getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
+                },
+                function(err) {
+                    console.log(err)
+                })
+
+        }else if (Storage.get('ROLE').indexOf("master") != -1) {
+            $scope.ifcity = false
+            $scope.ifprovince = false
+            $scope.ifhospitalinput = false
+            $scope.ifhospitalselect = true
+            $scope.Hospitals = []
+            Department.getinfo({
+                token: Storage.get('TOKEN'),
+                departLeaderId: Storage.get('_id')
+            }).then(function(data) {
+                    for (i = 0; i < data.results.length; i++) {
+                        $scope.Hospitals.push({ hospital: i, name: data.results[i].hospital, district: data.results[i].district })
+                    }
+                    console.log($scope.Hospitals)
+                    //初始化列表
+                    var countInfo = {}
+                    var Info = {}
+                    $scope.currentPage = 1
+                    $scope.itemsPerPage = 10000
+                    getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
+                },
+                function(err) {
+                    console.log(err)
+                })
+        }
+
+
+
+
+
+
+
         // 页面改变
         $scope.pageChanged = function() {
             console.log($scope.currentPage)
@@ -6794,35 +7229,83 @@ angular.module('controllers', ['ngResource', 'services'])
         }
         $scope.searchList = function() {
             $scope.loadingflag = true
-
+            countInfo = {}
             isClick = true
+            if (Storage.get('ROLE').indexOf("admin") != -1) {
+                if (($scope.Province == undefined) || ($scope.Province == '')) {
+                    countInfo.province = ''
+                } else {
+                    countInfo.province = $scope.Province.province.name
+                }
 
-            if (($scope.Province == undefined) || ($scope.Province == '')) {
-                countInfo.province = ''
-            } else {
-                countInfo.province = $scope.Province.province.name
+                if (($scope.City == undefined) || ($scope.City == '')) {
+                    countInfo.city = ''
+                } else {
+                    countInfo.city = $scope.City.city.name
+                }
+
+                if ($scope.starttime == undefined) {
+                    countInfo.startTime = '2016-01-01'
+                } else {
+                    countInfo.startTime = $scope.starttime
+                }
+
+                if ($scope.endtime == undefined) {
+                    countInfo.endTime = now
+                } else {
+                    countInfo.endTime = $scope.endtime
+                }
+
+                countInfo.hospital = $scope.hospital
+                countInfo.doctor = $scope.doctor
+
+            } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
+
+                if (($scope.City == undefined) || ($scope.City == '')) {
+                    countInfo.city = ''
+                } else {
+                    countInfo.city = $scope.City.city.name
+                }
+
+                if ($scope.starttime == undefined) {
+                    countInfo.startTime = '2016-01-01'
+                } else {
+                    countInfo.startTime = $scope.starttime
+                }
+
+                if ($scope.endtime == undefined) {
+                    countInfo.endTime = now
+                } else {
+                    countInfo.endTime = $scope.endtime
+                }
+
+                countInfo.hospital = $scope.hospital
+                countInfo.doctor = $scope.doctor
+                console.log(countInfo)
+            }else if (Storage.get('ROLE').indexOf("master") != -1) {
+                if ($scope.starttime == undefined) {
+                    countInfo.startTime = '2016-01-01'
+                } else {
+                    countInfo.startTime = $scope.starttime
+                }
+
+                if ($scope.endtime == undefined) {
+                    countInfo.endTime = now
+                } else {
+                    countInfo.endTime = $scope.endtime
+                }
+
+                if (($scope.City == undefined) || ($scope.City == '')||($scope.Hospital == undefined) || ($scope.Hospital == '')) {
+                    countInfo.hospital = $scope.Hospitals[0].name
+                    countInfo.city = $scope.Hospitals[0].district
+                } else {
+                    countInfo.hospital = $scope.Hospital.hospital.name
+                    countInfo.hospital = $scope.Hospital.hospital.district
+
+                }
+                console.log(countInfo)
+
             }
-
-            if (($scope.City == undefined) || ($scope.City == '')) {
-                countInfo.city = ''
-            } else {
-                countInfo.city = $scope.City.city.name
-            }
-
-            if ($scope.starttime == undefined) {
-                countInfo.startTime = '2016-01-01'
-            } else {
-                countInfo.startTime = $scope.starttime
-            }
-
-            if ($scope.endtime == undefined) {
-                countInfo.endTime = now
-            } else {
-                countInfo.endTime = $scope.endtime
-            }
-
-            countInfo.hospital = $scope.hospital
-            countInfo.doctor = $scope.doctor
 
             $scope.currentPage = 1
             getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
@@ -6835,8 +7318,7 @@ angular.module('controllers', ['ngResource', 'services'])
     }])
 
     // 数据监控——医生工作量统计
-    .controller('workloadCtrl', ['Dict', 'Monitor1', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Dict, Monitor1, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
-        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
+    .controller('workloadCtrl', ['Dict', 'Monitor1', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', 'Department', function(Dict, Monitor1, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams, Department) {
 
         $scope.loadingflag = true
 
@@ -6865,28 +7347,6 @@ angular.module('controllers', ['ngResource', 'services'])
                 console.log(err)
             }
         )
-        $scope.getCity = function(province) {
-            if (province != null) {
-                Dict.getDistrict({
-                    level: '2',
-                    province: province.province,
-                    city: ''
-
-                }).then(
-                    function(data) {
-                        $scope.Cities = data.results
-                        // console.log($scope.Cities);
-                    },
-                    function(err) {
-                        console.log(err)
-                    }
-                )
-            } else {
-                $scope.Cities = {}
-                // $scope.Districts ={};
-            }
-            $scope.City = ''
-        }
 
         // 获取当前日期
         var myDate = new Date();
@@ -6894,30 +7354,49 @@ angular.module('controllers', ['ngResource', 'services'])
         var tempyesterday = new Date(new Date() - 24 * 60 * 60 * 1000);
         var yesterday = tempyesterday.toLocaleDateString();
         var isClick = false
-        var countInfo = {}
-        var Info = {}
+
         Storage.set('Tab', 1)
 
         // ---------------获取搜索(或未搜索)列表及列表数------------------------
         var getLists = function(currentPage, itemsPerPage, countInfo) {
             console.log(now)
-            countInfo.token = Storage.get('TOKEN'),
-                Info = Object.assign({}, countInfo)
-            Info.limit = itemsPerPage,
-                Info.skip = (currentPage - 1) * itemsPerPage
-            if (isClick == false) {
-                countInfo = {
-                    province: '浙江省',
-                    city: '杭州市',
-                    startTime: yesterday,
-                    endTime: now,
-                    token: Storage.get('TOKEN')
+            countInfo.token = Storage.get('TOKEN')
+            Info = Object.assign({}, countInfo)
+            Info.limit = itemsPerPage
+            Info.skip = (currentPage - 1) * itemsPerPage
+                       if (isClick == false) {
+
+                if (Storage.get('ROLE').indexOf("admin") != -1) {
+                    countInfo = {
+                        province: '',
+                        city: '',
+                        startTime: yesterday,
+                        endTime: now,
+                        token: Storage.get('TOKEN')
+                    }
+
+                } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
+                    countInfo = {
+                        city: $scope.Cities[0].name,
+                        startTime: yesterday,
+                        endTime: now,
+                        token: Storage.get('TOKEN')
+                    }
+                } else if (Storage.get('ROLE').indexOf("master") != -1) {
+                    console.log($scope.Hospitals)
+                    countInfo = {
+                        city: $scope.Hospitals[0].district,
+                        hospital: $scope.Hospitals[0].name,
+                        startTime: yesterday,
+                        endTime: now,
+                        token: Storage.get('TOKEN')
+                    }
                 }
                 $scope.starttime = yesterday
                 $scope.endtime = now
-                Info = Object.assign({}, countInfo),
-                    Info.limit = itemsPerPage,
-                    Info.skip = (currentPage - 1) * itemsPerPage
+                Info = Object.assign({}, countInfo)
+                Info.limit = itemsPerPage
+                Info.skip = (currentPage - 1) * itemsPerPage
             }
             console.log(Info);
             //获取搜索列表
@@ -6943,11 +7422,86 @@ angular.module('controllers', ['ngResource', 'services'])
                 $scope.totalItems = data.results.length
             }, function() {})
         }
-        // ---------------------------------------------------------------------
-        //初始化列表
-        $scope.currentPage = 1
-        $scope.itemsPerPage = 10000
-        getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
+
+        if (Storage.get('ROLE').indexOf("admin") != -1) {
+            $scope.ifprovince = true
+            $scope.getCity = function(province) {
+                if (province != null) {
+                    Dict.getDistrict({
+                        level: '2',
+                        province: province.province,
+                        city: ''
+
+                    }).then(
+                        function(data) {
+                            $scope.Cities = data.results
+                        },
+                        function(err) {
+                            console.log(err)
+                        }
+                    )
+                } else {
+                    $scope.Cities = {}
+                    // $scope.Districts ={};
+                }
+                $scope.City = ''
+
+            }
+
+            //初始化列表
+            var countInfo = {}
+            var Info = {}
+            $scope.currentPage = 1
+            $scope.itemsPerPage = 10000
+            getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
+        } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
+            $scope.ifprovince = false
+            $scope.Cities = []
+            Department.getinfo({
+                token: Storage.get('TOKEN'),
+                portleaderId: Storage.get('_id')
+            }).then(function(data) {
+                    for (i = 0; i < data.results.length; i++) {
+
+                        $scope.Cities.push({ city: i, name: data.results[i].district })
+                    }
+                    //初始化列表
+                    var countInfo = {}
+                    var Info = {}
+                    $scope.currentPage = 1
+                    $scope.itemsPerPage = 10000
+                    getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
+                },
+                function(err) {
+                    console.log(err)
+                })
+
+        }else if (Storage.get('ROLE').indexOf("master") != -1) {
+            $scope.ifcity = false
+            $scope.ifprovince = false
+            $scope.ifhospitalinput = false
+            $scope.ifhospitalselect = true
+            $scope.Hospitals = []
+            Department.getinfo({
+                token: Storage.get('TOKEN'),
+                departLeaderId: Storage.get('_id')
+            }).then(function(data) {
+                    for (i = 0; i < data.results.length; i++) {
+                        $scope.Hospitals.push({ hospital: i, name: data.results[i].hospital, district: data.results[i].district })
+                    }
+                    console.log($scope.Hospitals)
+                    //初始化列表
+                    var countInfo = {}
+                    var Info = {}
+                    $scope.currentPage = 1
+                    $scope.itemsPerPage = 10000
+                    getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
+                },
+                function(err) {
+                    console.log(err)
+                })
+        }
+
         // 页面改变
         $scope.pageChanged = function() {
             console.log($scope.currentPage)
@@ -6971,57 +7525,92 @@ angular.module('controllers', ['ngResource', 'services'])
 
         $scope.searchList = function() {
             $scope.loadingflag = true
-
+            countInfo = {}
             isClick = true
+            if (Storage.get('ROLE').indexOf("admin") != -1) {
+                if (($scope.Province == undefined) || ($scope.Province == '')) {
+                    countInfo.province = ''
+                } else {
+                    countInfo.province = $scope.Province.province.name
+                }
 
-            if (($scope.Province == undefined) || ($scope.Province == '')) {
-                countInfo.province = ''
-            } else {
-                countInfo.province = $scope.Province.province.name
+                if (($scope.City == undefined) || ($scope.City == '')) {
+                    countInfo.city = ''
+                } else {
+                    countInfo.city = $scope.City.city.name
+                }
+
+                if ($scope.starttime == undefined) {
+                    countInfo.startTime = '2016-01-01'
+                } else {
+                    countInfo.startTime = $scope.starttime
+                }
+
+                if ($scope.endtime == undefined) {
+                    countInfo.endTime = now
+                } else {
+                    countInfo.endTime = $scope.endtime
+                }
+
+                countInfo.hospital = $scope.hospital
+                countInfo.doctor = $scope.doctor
+
+            } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
+
+                if (($scope.City == undefined) || ($scope.City == '')) {
+                    countInfo.city = ''
+                } else {
+                    countInfo.city = $scope.City.city.name
+                }
+
+                if ($scope.starttime == undefined) {
+                    countInfo.startTime = '2016-01-01'
+                } else {
+                    countInfo.startTime = $scope.starttime
+                }
+
+                if ($scope.endtime == undefined) {
+                    countInfo.endTime = now
+                } else {
+                    countInfo.endTime = $scope.endtime
+                }
+
+                countInfo.hospital = $scope.hospital
+                countInfo.doctor = $scope.doctor
+                console.log(countInfo)
+            }else if (Storage.get('ROLE').indexOf("master") != -1) {
+                if ($scope.starttime == undefined) {
+                    countInfo.startTime = '2016-01-01'
+                } else {
+                    countInfo.startTime = $scope.starttime
+                }
+
+                if ($scope.endtime == undefined) {
+                    countInfo.endTime = now
+                } else {
+                    countInfo.endTime = $scope.endtime
+                }
+
+                if (($scope.City == undefined) || ($scope.City == '')||($scope.Hospital == undefined) || ($scope.Hospital == '')) {
+                    countInfo.hospital = $scope.Hospitals[0].name
+                    countInfo.city = $scope.Hospitals[0].district
+                } else {
+                    countInfo.hospital = $scope.Hospital.hospital.name
+                    countInfo.hospital = $scope.Hospital.hospital.district
+
+                }
+                console.log(countInfo)
+
             }
 
-            if (($scope.City == undefined) || ($scope.City == '')) {
-                countInfo.city = ''
-            } else {
-                countInfo.city = $scope.City.city.name
-            }
-
-            if ($scope.starttime == undefined) {
-                countInfo.startTime = '2016-01-01'
-            } else {
-                countInfo.startTime = $scope.starttime
-            }
-
-            if ($scope.endtime == undefined) {
-                countInfo.endTime = now
-            } else {
-                countInfo.endTime = $scope.endtime
-            }
-
-            countInfo.hospital = $scope.hospital
-            countInfo.doctor = $scope.doctor
-
-            // }
             $scope.currentPage = 1
             getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         }
 
-
-        //进度条控制  
-
-        // startProgerss()
-        // function startProgerss() {
-        //     $scope.length = 90;
-        //     // $("div[role='progressbar']").css("width", "100%");
-        //     //短暂延迟后刷新页面,貌似""作用是刷新本页面  
-        //     $("div[role='progressbar']").css("width", $scope.length + "%");
-        // }
-
     }])
 
     // 数据监控——患者地区分布
-    .controller('PatregionCtrl', ['Dict', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Dict, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
-        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
+    .controller('PatregionCtrl', ['Dict', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', 'Department', function(Dict, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams, Department) {
 
         $scope.loadingflag = true
 
@@ -7053,51 +7642,60 @@ angular.module('controllers', ['ngResource', 'services'])
                 console.log(err)
             }
         )
-        $scope.getCity = function(province) {
-            if (province != null) {
-                Dict.getDistrict({
-                    level: '2',
-                    province: province.province,
-                    city: ''
 
-                }).then(
-                    function(data) {
-                        $scope.Cities = data.results
-                        // console.log($scope.Cities);
+        $scope.$on('$viewContentLoaded', function() {
+            if (Storage.get('ROLE').indexOf("admin") != -1) {
+                $scope.ifprovince = true
+                $scope.getCity = function(province) {
+                    if (province != null) {
+                        Dict.getDistrict({
+                            level: '2',
+                            province: province.province,
+                            city: ''
+
+                        }).then(
+                            function(data) {
+                                $scope.Cities = data.results
+                                console.log($scope.Cities);
+                            },
+                            function(err) {
+                                console.log(err)
+                            }
+                        )
+                    } else {
+                        $scope.Cities = {}
+                        // $scope.Districts ={};
+                    }
+                    $scope.City = ''
+                }
+                console.log($scope.City)
+                showpie()
+
+
+            } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
+                $scope.ifprovince = false
+                $scope.Cities = []
+                Department.getinfo({
+                    token: Storage.get('TOKEN'),
+                    portleaderId: Storage.get('_id')
+                }).then(function(data) {
+                        for (i = 0; i < data.results.length; i++) {
+
+                            $scope.Cities.push({ city: i, name: data.results[i].district })
+                        }
+                        console.log($scope.Cities)
+                        showpie()
                     },
                     function(err) {
                         console.log(err)
-                    }
-                )
-            } else {
-                $scope.Cities = {}
-                // $scope.Districts ={};
-            }
-            $scope.City = ''
-        }
+                    })
 
-        $scope.$on('$viewContentLoaded', function() {
-            showpie()
+            }
         });
 
         // 获取当前日期
         var myDate = new Date();
         var now = myDate.toLocaleDateString();
-        var formatDateTime = function(date) {
-            var y = date.getFullYear();
-            var m = date.getMonth() + 1;
-            m = m < 10 ? ('0' + m) : m;
-            var d = date.getDate();
-            d = d < 10 ? ('0' + d) : d;
-            var h = date.getHours();
-            h = h < 10 ? ('0' + h) : h;
-            var minute = date.getMinutes();
-            minute = minute < 10 ? ('0' + minute) : minute;
-            var second = date.getSeconds();
-            second = second < 10 ? ('0' + second) : second;
-            return y + '-' + m + '-' + d + ' ' + h + ':' + minute + ':' + second;
-        };
-        var nowtime = myDate.toLocaleDateString();
 
         var isClick = false
         var RegionInfo = {}
@@ -7105,80 +7703,111 @@ angular.module('controllers', ['ngResource', 'services'])
         $scope.Province = {}
         $scope.viewPatRegion = function() {
             $scope.loadingflag = true
-            if (($scope.Province.province == undefined) && ($scope.City == undefined) && (($scope.starttime == undefined) || ($scope.endtime == undefined))) {
-                $('#inputerror').modal('show')
-                $timeout(function() {
-                    $('#inputerror').modal('hide')
-                }, 1000)
-                $scope.loadingflag = false
-            } else {
-
-                if (!($scope.Province.province == undefined)) {
-                    if (($scope.starttime == undefined) && ($scope.endtime == undefined)) {
-                        if ($scope.City.city == undefined) {
-                            RegionInfo = {
-                                province: $scope.Province.province.name,
-                                // city: $scope.City.city.name,
-                                startTime: '2016-01-01  00:00:00',
-                                endTime: nowtime,
-                                token: Storage.get('TOKEN')
+            if (Storage.get('ROLE').indexOf("admin") != -1) {
+                if (($scope.Province.province == undefined) && ($scope.City == undefined) && (($scope.starttime == undefined) || ($scope.endtime == undefined))) {
+                    $('#inputerror').modal('show')
+                    $timeout(function() {
+                        $('#inputerror').modal('hide')
+                    }, 1000)
+                    $scope.loadingflag = false
+                } else {
+                    if (!($scope.Province.province == undefined)) {
+                        if (($scope.starttime == undefined) && ($scope.endtime == undefined)) {
+                            if ($scope.City.city == undefined) {
+                                RegionInfo = {
+                                    province: $scope.Province.province.name,
+                                    // city: $scope.City.city.name,
+                                    startTime: '2016-01-01',
+                                    endTime: now,
+                                    token: Storage.get('TOKEN')
+                                }
+                                textInfo = $scope.Province.province.name + '患者地区分布'
+                            } else {
+                                RegionInfo = {
+                                    province: $scope.Province.province.name,
+                                    city: $scope.City.city.name,
+                                    startTime: '2016-01-01',
+                                    endTime: now,
+                                    token: Storage.get('TOKEN')
+                                }
+                                textInfo = $scope.Province.province.name + $scope.City.city.name + '患者地区分布'
                             }
-                            textInfo = $scope.Province.province.name + '患者地区分布'
-                        } else {
+                        } else if ($scope.City.city == undefined) {
                             RegionInfo = {
                                 province: $scope.Province.province.name,
                                 city: $scope.City.city.name,
-                                startTime: '2016-01-01  00:00:00',
-                                endTime: nowtime,
+                                startTime: $scope.starttime,
+                                endTime: $scope.endtime,
                                 token: Storage.get('TOKEN')
                             }
                             textInfo = $scope.Province.province.name + $scope.City.city.name + '患者地区分布'
+                        } else {
+                            RegionInfo = {
+                                province: $scope.Province.province.name,
+                                // city: $scope.City.city.name,
+                                startTime: $scope.starttime,
+                                endTime: $scope.endtime,
+                                token: Storage.get('TOKEN')
+                            }
+                            textInfo = $scope.Province.province.name + '患者地区分布'
                         }
-                    } else if ($scope.City.city == undefined) {
+                    } else if ((!($scope.City == undefined)) && (!($scope.starttime == undefined))) {
                         RegionInfo = {
-                            province: $scope.Province.province.name,
-                            city: $scope.City.city.name,
-                            startTime: $scope.starttime + ' 00:00:00',
-                            endTime: $scope.endtime + ' 00:00:00',
-                            token: Storage.get('TOKEN')
-                        }
-                        textInfo = $scope.Province.province.name + $scope.City.city.name + '患者地区分布'
-                    } else {
-                        RegionInfo = {
-                            province: $scope.Province.province.name,
+                            // province:  $scope.Province.province.name,
                             // city: $scope.City.city.name,
-                            startTime: $scope.starttime + ' 00:00:00',
-                            endTime: $scope.endtime + ' 00:00:00',
+                            startTime: $scope.starttime,
+                            endTime: $scope.endtime,
                             token: Storage.get('TOKEN')
                         }
-                        textInfo = $scope.Province.province.name + '患者地区分布'
+                        textInfo = '注册患者地区分布'
                     }
-                } else if ((!($scope.City == undefined)) && (!($scope.starttime == undefined))) {
+                }
+            } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
+                if (($scope.starttime == undefined) && ($scope.endtime == undefined)) {
                     RegionInfo = {
-                        // province:  $scope.Province.province.name,
-                        // city: $scope.City.city.name,
-                        startTime: $scope.starttime + ' 00:00:00',
-                        endTime: $scope.endtime + ' 00:00:00',
+                        city: $scope.City.city.name,
+                        startTime: '2016-01-01',
+                        endTime: now,
                         token: Storage.get('TOKEN')
                     }
-                    textInfo = '注册患者地区分布'
+                } else {
+                    RegionInfo = {
+                        city: $scope.City.city.name,
+                        startTime: $scope.starttime,
+                        endTime: $scope.endtime,
+                        token: Storage.get('TOKEN')
+                    }
                 }
-                isClick = true
-                showpie()
+                textInfo = $scope.City.city.name + '患者地区分布'
+
             }
+
+            isClick = true
+            showpie()
         }
 
         var showpie = function() {
 
             if (isClick == false) {
-                RegionInfo = {
-                    province: '浙江省',
-                    city: '',
-                    startTime: '2016-01-01 00:00:00',
-                    endTime: now,
-                    token: Storage.get('TOKEN')
+                if (Storage.get('ROLE').indexOf("admin") != -1) {
+                    RegionInfo = {
+                        province: '浙江省',
+                        city: '',
+                        startTime: '2016-01-01',
+                        endTime: now,
+                        token: Storage.get('TOKEN')
+                    }
+                    textInfo = '浙江省患者地区分布'
+                } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
+                    RegionInfo = {
+                        city: $scope.Cities[0].name,
+                        startTime: '2016-01-01',
+                        endTime: now,
+                        token: Storage.get('TOKEN')
+                    }
+                    textInfo = $scope.Cities[0].name + '注册患者地区分布'
+
                 }
-                textInfo = '浙江省患者地区分布'
             }
             Monitor2.GetPatRegion(RegionInfo).then(function(data) {
                     $scope.loadingflag = false
@@ -7235,8 +7864,7 @@ angular.module('controllers', ['ngResource', 'services'])
     }])
 
     // 数据监控——患者变化趋势
-    .controller('PattrendCtrl', ['Dict', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Dict, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
-        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
+    .controller('PattrendCtrl', ['Dict', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', 'Department', function(Dict, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams, Department) {
 
         $scope.loadingflag = true
 
@@ -7269,40 +7897,60 @@ angular.module('controllers', ['ngResource', 'services'])
                 console.log(err)
             }
         )
-        $scope.getCity = function(province) {
-            if (province != null) {
-                Dict.getDistrict({
-                    level: '2',
-                    province: province.province,
-                    city: ''
 
-                }).then(
-                    function(data) {
-                        $scope.Cities = data.results
-                        // console.log($scope.Cities);
+
+        $scope.$on('$viewContentLoaded', function() {
+            if (Storage.get('ROLE').indexOf("admin") != -1) {
+                $scope.ifprovince = true
+                $scope.getCity = function(province) {
+                    if (province != null) {
+                        Dict.getDistrict({
+                            level: '2',
+                            province: province.province,
+                            city: ''
+
+                        }).then(
+                            function(data) {
+                                $scope.Cities = data.results
+                            },
+                            function(err) {
+                                console.log(err)
+                            }
+                        )
+                    } else {
+                        $scope.Cities = {}
+                        // $scope.Districts ={};
+                    }
+                    $scope.City = ''
+                }
+                showlinegraph()
+
+
+            } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
+                $scope.ifprovince = false
+                $scope.Cities = []
+                Department.getinfo({
+                    token: Storage.get('TOKEN'),
+                    portleaderId: Storage.get('_id')
+                }).then(function(data) {
+                        for (i = 0; i < data.results.length; i++) {
+                            $scope.Cities.push({ city: i, name: data.results[i].district })
+                        }
+                        showlinegraph()
                     },
                     function(err) {
                         console.log(err)
-                    }
-                )
-            } else {
-                $scope.Cities = {}
-                // $scope.Districts ={};
-            }
-            $scope.City = ''
-        }
+                    })
 
-        $scope.$on('$viewContentLoaded', function() {
-            showlinegraph()
+            }
         });
+
 
         // 获取当前日期
         var myDate = new Date();
         var now = myDate.toLocaleDateString();
         var tempyesterday = new Date(new Date() - 24 * 60 * 60 * 1000);
         var yesterday = tempyesterday.toLocaleDateString();
-        var nowtime=now+' 00:00:00'
-        var yesterdaytime=yesterday+' 00:00:00'
 
         var isClick = false
         var Info = {}
@@ -7310,79 +7958,110 @@ angular.module('controllers', ['ngResource', 'services'])
         $scope.Province = {}
         $scope.viewPatTrend = function() {
             $scope.loadingflag = true
-
-            if (($scope.Province.province == undefined) && ($scope.City == undefined) && (($scope.starttime == undefined) || ($scope.endtime == undefined))) {
-                $('#inputerror').modal('show')
-                $timeout(function() {
-                    $('#inputerror').modal('hide')
-                }, 1000)
-                $scope.loadingflag = false
-            } else {
-                if (!($scope.Province.province == undefined)) {
-                    if (($scope.starttime == undefined) && ($scope.endtime == undefined)) {
-                        if ($scope.City.city == undefined) {
-                            TrendInfo = {
-                                province: $scope.Province.province.name,
-                                // city: $scope.City.city.name,
-                                startTime: '2016-01-01  00:00:00',
-                                endTime: nowtime,
-                                token: Storage.get('TOKEN')
+            if (Storage.get('ROLE').indexOf("admin") != -1) {
+                if (($scope.Province.province == undefined) && ($scope.City == undefined) && (($scope.starttime == undefined) || ($scope.endtime == undefined))) {
+                    $('#inputerror').modal('show')
+                    $timeout(function() {
+                        $('#inputerror').modal('hide')
+                    }, 1000)
+                    $scope.loadingflag = false
+                } else {
+                    if (!($scope.Province.province == undefined)) {
+                        if (($scope.starttime == undefined) && ($scope.endtime == undefined)) {
+                            if ($scope.City.city == undefined) {
+                                TrendInfo = {
+                                    province: $scope.Province.province.name,
+                                    // city: $scope.City.city.name,
+                                    startTime: '2016-01-01',
+                                    endTime: now,
+                                    token: Storage.get('TOKEN')
+                                }
+                                textInfo = $scope.Province.province.name + '患者注册变化趋势折线图'
+                            } else {
+                                TrendInfo = {
+                                    province: $scope.Province.province.name,
+                                    city: $scope.City.city.name,
+                                    startTime: '2016-01-01',
+                                    endTime: now,
+                                    token: Storage.get('TOKEN')
+                                }
+                                textInfo = $scope.Province.province.name + $scope.City.city.name + '患者注册变化趋势折线图'
                             }
-                            textInfo = $scope.Province.province.name + '患者注册变化趋势折线图'
-                        } else {
+                        } else if ($scope.City.city == undefined) {
                             TrendInfo = {
                                 province: $scope.Province.province.name,
                                 city: $scope.City.city.name,
-                                startTime: '2016-01-01  00:00:00',
-                                endTime: nowtime,
+                                startTime: $scope.starttime,
+                                endTime: $scope.endtime,
                                 token: Storage.get('TOKEN')
                             }
                             textInfo = $scope.Province.province.name + $scope.City.city.name + '患者注册变化趋势折线图'
+                        } else {
+                            TrendInfo = {
+                                province: $scope.Province.province.name,
+                                // city: $scope.City.city.name,
+                                startTime: $scope.starttime,
+                                endTime: $scope.endtime,
+                                token: Storage.get('TOKEN')
+                            }
+                            textInfo = $scope.Province.province.name + '患者注册变化趋势折线图'
                         }
-                    } else if ($scope.City.city == undefined) {
+                    } else if ((!($scope.City == undefined)) && (!($scope.starttime == undefined))) {
                         TrendInfo = {
-                            province: $scope.Province.province.name,
+                            // province:  $scope.Province.province.name,
                             // city: $scope.City.city.name,
-                            startTime: $scope.starttime + ' 00:00:00',
-                            endTime: $scope.endtime + ' 00:00:00',
+                            startTime: $scope.starttime,
+                            endTime: $scope.endtime,
                             token: Storage.get('TOKEN')
                         }
-                        textInfo = $scope.Province.province.name + '患者注册变化趋势折线图'
-                    } else {
-                        TrendInfo = {
-                            province: $scope.Province.province.name,
-                            city: $scope.City.city.name,
-                            startTime: $scope.starttime + ' 00:00:00',
-                            endTime: $scope.endtime + ' 00:00:00',
-                            token: Storage.get('TOKEN')
-                        }
-                        textInfo = $scope.Province.province.name + $scope.City.city.name + '患者注册变化趋势折线图'
+                        textInfo = '患者注册变化趋势折线图'
                     }
-                } else if ((!($scope.City == undefined)) && (!($scope.starttime == undefined))) {
+                }
+            } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
+                if (($scope.starttime == undefined) && ($scope.endtime == undefined)) {
                     TrendInfo = {
-                        // province:  $scope.Province.province.name,
-                        // city: $scope.City.city.name,
-                        startTime: $scope.starttime + ' 00:00:00',
-                        endTime: $scope.endtime + ' 00:00:00',
+                        city: $scope.City.city.name,
+                        startTime: '2016-01-01',
+                        endTime: now,
                         token: Storage.get('TOKEN')
                     }
-                    textInfo = '患者注册变化趋势折线图'
+                } else {
+                    TrendInfo = {
+                        city: $scope.City.city.name,
+                        startTime: $scope.starttime,
+                        endTime: $scope.endtime,
+                        token: Storage.get('TOKEN')
+                    }
                 }
+                textInfo = $scope.City.city.name + '患者注册变化趋势折线图'
 
-                isClick = true
-                showlinegraph()
             }
+
+            isClick = true
+            showlinegraph()
         }
+
         var showlinegraph = function() {
             if (isClick == false) {
-                Info = {
-                    province: '浙江省',
-                    city: '',
-                    startTime: '2016-01-01 00:00:00',
-                    endTime: nowtime,
-                    token: Storage.get('TOKEN')
+                if (Storage.get('ROLE').indexOf("admin") != -1) {
+                    TrendInfo = {
+                        province: '浙江省',
+                        city: '',
+                        startTime: '2016-01-01',
+                        endTime: now,
+                        token: Storage.get('TOKEN')
+                    }
+                    textInfo = '浙江省患者注册变化趋势折线图'
+                } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
+                    TrendInfo = {
+                        city: $scope.Cities[0].name,
+                        startTime: '2016-01-01',
+                        endTime: now,
+                        token: Storage.get('TOKEN')
+                    }
+                    textInfo = $scope.Cities[0].name + '患者注册变化趋势折线图'
+
                 }
-                textInfo = '浙江省患者注册变化趋势折线图'
             }
             Monitor2.GetPatTrend(Info).then(function(data) {
                     $scope.loadingflag = false
@@ -7419,13 +8098,13 @@ angular.module('controllers', ['ngResource', 'services'])
                     }
 
                     Monitor2.GetPatTrend({
-                    province: '浙江省',
-                    city: '',
-                    startTime:yesterdaytime,
-                    endTime: nowtime,
-                    token: Storage.get('TOKEN')
+                        province: '浙江省',
+                        city: '',
+                        startTime: yesterdaytime,
+                        endTime: nowtime,
+                        token: Storage.get('TOKEN')
                     }).then(function(data1) {
-                        sumtoday=data1.results.length
+                        sumtoday = data1.results.length
                     })
 
 
@@ -7473,7 +8152,7 @@ angular.module('controllers', ['ngResource', 'services'])
     }])
 
     // 数据监控——患者保险统计
-    .controller('PatinsuranceCtrl', ['Dict', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Dict, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
+    .controller('PatinsuranceCtrl', ['Dict', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', 'Department', function(Dict, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams, Department) {
         var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
 
         $scope.loadingflag = true
@@ -7503,34 +8182,13 @@ angular.module('controllers', ['ngResource', 'services'])
                 console.log(err)
             }
         )
-        $scope.getCity = function(province) {
-            if (province != null) {
-                Dict.getDistrict({
-                    level: '2',
-                    province: province.province,
-                    city: ''
 
-                }).then(
-                    function(data) {
-                        $scope.Cities = data.results
-                        // console.log($scope.Cities);
-                    },
-                    function(err) {
-                        console.log(err)
-                    }
-                )
-            } else {
-                $scope.Cities = {}
-                // $scope.Districts ={};
-            }
-            $scope.City = ''
-        }
         // 获取当前日期
         var myDate = new Date();
         var now = myDate.toLocaleDateString();
         var isClick = false
-        var countInfo = {}
-        var Info = {}
+        var tempyesterday = new Date(new Date() - 24 * 60 * 60 * 1000);
+        var yesterday = tempyesterday.toLocaleDateString();
         Storage.set('Tab', 1)
 
         // ---------------获取搜索(或未搜索)列表及列表数------------------------
@@ -7539,18 +8197,39 @@ angular.module('controllers', ['ngResource', 'services'])
                 Info = Object.assign({}, countInfo)
             Info.limit = itemsPerPage,
                 Info.skip = (currentPage - 1) * itemsPerPage
+
+
             if (isClick == false) {
-                countInfo = {
-                    province: '浙江省',
-                    city: '',
-                    startTime: '2017-01-01',
-                    endTime: now,
-                    token: Storage.get('TOKEN')
+
+                if (Storage.get('ROLE').indexOf("admin") != -1) {
+                    countInfo = {
+                        province: '浙江省',
+                        city: '',
+                        startTime: yesterday,
+                        endTime: now,
+                        token: Storage.get('TOKEN')
+                    }
+                    $scope.starttime = yesterday
+                    $scope.endtime = now
+                    Info = Object.assign({}, countInfo),
+                        Info.limit = itemsPerPage,
+                        Info.skip = (currentPage - 1) * itemsPerPage
+                } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
+                    countInfo = {
+                        city: $scope.Cities[0].name,
+                        startTime: yesterday,
+                        endTime: now,
+                        token: Storage.get('TOKEN')
+                    }
+                    $scope.starttime = yesterday
+                    $scope.endtime = now
+                    Info = Object.assign({}, countInfo),
+                        Info.limit = itemsPerPage,
+                        Info.skip = (currentPage - 1) * itemsPerPage
                 }
-                Info = Object.assign({}, countInfo),
-                    Info.limit = itemsPerPage,
-                    Info.skip = (currentPage - 1) * itemsPerPage
             }
+
+
             console.log(Info);
             //获取搜索列表
             var promise = Monitor2.GetPatInsurance(Info)
@@ -7577,11 +8256,61 @@ angular.module('controllers', ['ngResource', 'services'])
                 console.log($scope.totalItems)
             }, function() {})
         }
-        // ---------------------------------------------------------------------
-        //初始化列表
-        $scope.currentPage = 1
-        $scope.itemsPerPage = 100
-        getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
+
+        if (Storage.get('ROLE').indexOf("admin") != -1) {
+            $scope.ifprovince = true
+            $scope.getCity = function(province) {
+                if (province != null) {
+                    Dict.getDistrict({
+                        level: '2',
+                        province: province.province,
+                        city: ''
+
+                    }).then(
+                        function(data) {
+                            $scope.Cities = data.results
+                        },
+                        function(err) {
+                            console.log(err)
+                        }
+                    )
+                } else {
+                    $scope.Cities = {}
+                    // $scope.Districts ={};
+                }
+                $scope.City = ''
+            }
+            //初始化列表
+            var countInfo = {}
+            var Info = {}
+            $scope.currentPage = 1
+            $scope.itemsPerPage = 10000
+            getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
+        } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
+            $scope.ifprovince = false
+            $scope.Cities = []
+            Department.getinfo({
+                token: Storage.get('TOKEN'),
+                portleaderId: Storage.get('_id')
+            }).then(function(data) {
+                    for (i = 0; i < data.results.length; i++) {
+
+                        $scope.Cities.push({ city: i, name: data.results[i].district })
+                    }
+                    //初始化列表
+                    var countInfo = {}
+                    var Info = {}
+                    $scope.currentPage = 1
+                    $scope.itemsPerPage = 10000
+                    getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
+                },
+                function(err) {
+                    console.log(err)
+                })
+
+        }
+
+
         // 页面改变
         $scope.pageChanged = function() {
             console.log($scope.currentPage)
@@ -7595,24 +8324,83 @@ angular.module('controllers', ['ngResource', 'services'])
         }
 
         $scope.searchList = function() {
-            $scope.loadingflag = true
+            //     $scope.loadingflag = true
 
-            if (($scope.Province.province == undefined) || ($scope.starttime == undefined) || ($scope.endtime == undefined) || ($scope.starttime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null) || ($scope.endtime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null)) {
-                $('#inputerror').modal('show')
-                $timeout(function() {
-                    $('#inputerror').modal('hide')
-                }, 1000)
-            } else {
-                isClick = true
-                countInfo.province = $scope.Province.province.name
-                countInfo.startTime = $scope.starttime
-                countInfo.endTime = $scope.endtime
-                if ($scope.City.city == undefined) {
+            //     if (($scope.Province.province == undefined) || ($scope.starttime == undefined) || ($scope.endtime == undefined) || ($scope.starttime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null) || ($scope.endtime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null)) {
+            //         $('#inputerror').modal('show')
+            //         $timeout(function() {
+            //             $('#inputerror').modal('hide')
+            //         }, 1000)
+            //     } else {
+            //         isClick = true
+            //         countInfo.province = $scope.Province.province.name
+            //         countInfo.startTime = $scope.starttime
+            //         countInfo.endTime = $scope.endtime
+            //         if ($scope.City.city == undefined) {
+            //             countInfo.city = ''
+            //         } else {
+            //             countInfo.city = $scope.City.city.name
+            //         }
+            //     }
+            // }
+            $scope.loadingflag = true
+            countInfo = {}
+            isClick = true
+            if (Storage.get('ROLE').indexOf("admin") != -1) {
+                if (($scope.Province == undefined) || ($scope.Province == '')) {
+                    countInfo.province = ''
+                } else {
+                    countInfo.province = $scope.Province.province.name
+                }
+
+                if (($scope.City == undefined) || ($scope.City == '')) {
                     countInfo.city = ''
                 } else {
                     countInfo.city = $scope.City.city.name
                 }
+
+                if ($scope.starttime == undefined) {
+                    countInfo.startTime = '2016-01-01'
+                } else {
+                    countInfo.startTime = $scope.starttime
+                }
+
+                if ($scope.endtime == undefined) {
+                    countInfo.endTime = now
+                } else {
+                    countInfo.endTime = $scope.endtime
+                }
+
+                countInfo.hospital = $scope.hospital
+                countInfo.doctor = $scope.doctor
+
+            } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
+
+                if (($scope.City == undefined) || ($scope.City == '')) {
+                    countInfo.city = ''
+                } else {
+                    countInfo.city = $scope.City.city.name
+                }
+
+                if ($scope.starttime == undefined) {
+                    countInfo.startTime = '2016-01-01'
+                } else {
+                    countInfo.startTime = $scope.starttime
+                }
+
+                if ($scope.endtime == undefined) {
+                    countInfo.endTime = now
+                } else {
+                    countInfo.endTime = $scope.endtime
+                }
+
+                countInfo.hospital = $scope.hospital
+                countInfo.doctor = $scope.doctor
+                console.log(countInfo)
             }
+
+            $scope.currentPage = 1
+            getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         }
     }])
 
@@ -8325,6 +9113,16 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.flagdistrdp = false
             $scope.flaghealth = true
             $scope.flagdata = false
+            $scope.flaginsu = false
+            $scope.flagpatrefund = false
+            $scope.flagadvice = false
+
+        } else if ((tempuserrole.indexOf("master") != -1) || (tempuserrole.indexOf("Leader") != -1)) {
+            $scope.flagdoctor = false
+            $scope.flaguser = false
+            $scope.flagdistrdp = false
+            $scope.flaghealth = false
+            $scope.flagdata = true
             $scope.flaginsu = false
             $scope.flagpatrefund = false
             $scope.flagadvice = false
