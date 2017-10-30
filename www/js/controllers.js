@@ -5098,51 +5098,6 @@ angular.module('controllers', ['ngResource', 'services'])
             }, function() {})
         }
 
-        // 显示下属科室数据
-        var showdepartmentflag = true;
-        $scope.showdepartment = function(districtname) {
-            // 获得按钮行数
-            var e = e || window.event;
-            var target = e.target || e.srcElement;
-            if (target.parentNode.tagName.toLowerCase() == "td") {
-                var rowIndex = target.parentNode.parentNode.rowIndex;
-            }
-            // 获得该地区下属科室数据
-            var districtInfo = {}
-            districtInfo.district = districtname
-            districtInfo.token = Storage.get('TOKEN')
-            var promise = Department.GetDepartmentInfo(districtInfo)
-            var thisdepartmentlist = []
-            if (showdepartmentflag == true) {
-                console.log(showdepartmentflag)
-                promise.then(function(data) {
-                    console.log(data.results[0].department)
-                    if (!(data.results[0].department == undefined)) {
-                        thisdepartmentlist = data.results
-                        Storage.set('thisdepartmentlist.length', thisdepartmentlist.length)
-                        for (i = 0; i < thisdepartmentlist.length; i++) {
-                            var x = document.getElementById('districtlist').insertRow(rowIndex + 1);
-                            for (j = 0; j < 4; j++) {
-                                var y = x.insertCell(j);
-                                if (j == 2) {
-                                    y.innerHTML = thisdepartmentlist[i].department;
-                                } else { y.innerHTML = '' };
-                            }
-                        }
-                        showdepartmentflag = false;
-                    }
-                }, function(err) {})
-
-            } else {
-                console.log(Storage.get('thisdepartmentlist.length'))
-                for (i = 0; i < Storage.get('thisdepartmentlist.length'); i++) {
-                    console.log(thisdepartmentlist.length)
-                    var x = document.getElementById('districtlist')
-                    x.deleteRow(rowIndex + 1);
-                }
-                showdepartmentflag = true;
-            }
-        }
     }])
 
     // 地区--详细信息modal
@@ -5678,46 +5633,7 @@ angular.module('controllers', ['ngResource', 'services'])
             }, function() {})
         }
 
-        // 科室下属医生信息
-        var showdoctorflag = true;
-        $scope.showdoctor = function(department) {
-            // 获得按钮行数
-            var e = e || window.event;
-            var target = e.target || e.srcElement;
-            if (target.parentNode.tagName.toLowerCase() == "td") {
-                var rowIndex = target.parentNode.parentNode.rowIndex;
-            }
 
-            // 获得该科室下设医生数据
-            department.token = Storage.get('TOKEN')
-            var promise = Department.GetDoctorList(department)
-            var thisdoctorlist = []
-
-            if (showdoctorflag == true) {
-                promise.then(function(data) {
-                    thisdoctorlist = data.results
-                    Storage.set('thisdoctorlist.length', thisdoctorlist.length)
-                    for (i = 0; i < data.results.length; i++) {
-                        var x = document.getElementById('departmentlist').insertRow(rowIndex + 1);
-                        for (j = 0; j < 7; j++) {
-                            var y = x.insertCell(j);
-                            if (j == 5) {
-                                y.innerHTML = thisdoctorlist[i].name;
-                            } else { y.innerHTML = '' };
-                        }
-                    }
-                    showdoctorflag = false
-                }, function(err) {})
-            } else {
-                console.log(Storage.get('thisdoctorlist.length'))
-                for (i = 0; i < Storage.get('thisdoctorlist.length'); i++) {
-                    console.log(thisdoctorlist.length)
-                    var x = document.getElementById('departmentlist')
-                    x.deleteRow(rowIndex + 1);
-                }
-                showdoctorflag = true;
-            }
-        }
     }])
 
     // 科室--详细信息modal
@@ -5839,11 +5755,11 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.ifPatinsurance = false
             $scope.ifgroup = false
         }
-         if ((Storage.get('ROLE').indexOf("admin") != -1) || (Storage.get('ROLE').indexOf("Leader") != -1)) {
-               $scope.myindex=1
-            } else if (Storage.get('ROLE').indexOf("master") != -1) {
-                  $scope.myindex=3
-            
+        if ((Storage.get('ROLE').indexOf("admin") != -1) || (Storage.get('ROLE').indexOf("Leader") != -1)) {
+            $scope.indexnow = 1
+        } else if (Storage.get('ROLE').indexOf("master") != -1) {
+            $scope.indexnow = 3
+
         }
 
     }])
@@ -5966,7 +5882,7 @@ angular.module('controllers', ['ngResource', 'services'])
                                 RegionInfo = {
                                     province: $scope.Province.province.name,
                                     // city: $scope.City.city.name,
-                                    startTime: '2016-01-01',
+                                    startTime: '2017/01/01',
                                     endTime: now,
                                     token: Storage.get('TOKEN')
                                 }
@@ -5975,7 +5891,7 @@ angular.module('controllers', ['ngResource', 'services'])
                                 RegionInfo = {
                                     province: $scope.Province.province.name,
                                     city: $scope.City.city.name,
-                                    startTime: '2016-01-01',
+                                    startTime: '2017/01/01',
                                     endTime: now,
                                     token: Storage.get('TOKEN')
                                 }
@@ -6015,7 +5931,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 if (($scope.starttime == undefined) && ($scope.endtime == undefined)) {
                     RegionInfo = {
                         city: $scope.City.city.name,
-                        startTime: '2016-01-01',
+                        startTime: '2017/01/01',
                         endTime: now,
                         token: Storage.get('TOKEN')
                     }
@@ -6043,18 +5959,22 @@ angular.module('controllers', ['ngResource', 'services'])
                     RegionInfo = {
                         province: '浙江省',
                         city: '',
-                        startTime: '2016-01-01',
+                        startTime: '2017/01/01',
                         endTime: now,
                         token: Storage.get('TOKEN')
                     }
+                    $scope.starttime = '2017/01/01'
+                    $scope.endtime = now
                     textInfo = '浙江省医生地区分布'
                 } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
                     RegionInfo = {
                         city: $scope.Cities[0].name,
-                        startTime: '2016-01-01',
+                        startTime: '2017/01/01',
                         endTime: now,
                         token: Storage.get('TOKEN')
                     }
+                    $scope.starttime = '2017/01/01'
+                    $scope.endtime = now
                     textInfo = $scope.Cities[0].name + '注册医生地区分布'
 
                 }
@@ -6195,11 +6115,14 @@ angular.module('controllers', ['ngResource', 'services'])
         });
 
 
-        // 获取当前日期
+        // 获取当前日期\昨日日期\本月第一日日期
         var myDate = new Date();
         var now = myDate.toLocaleDateString();
         var tempyesterday = new Date(new Date() - 24 * 60 * 60 * 1000);
         var yesterday = tempyesterday.toLocaleDateString();
+        var tempCurrentMonthFirst = new Date()
+        tempCurrentMonthFirst.setDate(1);
+        var CurrentMonthFirst = tempCurrentMonthFirst.toLocaleDateString();
 
         var isClick = false
         var TrendInfo = {}
@@ -6221,20 +6144,20 @@ angular.module('controllers', ['ngResource', 'services'])
                                 TrendInfo = {
                                     province: $scope.Province.province.name,
                                     // city: $scope.City.city.name,
-                                    startTime: '2016-01-01',
+                                    startTime: CurrentMonthFirst,
                                     endTime: now,
                                     token: Storage.get('TOKEN')
                                 }
-                                textInfo = $scope.Province.province.name + '医生注册变化趋势折线图'
+                                textInfo = $scope.Province.province.name + '本月医生注册变化趋势折线图'
                             } else {
                                 TrendInfo = {
                                     province: $scope.Province.province.name,
                                     city: $scope.City.city.name,
-                                    startTime: '2016-01-01',
+                                    startTime: CurrentMonthFirst,
                                     endTime: now,
                                     token: Storage.get('TOKEN')
                                 }
-                                textInfo = $scope.Province.province.name + $scope.City.city.name + '医生注册变化趋势折线图'
+                                textInfo = $scope.Province.province.name + $scope.City.city.name + '本月医生注册变化趋势折线图'
                             }
                         } else if ($scope.City.city == undefined) {
                             TrendInfo = {
@@ -6270,10 +6193,11 @@ angular.module('controllers', ['ngResource', 'services'])
                 if (($scope.starttime == undefined) && ($scope.endtime == undefined)) {
                     TrendInfo = {
                         city: $scope.City.city.name,
-                        startTime: '2016-01-01',
+                        startTime: CurrentMonthFirst,
                         endTime: now,
                         token: Storage.get('TOKEN')
                     }
+                     textInfo = $scope.City.city.name + '本月医生注册变化趋势折线图'
                 } else {
                     TrendInfo = {
                         city: $scope.City.city.name,
@@ -6297,22 +6221,26 @@ angular.module('controllers', ['ngResource', 'services'])
                     TrendInfo = {
                         province: '浙江省',
                         city: '',
-                        startTime: '2016-01-01',
+                        startTime: CurrentMonthFirst,
                         endTime: now,
                         token: Storage.get('TOKEN')
                     }
-                    textInfo = '浙江省医生注册变化趋势折线图'
+                    $scope.starttime = CurrentMonthFirst
+                    $scope.endtime = now
+                    textInfo = '浙江省本月医生注册变化趋势折线图'
                 } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
                     TrendInfo = {
                         city: $scope.Cities[0].name,
-                        startTime: '2016-01-01',
+                        startTime: CurrentMonthFirst,
                         endTime: now,
                         token: Storage.get('TOKEN')
                     }
-                    textInfo = $scope.Cities[0].name + '医生注册变化趋势折线图'
-
+                    $scope.starttime = CurrentMonthFirst
+                    $scope.endtime = now
+                    textInfo = $scope.Cities[0].name + '本月医生注册变化趋势折线图'
                 }
             }
+            console.log(TrendInfo)
             Monitor1.GetTrend(TrendInfo).then(function(data) {
                     $scope.loadingflag = false
                     if (data.results.length == 0) {
@@ -6368,10 +6296,10 @@ angular.module('controllers', ['ngResource', 'services'])
                         },
                         xAxis: {
                             axisLabel: {
-                                interval: 'auto'
+                                interval: 0
                             },
                             type: 'category',
-                            boundaryGap: false,
+                            // boundaryGap: false,
                             data: _time
                         },
                         yAxis: {
@@ -6380,6 +6308,7 @@ angular.module('controllers', ['ngResource', 'services'])
                                 formatter: '{value} 人'
                             }
                         },
+
                         series: [{
                             name: '注册人数',
                             type: 'line',
@@ -6515,6 +6444,9 @@ angular.module('controllers', ['ngResource', 'services'])
 
         if (Storage.get('ROLE').indexOf("admin") != -1) {
             $scope.ifprovince = true
+            $scope.ifcity = true
+            $scope.ifhospitalinput = true
+
             $scope.getCity = function(province) {
                 if (province != null) {
                     Dict.getDistrict({
@@ -6545,7 +6477,7 @@ angular.module('controllers', ['ngResource', 'services'])
         } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
             $scope.ifprovince = false
             $scope.ifcity = true
-
+            $scope.ifhospitalinput = true
             $scope.Cities = []
             Department.getinfo({
                 token: Storage.get('TOKEN'),
@@ -6632,7 +6564,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 }
 
                 if ($scope.starttime == undefined) {
-                    countInfo.startTime = '2016-01-01'
+                    countInfo.startTime = CurrentMonthFirst
                 } else {
                     countInfo.startTime = $scope.starttime
                 }
@@ -6655,7 +6587,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 }
 
                 if ($scope.starttime == undefined) {
-                    countInfo.startTime = '2016-01-01'
+                    countInfo.startTime = CurrentMonthFirst
                 } else {
                     countInfo.startTime = $scope.starttime
                 }
@@ -6671,7 +6603,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 console.log(countInfo)
             } else if (Storage.get('ROLE').indexOf("master") != -1) {
                 if ($scope.starttime == undefined) {
-                    countInfo.startTime = '2016-01-01'
+                    countInfo.startTime = CurrentMonthFirst
                 } else {
                     countInfo.startTime = $scope.starttime
                 }
@@ -6740,6 +6672,9 @@ angular.module('controllers', ['ngResource', 'services'])
         var now = myDate.toLocaleDateString();
         var tempyesterday = new Date(new Date() - 24 * 60 * 60 * 1000);
         var yesterday = tempyesterday.toLocaleDateString();
+          var tempCurrentMonthFirst = new Date()
+        tempCurrentMonthFirst.setDate(1);
+        var CurrentMonthFirst = tempCurrentMonthFirst.toLocaleDateString();
         var isClick = false
         Storage.set('Tab', 1)
 
@@ -6832,6 +6767,8 @@ angular.module('controllers', ['ngResource', 'services'])
 
         if (Storage.get('ROLE').indexOf("admin") != -1) {
             $scope.ifprovince = true
+            $scope.ifcity = true
+            $scope.ifhospitalinput = true
             $scope.getCity = function(province) {
                 if (province != null) {
                     Dict.getDistrict({
@@ -6861,8 +6798,8 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.itemsPerPage = 10000
             getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
-            $scope.ifprovince = false
             $scope.ifcity = true
+            $scope.ifhospitalinput = true
 
             $scope.Cities = []
             Department.getinfo({
@@ -6949,7 +6886,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 }
 
                 if ($scope.starttime == undefined) {
-                    countInfo.startTime = '2016-01-01'
+                    countInfo.startTime = CurrentMonthFirst
                 } else {
                     countInfo.startTime = $scope.starttime
                 }
@@ -6965,7 +6902,7 @@ angular.module('controllers', ['ngResource', 'services'])
 
             } else if (Storage.get('ROLE').indexOf("master") != -1) {
                 if ($scope.starttime == undefined) {
-                    countInfo.startTime = '2016-01-01'
+                    countInfo.startTime = CurrentMonthFirst
                 } else {
                     countInfo.startTime = $scope.starttime
                 }
@@ -7004,14 +6941,14 @@ angular.module('controllers', ['ngResource', 'services'])
             if (isClick == false) {
                 DetailInfo = {
                     doctoruserId: Id,
-                    startTime: '2016-01-01',
+                    startTime: CurrentMonthFirst,
                     endTime: now,
                     token: Storage.get('TOKEN')
                 }
             } else {
                 DetailInfo = {
                     doctoruserId: Id,
-                    startTime: '2016-01-01',
+                    startTime: CurrentMonthFirst,
                     endTime: now,
                     token: Storage.get('TOKEN')
                 }
@@ -7072,6 +7009,9 @@ angular.module('controllers', ['ngResource', 'services'])
         var now = myDate.toLocaleDateString();
         var tempyesterday = new Date(new Date() - 24 * 60 * 60 * 1000);
         var yesterday = tempyesterday.toLocaleDateString();
+          var tempCurrentMonthFirst = new Date()
+        tempCurrentMonthFirst.setDate(1);
+        var CurrentMonthFirst = tempCurrentMonthFirst.toLocaleDateString();
         var isClick = false
         Storage.set('Tab', 1)
 
@@ -7147,6 +7087,8 @@ angular.module('controllers', ['ngResource', 'services'])
 
         if (Storage.get('ROLE').indexOf("admin") != -1) {
             $scope.ifprovince = true
+            $scope.ifcity = true
+            $scope.ifhospitalinput = true
             $scope.getCity = function(province) {
                 if (province != null) {
                     Dict.getDistrict({
@@ -7175,8 +7117,8 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.itemsPerPage = 10000
             getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
-            $scope.ifprovince = false
             $scope.ifcity = true
+            $scope.ifhospitalinput = true
 
             $scope.Cities = []
             Department.getinfo({
@@ -7268,7 +7210,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 }
 
                 if ($scope.starttime == undefined) {
-                    countInfo.startTime = '2016-01-01'
+                    countInfo.startTime = CurrentMonthFirst
                 } else {
                     countInfo.startTime = $scope.starttime
                 }
@@ -7291,7 +7233,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 }
 
                 if ($scope.starttime == undefined) {
-                    countInfo.startTime = '2016-01-01'
+                    countInfo.startTime = CurrentMonthFirst
                 } else {
                     countInfo.startTime = $scope.starttime
                 }
@@ -7307,7 +7249,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 console.log(countInfo)
             } else if (Storage.get('ROLE').indexOf("master") != -1) {
                 if ($scope.starttime == undefined) {
-                    countInfo.startTime = '2016-01-01'
+                    countInfo.startTime = CurrentMonthFirst
                 } else {
                     countInfo.startTime = $scope.starttime
                 }
@@ -7375,6 +7317,9 @@ angular.module('controllers', ['ngResource', 'services'])
         var now = myDate.toLocaleDateString();
         var tempyesterday = new Date(new Date() - 24 * 60 * 60 * 1000);
         var yesterday = tempyesterday.toLocaleDateString();
+          var tempCurrentMonthFirst = new Date()
+        tempCurrentMonthFirst.setDate(1);
+        var CurrentMonthFirst = tempCurrentMonthFirst.toLocaleDateString();
         var isClick = false
 
         Storage.set('Tab', 1)
@@ -7447,6 +7392,8 @@ angular.module('controllers', ['ngResource', 'services'])
 
         if (Storage.get('ROLE').indexOf("admin") != -1) {
             $scope.ifprovince = true
+            $scope.ifcity = true
+            $scope.ifhospitalinput = true
             $scope.getCity = function(province) {
                 if (province != null) {
                     Dict.getDistrict({
@@ -7477,8 +7424,8 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.itemsPerPage = 10000
             getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
-            $scope.ifprovince = false
             $scope.ifcity = true
+            $scope.ifhospitalinput = true
 
             $scope.Cities = []
             Department.getinfo({
@@ -7565,7 +7512,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 }
 
                 if ($scope.starttime == undefined) {
-                    countInfo.startTime = '2016-01-01'
+                    countInfo.startTime = CurrentMonthFirst
                 } else {
                     countInfo.startTime = $scope.starttime
                 }
@@ -7588,7 +7535,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 }
 
                 if ($scope.starttime == undefined) {
-                    countInfo.startTime = '2016-01-01'
+                    countInfo.startTime = CurrentMonthFirst
                 } else {
                     countInfo.startTime = $scope.starttime
                 }
@@ -7604,7 +7551,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 console.log(countInfo)
             } else if (Storage.get('ROLE').indexOf("master") != -1) {
                 if ($scope.starttime == undefined) {
-                    countInfo.startTime = '2016-01-01'
+                    countInfo.startTime = CurrentMonthFirst
                 } else {
                     countInfo.startTime = $scope.starttime
                 }
@@ -7740,7 +7687,7 @@ angular.module('controllers', ['ngResource', 'services'])
                                 RegionInfo = {
                                     province: $scope.Province.province.name,
                                     // city: $scope.City.city.name,
-                                    startTime: '2016-01-01',
+                                    startTime: '2017/01/01',
                                     endTime: now,
                                     token: Storage.get('TOKEN')
                                 }
@@ -7749,7 +7696,7 @@ angular.module('controllers', ['ngResource', 'services'])
                                 RegionInfo = {
                                     province: $scope.Province.province.name,
                                     city: $scope.City.city.name,
-                                    startTime: '2016-01-01',
+                                    startTime: '2017/01/01',
                                     endTime: now,
                                     token: Storage.get('TOKEN')
                                 }
@@ -7789,7 +7736,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 if (($scope.starttime == undefined) && ($scope.endtime == undefined)) {
                     RegionInfo = {
                         city: $scope.City.city.name,
-                        startTime: '2016-01-01',
+                        startTime: '2017/01/01',
                         endTime: now,
                         token: Storage.get('TOKEN')
                     }
@@ -7816,18 +7763,22 @@ angular.module('controllers', ['ngResource', 'services'])
                     RegionInfo = {
                         province: '浙江省',
                         city: '',
-                        startTime: '2016-01-01',
+                        startTime: '2017/01/01',
                         endTime: now,
                         token: Storage.get('TOKEN')
                     }
+                    $scope.starttime = '2017/01/01'
+                    $scope.endtime = now
                     textInfo = '浙江省患者地区分布'
                 } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
                     RegionInfo = {
                         city: $scope.Cities[0].name,
-                        startTime: '2016-01-01',
+                        startTime: '2017/01/01',
                         endTime: now,
                         token: Storage.get('TOKEN')
                     }
+                    $scope.starttime = '2017/01/01'
+                    $scope.endtime = now
                     textInfo = $scope.Cities[0].name + '注册患者地区分布'
 
                 }
@@ -7974,6 +7925,9 @@ angular.module('controllers', ['ngResource', 'services'])
         var now = myDate.toLocaleDateString();
         var tempyesterday = new Date(new Date() - 24 * 60 * 60 * 1000);
         var yesterday = tempyesterday.toLocaleDateString();
+          var tempCurrentMonthFirst = new Date()
+        tempCurrentMonthFirst.setDate(1);
+        var CurrentMonthFirst = tempCurrentMonthFirst.toLocaleDateString();
 
         var isClick = false
         var TrendInfo = {}
@@ -7995,20 +7949,20 @@ angular.module('controllers', ['ngResource', 'services'])
                                 TrendInfo = {
                                     province: $scope.Province.province.name,
                                     // city: $scope.City.city.name,
-                                    startTime: '2016-01-01',
+                                    startTime: CurrentMonthFirst,
                                     endTime: now,
                                     token: Storage.get('TOKEN')
                                 }
-                                textInfo = $scope.Province.province.name + '患者注册变化趋势折线图'
+                                textInfo = $scope.Province.province.name + '本月患者注册变化趋势折线图'
                             } else {
                                 TrendInfo = {
                                     province: $scope.Province.province.name,
                                     city: $scope.City.city.name,
-                                    startTime: '2016-01-01',
+                                    startTime: CurrentMonthFirst,
                                     endTime: now,
                                     token: Storage.get('TOKEN')
                                 }
-                                textInfo = $scope.Province.province.name + $scope.City.city.name + '患者注册变化趋势折线图'
+                                textInfo = $scope.Province.province.name + $scope.City.city.name + '本月患者注册变化趋势折线图'
                             }
                         } else if ($scope.City.city == undefined) {
                             TrendInfo = {
@@ -8044,10 +7998,11 @@ angular.module('controllers', ['ngResource', 'services'])
                 if (($scope.starttime == undefined) && ($scope.endtime == undefined)) {
                     TrendInfo = {
                         city: $scope.City.city.name,
-                        startTime: '2016-01-01',
+                        startTime: CurrentMonthFirst,
                         endTime: now,
                         token: Storage.get('TOKEN')
                     }
+                    textInfo = $scope.City.city.name + '本月患者注册变化趋势折线图'
                 } else {
                     TrendInfo = {
                         city: $scope.City.city.name,
@@ -8070,19 +8025,23 @@ angular.module('controllers', ['ngResource', 'services'])
                     TrendInfo = {
                         province: '浙江省',
                         city: '',
-                        startTime: '2016-01-01',
+                        startTime: CurrentMonthFirst,
                         endTime: now,
                         token: Storage.get('TOKEN')
                     }
-                    textInfo = '浙江省患者注册变化趋势折线图'
+                     $scope.starttime = CurrentMonthFirst
+                    $scope.endtime = now
+                    textInfo = '浙江省本月患者注册变化趋势折线图'
                 } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
                     TrendInfo = {
                         city: $scope.Cities[0].name,
-                        startTime: '2016-01-01',
+                        startTime: CurrentMonthFirst,
                         endTime: now,
                         token: Storage.get('TOKEN')
                     }
-                    textInfo = $scope.Cities[0].name + '患者注册变化趋势折线图'
+                     $scope.starttime = CurrentMonthFirst
+                    $scope.endtime = now
+                    textInfo = $scope.Cities[0].name + '本月患者注册变化趋势折线图'
 
                 }
             }
@@ -8212,6 +8171,9 @@ angular.module('controllers', ['ngResource', 'services'])
         var isClick = false
         var tempyesterday = new Date(new Date() - 24 * 60 * 60 * 1000);
         var yesterday = tempyesterday.toLocaleDateString();
+          var tempCurrentMonthFirst = new Date()
+        tempCurrentMonthFirst.setDate(1);
+        var CurrentMonthFirst = tempCurrentMonthFirst.toLocaleDateString();
         Storage.set('Tab', 1)
 
         // ---------------获取搜索(或未搜索)列表及列表数------------------------
@@ -8281,7 +8243,9 @@ angular.module('controllers', ['ngResource', 'services'])
         }
 
         if (Storage.get('ROLE').indexOf("admin") != -1) {
-            $scope.ifprovince = true
+             $scope.ifprovince = true
+            $scope.ifcity = true
+            $scope.ifhospitalinput = true
             $scope.getCity = function(province) {
                 if (province != null) {
                     Dict.getDistrict({
@@ -8310,7 +8274,8 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.itemsPerPage = 10000
             getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
-            $scope.ifprovince = false
+            $scope.ifcity = true
+            $scope.ifhospitalinput = true
             $scope.Cities = []
             Department.getinfo({
                 token: Storage.get('TOKEN'),
@@ -8383,7 +8348,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 }
 
                 if ($scope.starttime == undefined) {
-                    countInfo.startTime = '2016-01-01'
+                    countInfo.startTime = CurrentMonthFirst
                 } else {
                     countInfo.startTime = $scope.starttime
                 }
@@ -8406,7 +8371,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 }
 
                 if ($scope.starttime == undefined) {
-                    countInfo.startTime = '2016-01-01'
+                    countInfo.startTime = tempCurrentMonthFirst
                 } else {
                     countInfo.startTime = $scope.starttime
                 }
