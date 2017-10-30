@@ -7976,7 +7976,7 @@ angular.module('controllers', ['ngResource', 'services'])
         var yesterday = tempyesterday.toLocaleDateString();
 
         var isClick = false
-        var Info = {}
+        var TrendInfo = {}
         var textInfo = ''
         $scope.Province = {}
         $scope.viewPatTrend = function() {
@@ -8086,7 +8086,7 @@ angular.module('controllers', ['ngResource', 'services'])
 
                 }
             }
-            Monitor2.GetPatTrend(Info).then(function(data) {
+            Monitor2.GetPatTrend(TrendInfo).then(function(data) {
                     $scope.loadingflag = false
 
                     if (data.results.length == 0) {
@@ -8123,8 +8123,8 @@ angular.module('controllers', ['ngResource', 'services'])
                     Monitor2.GetPatTrend({
                         province: '浙江省',
                         city: '',
-                        startTime: yesterdaytime,
-                        endTime: nowtime,
+                        startTime: yesterday,
+                        endTime: now,
                         token: Storage.get('TOKEN')
                     }).then(function(data1) {
                         sumtoday = data1.results.length
