@@ -6197,7 +6197,7 @@ angular.module('controllers', ['ngResource', 'services'])
                         endTime: now,
                         token: Storage.get('TOKEN')
                     }
-                     textInfo = $scope.City.city.name + '本月医生注册变化趋势折线图'
+                    textInfo = $scope.City.city.name + '本月医生注册变化趋势折线图'
                 } else {
                     TrendInfo = {
                         city: $scope.City.city.name,
@@ -6531,12 +6531,6 @@ angular.module('controllers', ['ngResource', 'services'])
             console.log($scope.currentPage)
             getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         }
-        // 当前页面的总条目数改变
-        $scope.changeLimit = function(num) {
-            $scope.itemsPerPage = num
-            $scope.currentPage = 1
-            getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
-        }
 
         $scope.searchClear = function() {
             isClick = false
@@ -6672,7 +6666,7 @@ angular.module('controllers', ['ngResource', 'services'])
         var now = myDate.toLocaleDateString();
         var tempyesterday = new Date(new Date() - 24 * 60 * 60 * 1000);
         var yesterday = tempyesterday.toLocaleDateString();
-          var tempCurrentMonthFirst = new Date()
+        var tempCurrentMonthFirst = new Date()
         tempCurrentMonthFirst.setDate(1);
         var CurrentMonthFirst = tempCurrentMonthFirst.toLocaleDateString();
         var isClick = false
@@ -6860,12 +6854,6 @@ angular.module('controllers', ['ngResource', 'services'])
             console.log($scope.currentPage)
             getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         }
-        // 当前页面的总条目数改变
-        $scope.changeLimit = function(num) {
-            $scope.itemsPerPage = num
-            $scope.currentPage = 1
-            getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
-        }
 
         $scope.searchList = function() {
 
@@ -7009,7 +6997,7 @@ angular.module('controllers', ['ngResource', 'services'])
         var now = myDate.toLocaleDateString();
         var tempyesterday = new Date(new Date() - 24 * 60 * 60 * 1000);
         var yesterday = tempyesterday.toLocaleDateString();
-          var tempCurrentMonthFirst = new Date()
+        var tempCurrentMonthFirst = new Date()
         tempCurrentMonthFirst.setDate(1);
         var CurrentMonthFirst = tempCurrentMonthFirst.toLocaleDateString();
         var isClick = false
@@ -7177,12 +7165,6 @@ angular.module('controllers', ['ngResource', 'services'])
             console.log($scope.currentPage)
             getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         }
-        // 当前页面的总条目数改变
-        $scope.changeLimit = function(num) {
-            $scope.itemsPerPage = num
-            $scope.currentPage = 1
-            getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
-        }
 
         $scope.searchClear = function() {
             isClick = false
@@ -7317,7 +7299,7 @@ angular.module('controllers', ['ngResource', 'services'])
         var now = myDate.toLocaleDateString();
         var tempyesterday = new Date(new Date() - 24 * 60 * 60 * 1000);
         var yesterday = tempyesterday.toLocaleDateString();
-          var tempCurrentMonthFirst = new Date()
+        var tempCurrentMonthFirst = new Date()
         tempCurrentMonthFirst.setDate(1);
         var CurrentMonthFirst = tempCurrentMonthFirst.toLocaleDateString();
         var isClick = false
@@ -7370,18 +7352,34 @@ angular.module('controllers', ['ngResource', 'services'])
             var promise = Monitor1.GetWorkload(Info)
             promise.then(function(data) {
                 $scope.loadingflag = false
-                $scope.workloadtableParams = new NgTableParams({
-                    count: 20
-                }, {
-                    counts: [],
-                    dataset: data.results
-                })
-                if (data.results.length == 0) {
-                    $('#nodata').modal('show')
-                    $timeout(function() {
-                        $('#nodata').modal('hide')
-                    }, 1000)
+
+                if ($scope.ifzero == 'all') {
+                    $scope.workloadtableParams = new NgTableParams({
+                        count: 20
+                    }, {
+                        counts: [],
+                        dataset: data.results
+                    })
+                } else if ($scope.ifzero == 'notzero') {
+                    var tempdata = new Array
+
+                    for (i = 0; i < data.results.length; i++) {
+                        if (!((data.results[i].count == 0) && (data.results[i].open == 0) && (data.results[i].consultation == 0) && (data.results[i].urgentcon == 0) && (data.results[i].communication == 0) && (data.results[i].personaldiag == 0) && (data.results[i].doctorsincharge == 0))) {
+                            tempdata.push(data.results[i])
+                        }
+                    }
+
+                    $scope.workloadtableParams = new NgTableParams({
+                        count: 20
+                    }, {
+                        counts: [],
+                        dataset: tempdata
+                    })
+
                 }
+
+
+
             }, function(err) {})
             // 获取总条目数
             var promise = Monitor1.GetWorkload(countInfo)
@@ -7420,13 +7418,13 @@ angular.module('controllers', ['ngResource', 'services'])
             //初始化列表
             var countInfo = {}
             var Info = {}
+            $scope.ifzero = 'notzero'
             $scope.currentPage = 1
             $scope.itemsPerPage = 10000
             getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
             $scope.ifcity = true
             $scope.ifhospitalinput = true
-
             $scope.Cities = []
             Department.getinfo({
                 token: Storage.get('TOKEN'),
@@ -7439,6 +7437,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     //初始化列表
                     var countInfo = {}
                     var Info = {}
+                    $scope.ifzero = 'notzero'
                     $scope.currentPage = 1
                     $scope.itemsPerPage = 10000
                     getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
@@ -7464,6 +7463,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     //初始化列表
                     var countInfo = {}
                     var Info = {}
+                    $scope.ifzero = 'notzero'
                     $scope.currentPage = 1
                     $scope.itemsPerPage = 10000
                     getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
@@ -7473,17 +7473,17 @@ angular.module('controllers', ['ngResource', 'services'])
                 })
         }
 
+
+        $scope.search_class = [
+            { id: 'all', name: '全部工作量' },
+            { id: 'notzero', name: '非零工作量' },
+        ]
         // 页面改变
         $scope.pageChanged = function() {
             console.log($scope.currentPage)
             getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         }
-        // 当前页面的总条目数改变
-        $scope.changeLimit = function(num) {
-            $scope.itemsPerPage = num
-            $scope.currentPage = 1
-            getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
-        }
+
 
         $scope.searchClear = function() {
             isClick = false
@@ -7925,7 +7925,7 @@ angular.module('controllers', ['ngResource', 'services'])
         var now = myDate.toLocaleDateString();
         var tempyesterday = new Date(new Date() - 24 * 60 * 60 * 1000);
         var yesterday = tempyesterday.toLocaleDateString();
-          var tempCurrentMonthFirst = new Date()
+        var tempCurrentMonthFirst = new Date()
         tempCurrentMonthFirst.setDate(1);
         var CurrentMonthFirst = tempCurrentMonthFirst.toLocaleDateString();
 
@@ -8029,7 +8029,7 @@ angular.module('controllers', ['ngResource', 'services'])
                         endTime: now,
                         token: Storage.get('TOKEN')
                     }
-                     $scope.starttime = CurrentMonthFirst
+                    $scope.starttime = CurrentMonthFirst
                     $scope.endtime = now
                     textInfo = '浙江省本月患者注册变化趋势折线图'
                 } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
@@ -8039,7 +8039,7 @@ angular.module('controllers', ['ngResource', 'services'])
                         endTime: now,
                         token: Storage.get('TOKEN')
                     }
-                     $scope.starttime = CurrentMonthFirst
+                    $scope.starttime = CurrentMonthFirst
                     $scope.endtime = now
                     textInfo = $scope.Cities[0].name + '本月患者注册变化趋势折线图'
 
@@ -8171,7 +8171,7 @@ angular.module('controllers', ['ngResource', 'services'])
         var isClick = false
         var tempyesterday = new Date(new Date() - 24 * 60 * 60 * 1000);
         var yesterday = tempyesterday.toLocaleDateString();
-          var tempCurrentMonthFirst = new Date()
+        var tempCurrentMonthFirst = new Date()
         tempCurrentMonthFirst.setDate(1);
         var CurrentMonthFirst = tempCurrentMonthFirst.toLocaleDateString();
         Storage.set('Tab', 1)
@@ -8243,7 +8243,7 @@ angular.module('controllers', ['ngResource', 'services'])
         }
 
         if (Storage.get('ROLE').indexOf("admin") != -1) {
-             $scope.ifprovince = true
+            $scope.ifprovince = true
             $scope.ifcity = true
             $scope.ifhospitalinput = true
             $scope.getCity = function(province) {
@@ -8304,12 +8304,7 @@ angular.module('controllers', ['ngResource', 'services'])
             console.log($scope.currentPage)
             getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         }
-        // 当前页面的总条目数改变
-        $scope.changeLimit = function(num) {
-            $scope.itemsPerPage = num
-            $scope.currentPage = 1
-            getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
-        }
+
 
         $scope.searchList = function() {
             //     $scope.loadingflag = true
