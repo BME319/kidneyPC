@@ -7001,6 +7001,10 @@ angular.module('controllers', ['ngResource', 'services'])
         tempCurrentMonthFirst.setDate(1);
         var CurrentMonthFirst = tempCurrentMonthFirst.toLocaleDateString();
         var isClick = false
+        var exportdata = new Array()
+
+
+
         Storage.set('Tab', 1)
 
         // ---------------获取搜索(或未搜索)列表及列表数------------------------
@@ -7065,10 +7069,20 @@ angular.module('controllers', ['ngResource', 'services'])
                 }
             }, function(err) {})
             // 获取总条目数
+            exportdata = []
             var promise = Monitor1.GetCharge(countInfo)
             promise.then(function(data) {
                 $scope.totalItems = data.results.length
                 console.log($scope.totalItems)
+                for(i = 0;i < data.results.length; i++){
+                    var tempevery = {}
+                    tempevery.doctorname = data.results[i].doctorname
+                    tempevery.province = data.results[i].province 
+                    tempevery.city = data.results[i].city
+                    tempevery.hospital = data.results[i].hospital 
+                    tempevery.money  = data.results[i].money/100
+                    exportdata.push(tempevery)
+                }
             }, function() {})
         }
 
@@ -7153,11 +7167,6 @@ angular.module('controllers', ['ngResource', 'services'])
                     console.log(err)
                 })
         }
-
-
-
-
-
 
 
         // 页面改变
@@ -7261,6 +7270,25 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.info = detail
             $('#charge_detail').modal('show')
         }
+        $scope.exportExcel = function(){
+            if(exportdata == []){
+                    $('#nodata').modal('show')
+                    $timeout(function() {
+                        $('#nodata').modal('hide')
+                    }, 1000)
+            }else{
+                console.log(exportdata)
+                var option={}
+                option.fileName = '收费统计'
+                option.datas=[{
+                    sheetData:exportdata,
+                    // sheetName:'sheet1',
+                    // sheetFilter:['two','one'],
+                    sheetHeader:['医生姓名','省份','城市','所属医院','收入（¥）']
+                }]
+                var toExcel=new ExportJsonExcel(option)
+                toExcel.saveExcel();
+        }}
     }])
 
     // 数据监控——医生工作量统计
