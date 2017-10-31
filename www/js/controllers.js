@@ -137,6 +137,14 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.myIndex = 7
         }
 
+            $scope.flagdoctor = false
+            $scope.flaguser = false
+            $scope.flagdistrdp = false
+            $scope.flaghealth = false
+            $scope.flagdata = false
+            $scope.flaginsu = false
+            $scope.flagpatrefund = false
+            $scope.flagadvice = false
         if (tempuserrole.indexOf("admin") != -1) {
             $scope.flagdoctor = true
             $scope.flaguser = true
@@ -146,26 +154,12 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.flaginsu = true
             $scope.flagpatrefund = true
             $scope.flagadvice = true
-
-        } else if (tempuserrole.indexOf("health") != -1) {
-            $scope.flagdoctor = false
-            $scope.flaguser = false
-            $scope.flagdistrdp = false
+        }
+      if (tempuserrole.indexOf("health") != -1) {
             $scope.flaghealth = true
-            $scope.flagdata = false
-            $scope.flaginsu = false
-            $scope.flagpatrefund = false
-            $scope.flagadvice = false
-
-        } else if ((tempuserrole.indexOf("master") != -1) || (tempuserrole.indexOf("Leader") != -1)) {
-            $scope.flagdoctor = false
-            $scope.flaguser = false
-            $scope.flagdistrdp = false
-            $scope.flaghealth = false
+        }
+      if ((tempuserrole.indexOf("master") != -1) || (tempuserrole.indexOf("Leader") != -1)) {
             $scope.flagdata = true
-            $scope.flaginsu = false
-            $scope.flagpatrefund = false
-            $scope.flagadvice = false
         }
 
         $scope.tounchecked = function() {
@@ -6540,18 +6534,19 @@ angular.module('controllers', ['ngResource', 'services'])
             getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         }
 
-        $scope.searchList = function() {
+          $scope.searchList = function() {
+            console.log($scope.Province)
             $scope.loadingflag = true
             countInfo = {}
             isClick = true
             if (Storage.get('ROLE').indexOf("admin") != -1) {
-                if (($scope.Province == undefined) || ($scope.Province == '')) {
+                if (($scope.Province == undefined) || ($scope.Province == '')||($scope.Province.province==null)) {
                     countInfo.province = ''
                 } else {
                     countInfo.province = $scope.Province.province.name
                 }
 
-                if (($scope.City == undefined) || ($scope.City == '')) {
+                if (($scope.City == undefined) || ($scope.City == '')||($scope.City.city==null)) {
                     countInfo.city = ''
                 } else {
                     countInfo.city = $scope.City.city.name
@@ -6574,7 +6569,7 @@ angular.module('controllers', ['ngResource', 'services'])
 
             } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
 
-                if (($scope.City == undefined) || ($scope.City == '')) {
+                if (($scope.City == undefined) || ($scope.City == '')||($scope.City.city==null)) {
                     countInfo.city = ''
                 } else {
                     countInfo.city = $scope.City.city.name
@@ -6608,7 +6603,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     countInfo.endTime = $scope.endtime
                 }
 
-                if (($scope.Hospital == undefined) || ($scope.Hospital == '')) {
+                if (($scope.Hospital == undefined) || ($scope.Hospital == '')||($scope.Hospital.hospital == null )) {
                     countInfo.hospital = $scope.Hospitals[0].name
                     countInfo.city = $scope.Hospitals[0].district
                 } else {
@@ -6618,6 +6613,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 console.log(countInfo)
 
             }
+
             $scope.currentPage = 1
             getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         }
@@ -6855,19 +6851,19 @@ angular.module('controllers', ['ngResource', 'services'])
             getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         }
 
-        $scope.searchList = function() {
-
+         $scope.searchList = function() {
+            console.log($scope.Province)
             $scope.loadingflag = true
             countInfo = {}
             isClick = true
             if (Storage.get('ROLE').indexOf("admin") != -1) {
-                if (($scope.Province == undefined) || ($scope.Province == '')) {
+                if (($scope.Province == undefined) || ($scope.Province == '')||($scope.Province.province==null)) {
                     countInfo.province = ''
                 } else {
                     countInfo.province = $scope.Province.province.name
                 }
 
-                if (($scope.City == undefined) || ($scope.City == '')) {
+                if (($scope.City == undefined) || ($scope.City == '')||($scope.City.city==null)) {
                     countInfo.city = ''
                 } else {
                     countInfo.city = $scope.City.city.name
@@ -6888,6 +6884,29 @@ angular.module('controllers', ['ngResource', 'services'])
                 countInfo.hospital = $scope.hospital
                 countInfo.doctor = $scope.doctor
 
+            } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
+
+                if (($scope.City == undefined) || ($scope.City == '')||($scope.City.city==null)) {
+                    countInfo.city = ''
+                } else {
+                    countInfo.city = $scope.City.city.name
+                }
+
+                if ($scope.starttime == undefined) {
+                    countInfo.startTime = CurrentMonthFirst
+                } else {
+                    countInfo.startTime = $scope.starttime
+                }
+
+                if ($scope.endtime == undefined) {
+                    countInfo.endTime = now
+                } else {
+                    countInfo.endTime = $scope.endtime
+                }
+
+                countInfo.hospital = $scope.hospital
+                countInfo.doctor = $scope.doctor
+                console.log(countInfo)
             } else if (Storage.get('ROLE').indexOf("master") != -1) {
                 if ($scope.starttime == undefined) {
                     countInfo.startTime = CurrentMonthFirst
@@ -6901,7 +6920,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     countInfo.endTime = $scope.endtime
                 }
 
-                if (($scope.Hospital == undefined) || ($scope.Hospital == '')) {
+                if (($scope.Hospital == undefined) || ($scope.Hospital == '')||($scope.Hospital.hospital == null )) {
                     countInfo.hospital = $scope.Hospitals[0].name
                     countInfo.city = $scope.Hospitals[0].district
                 } else {
@@ -6912,10 +6931,10 @@ angular.module('controllers', ['ngResource', 'services'])
 
             }
 
-
             $scope.currentPage = 1
             getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         }
+
         $scope.searchClear = function() {
             isClick = false
             countInfo = {}
@@ -7175,17 +7194,18 @@ angular.module('controllers', ['ngResource', 'services'])
 
         }
         $scope.searchList = function() {
+            console.log($scope.Province)
             $scope.loadingflag = true
             countInfo = {}
             isClick = true
             if (Storage.get('ROLE').indexOf("admin") != -1) {
-                if (($scope.Province == undefined) || ($scope.Province == '')) {
+                if (($scope.Province == undefined) || ($scope.Province == '')||($scope.Province.province==null)) {
                     countInfo.province = ''
                 } else {
                     countInfo.province = $scope.Province.province.name
                 }
 
-                if (($scope.City == undefined) || ($scope.City == '')) {
+                if (($scope.City == undefined) || ($scope.City == '')||($scope.City.city==null)) {
                     countInfo.city = ''
                 } else {
                     countInfo.city = $scope.City.city.name
@@ -7208,7 +7228,7 @@ angular.module('controllers', ['ngResource', 'services'])
 
             } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
 
-                if (($scope.City == undefined) || ($scope.City == '')) {
+                if (($scope.City == undefined) || ($scope.City == '')||($scope.City.city==null)) {
                     countInfo.city = ''
                 } else {
                     countInfo.city = $scope.City.city.name
@@ -7242,7 +7262,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     countInfo.endTime = $scope.endtime
                 }
 
-                if (($scope.Hospital == undefined) || ($scope.Hospital == '')) {
+                if (($scope.Hospital == undefined) || ($scope.Hospital == '')||($scope.Hospital.hospital == null)) {
                     countInfo.hospital = $scope.Hospitals[0].name
                     countInfo.city = $scope.Hospitals[0].district
                 } else {
@@ -7495,17 +7515,18 @@ angular.module('controllers', ['ngResource', 'services'])
         }
 
         $scope.searchList = function() {
+            console.log($scope.Province)
             $scope.loadingflag = true
             countInfo = {}
             isClick = true
             if (Storage.get('ROLE').indexOf("admin") != -1) {
-                if (($scope.Province == undefined) || ($scope.Province == '')) {
+                if (($scope.Province == undefined) || ($scope.Province == '')||($scope.Province.province==null)) {
                     countInfo.province = ''
                 } else {
                     countInfo.province = $scope.Province.province.name
                 }
 
-                if (($scope.City == undefined) || ($scope.City == '')) {
+                if (($scope.City == undefined) || ($scope.City == '')||($scope.City.city==null)) {
                     countInfo.city = ''
                 } else {
                     countInfo.city = $scope.City.city.name
@@ -7528,7 +7549,7 @@ angular.module('controllers', ['ngResource', 'services'])
 
             } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
 
-                if (($scope.City == undefined) || ($scope.City == '')) {
+                if (($scope.City == undefined) || ($scope.City == '')||($scope.City.city==null)) {
                     countInfo.city = ''
                 } else {
                     countInfo.city = $scope.City.city.name
@@ -7562,7 +7583,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     countInfo.endTime = $scope.endtime
                 }
 
-                if (($scope.Hospital == undefined) || ($scope.Hospital == '')) {
+                if (($scope.Hospital == undefined) || ($scope.Hospital == '')||($scope.Hospital.hospital == null)) {
                     countInfo.hospital = $scope.Hospitals[0].name
                     countInfo.city = $scope.Hospitals[0].district
                 } else {
@@ -7576,7 +7597,6 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.currentPage = 1
             getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         }
-
     }])
 
     // 数据监控——患者地区分布
@@ -8330,13 +8350,13 @@ angular.module('controllers', ['ngResource', 'services'])
             countInfo = {}
             isClick = true
             if (Storage.get('ROLE').indexOf("admin") != -1) {
-                if (($scope.Province == undefined) || ($scope.Province == '')) {
+                if (($scope.Province == undefined) || ($scope.Province == '')||($scope.Province.province)) {
                     countInfo.province = ''
                 } else {
                     countInfo.province = $scope.Province.province.name
                 }
 
-                if (($scope.City == undefined) || ($scope.City == '')) {
+                if (($scope.City == undefined) || ($scope.City == '')||($scope.City.city==null)) {
                     countInfo.city = ''
                 } else {
                     countInfo.city = $scope.City.city.name
@@ -8359,7 +8379,7 @@ angular.module('controllers', ['ngResource', 'services'])
 
             } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
 
-                if (($scope.City == undefined) || ($scope.City == '')) {
+                if (($scope.City == undefined) || ($scope.City == '')||($scope.City.city==null)) {
                     countInfo.city = ''
                 } else {
                     countInfo.city = $scope.City.city.name
@@ -9080,6 +9100,15 @@ angular.module('controllers', ['ngResource', 'services'])
         $scope.UserRole = roles
         $scope.LastLoginTime = Storage.get('LASTLOGIN')
 
+
+            $scope.flagdoctor = false
+            $scope.flaguser = false
+            $scope.flagdistrdp = false
+            $scope.flaghealth = false
+            $scope.flagdata = false
+            $scope.flaginsu = false
+            $scope.flagpatrefund = false
+            $scope.flagadvice = false
         if (tempuserrole.indexOf("admin") != -1) {
             $scope.flagdoctor = true
             $scope.flaguser = true
@@ -9089,27 +9118,12 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.flaginsu = true
             $scope.flagpatrefund = true
             $scope.flagadvice = true
-
-        } else if (tempuserrole.indexOf("health") != -1) {
-            $scope.flagdoctor = false
-            $scope.flaguser = false
-            $scope.flagdistrdp = false
+        }
+      if (tempuserrole.indexOf("health") != -1) {
             $scope.flaghealth = true
-            $scope.flagdata = false
-            $scope.flaginsu = false
-            $scope.flagpatrefund = false
-            $scope.flagadvice = false
-
-        } else if ((tempuserrole.indexOf("master") != -1) || (tempuserrole.indexOf("Leader") != -1)) {
-            $scope.flagdoctor = false
-            $scope.flaguser = false
-            $scope.flagdistrdp = false
-            $scope.flaghealth = false
+        }
+      if ((tempuserrole.indexOf("master") != -1) || (tempuserrole.indexOf("Leader") != -1)) {
             $scope.flagdata = true
-            $scope.flaginsu = false
-            $scope.flagpatrefund = false
-            $scope.flagadvice = false
-
         }
         // $scope.godata = function() {
         //     // debugger
