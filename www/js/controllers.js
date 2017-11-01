@@ -6332,7 +6332,7 @@ angular.module('controllers', ['ngResource', 'services'])
     }])
 
     // 数据监控——医生超时咨询统计
-    .controller('overtimeCtrl', ['Dict', 'Monitor1', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', 'Department', function(Dict, Monitor1, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams, Department) {
+    .controller('overtimeCtrl', ['Dict', 'Monitor1', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', 'Department','$filter',function(Dict, Monitor1, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams, Department, $filter) {
 
         $scope.loadingflag = true
 
@@ -6416,6 +6416,7 @@ angular.module('controllers', ['ngResource', 'services'])
 
             console.log(Info);
             //获取搜索列表
+            exportdata = []
             var promise = Monitor1.GetOvertime(Info)
             promise.then(function(data) {
                 $scope.loadingflag = false
@@ -6431,14 +6432,6 @@ angular.module('controllers', ['ngResource', 'services'])
                         $('#nodata').modal('hide')
                     }, 1000)
                 }
-            }, function(err) {})
-            // 获取总条目数
-            exportdata = []
-            var promise = Monitor1.GetOvertime(countInfo)
-            promise.then(function(data) {
-                console.log(countInfo)
-                $scope.totalItems = data.results.length
-                console.log($scope.totalItems)
                 console.log(data.results)
                 for(i = 0;i < data.results.length; i++){
                     var tempevery = {}
@@ -6449,9 +6442,16 @@ angular.module('controllers', ['ngResource', 'services'])
                     tempevery.phoneNo  = data.results[i].phoneNo
                     tempevery.patientname  = data.results[i].patientname
                     tempevery.help  = data.results[i].help
-                    tempevery.time  = data.results[i].time.replace("T00:00:00.000Z", "")                  
+                    tempevery.time  = $filter('timeFormat')(data.results[i].time,'YYYY-MM-DD h:m')                
                     exportdata.push(tempevery)
-                }                
+                }  
+            }, function(err) {})
+            // 获取总条目数
+            var promise = Monitor1.GetOvertime(countInfo)
+            promise.then(function(data) {
+                console.log(countInfo)
+                $scope.totalItems = data.results.length
+                console.log($scope.totalItems)              
             }, function() {})
         }
 
@@ -8276,7 +8276,7 @@ angular.module('controllers', ['ngResource', 'services'])
     }])
 
     // 数据监控——患者保险统计
-    .controller('PatinsuranceCtrl', ['Dict', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', 'Department', function(Dict, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams, Department) {
+    .controller('PatinsuranceCtrl', ['Dict', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', 'Department','$filter',function(Dict, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams, Department, $filter) {
         var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
 
         $scope.loadingflag = true
@@ -8385,7 +8385,8 @@ angular.module('controllers', ['ngResource', 'services'])
                     tempevery.doctorphone = data.results[i].doctorphone 
                     tempevery.province  = data.results[i].province
                     tempevery.city  = data.results[i].city
-                    tempevery.time  = data.results[i].time.replace("T00:00:00.000Z", "")
+                    tempevery.hospital  = data.results[i].hospital                    
+                    tempevery.time  =  $filter('timeFormat')(data.results[i].time,'YYYY-MM-DD h:m')
                     exportdata.push(tempevery)
                 }
             }, function(err) {})
