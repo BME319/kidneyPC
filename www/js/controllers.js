@@ -6369,21 +6369,23 @@ angular.module('controllers', ['ngResource', 'services'])
                         _time[i] = timecount[i].t
                     }
 
-                    Monitor1.GetTrend({
-                        province: '浙江省',
-                        city: '',
-                        startTime: yesterday,
-                        endTime: now,
-                        token: Storage.get('TOKEN')
-                    }).then(function(data1) {
-                        sumtoday = data1.results.length
-                    })
+                    var todaytrendinfo = {}
+                    todaytrendinfo = TrendInfo
+                    todaytrendinfo.startTime = now
+                    todaytrendinfo.endTime = now
 
-                    var myTrend = echarts.init(document.getElementById('trend'))
+                    Monitor1.GetTrend(todaytrendinfo).then(function(data1) {
+                        if (data1.results.length == 0) {
+                            sumtoday = 0
+                        } else {
+                            sumtoday = data1.results[0].count
+                        }
+
+                         var myTrend = echarts.init(document.getElementById('trend'))
                     var option = {
                         title: {
                             text: textInfo,
-                            subtext: '今日新增注册医生' + sumtoday + '人',
+                            subtext: '今日('+now+')新增注册医生' + sumtoday + '人',
                             x: 'center'
                         },
                         tooltip: {
@@ -6419,6 +6421,10 @@ angular.module('controllers', ['ngResource', 'services'])
                         }]
                     }
                     myTrend.setOption(option)
+                    })
+
+
+                   
                 }),
                 function(err) {
                     console.log(err)
@@ -6449,7 +6455,7 @@ angular.module('controllers', ['ngResource', 'services'])
     }])
 
     // 数据监控——医生超时咨询统计
-    .controller('overtimeCtrl', ['Dict', 'Monitor1', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', 'Department','$filter',function(Dict, Monitor1, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams, Department, $filter) {
+    .controller('overtimeCtrl', ['Dict', 'Monitor1', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', 'Department', '$filter', function(Dict, Monitor1, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams, Department, $filter) {
 
         $scope.loadingflag = true
 
@@ -6550,25 +6556,25 @@ angular.module('controllers', ['ngResource', 'services'])
                     }, 1000)
                 }
                 console.log(data.results)
-                for(i = 0;i < data.results.length; i++){
+                for (i = 0; i < data.results.length; i++) {
                     var tempevery = {}
                     tempevery.doctorname = data.results[i].doctorname
-                    tempevery.province = data.results[i].province 
+                    tempevery.province = data.results[i].province
                     tempevery.city = data.results[i].city
-                    tempevery.hospital = data.results[i].hospital 
-                    tempevery.phoneNo  = data.results[i].phoneNo
-                    tempevery.patientname  = data.results[i].patientname
-                    tempevery.help  = data.results[i].help
-                    tempevery.time  = $filter('timeFormat')(data.results[i].time,'YYYY-MM-DD h:m')                
+                    tempevery.hospital = data.results[i].hospital
+                    tempevery.phoneNo = data.results[i].phoneNo
+                    tempevery.patientname = data.results[i].patientname
+                    tempevery.help = data.results[i].help
+                    tempevery.time = $filter('timeFormat')(data.results[i].time, 'YYYY-MM-DD h:m')
                     exportdata.push(tempevery)
-                }  
+                }
             }, function(err) {})
             // 获取总条目数
             var promise = Monitor1.GetOvertime(countInfo)
             promise.then(function(data) {
                 console.log(countInfo)
                 $scope.totalItems = data.results.length
-                console.log($scope.totalItems)              
+                console.log($scope.totalItems)
             }, function() {})
         }
 
@@ -6756,25 +6762,26 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.currentPage = 1
             getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         }
-        $scope.exportExcel = function(){
-                if (exportdata.length == 0) {
+        $scope.exportExcel = function() {
+            if (exportdata.length == 0) {
                 $('#nodata').modal('show')
                 $timeout(function() {
                     $('#nodata').modal('hide')
                 }, 1000)
             } else {
                 console.log(exportdata)
-                var option={}
+                var option = {}
                 option.fileName = '超时咨询统计'
-                option.datas=[{
-                    sheetData:exportdata,
+                option.datas = [{
+                    sheetData: exportdata,
                     // sheetName:'sheet1',
                     // sheetFilter:['two','one'],
-                    sheetHeader:['医生姓名','省份','城市','所属医院','手机号码','患者','咨询问题','时间']
+                    sheetHeader: ['医生姓名', '省份', '城市', '所属医院', '手机号码', '患者', '咨询问题', '时间']
                 }]
-                var toExcel=new ExportJsonExcel(option)
+                var toExcel = new ExportJsonExcel(option)
                 toExcel.saveExcel();
-        }}
+            }
+        }
     }])
 
     // 数据监控——医生评分统计
@@ -6883,16 +6890,16 @@ angular.module('controllers', ['ngResource', 'services'])
                         counts: [],
                         dataset: data.results
                     })
-                for(i = 0;i < data.results.length; i++){
-                    var tempevery = {}
-                    tempevery.doctorname = data.results[i].doctorname
-                    tempevery.province = data.results[i].province 
-                    tempevery.city = data.results[i].city
-                    tempevery.hospital = data.results[i].hospital
-                    tempevery.phoneNo = data.results[i].phoneNo
-                    tempevery.score  = data.results[i].score
-                    exportdata.push(tempevery)
-                } 
+                    for (i = 0; i < data.results.length; i++) {
+                        var tempevery = {}
+                        tempevery.doctorname = data.results[i].doctorname
+                        tempevery.province = data.results[i].province
+                        tempevery.city = data.results[i].city
+                        tempevery.hospital = data.results[i].hospital
+                        tempevery.phoneNo = data.results[i].phoneNo
+                        tempevery.score = data.results[i].score
+                        exportdata.push(tempevery)
+                    }
                 } else if ($scope.ifnegative == 'negative') {
                     var tempdata = new Array
                     for (i = 0; i < data.results.length; i++) {
@@ -6900,11 +6907,11 @@ angular.module('controllers', ['ngResource', 'services'])
                             tempdata.push(data.results[i])
                             var tempevery = {}
                             tempevery.doctorname = data.results[i].doctorname
-                            tempevery.province = data.results[i].province 
+                            tempevery.province = data.results[i].province
                             tempevery.city = data.results[i].city
                             tempevery.hospital = data.results[i].hospital
                             tempevery.phoneNo = data.results[i].phoneNo
-                            tempevery.score  = data.results[i].score
+                            tempevery.score = data.results[i].score
                             exportdata.push(tempevery)
                         }
                     }
@@ -6926,7 +6933,7 @@ angular.module('controllers', ['ngResource', 'services'])
             var promise = Monitor1.GetEvaluation(countInfo)
             promise.then(function(data) {
                 $scope.totalItems = data.results.length
-                console.log($scope.totalItems)               
+                console.log($scope.totalItems)
             }, function() {})
         }
 
@@ -7148,7 +7155,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 }
             })
         }
-        $scope.exportExcel = function(){
+        $scope.exportExcel = function() {
             if (exportdata.length == 0) {
                 $('#nodata').modal('show')
                 $timeout(function() {
@@ -7156,17 +7163,18 @@ angular.module('controllers', ['ngResource', 'services'])
                 }, 1000)
             } else {
                 console.log(exportdata)
-                var option={}
+                var option = {}
                 option.fileName = '评价统计'
-                option.datas=[{
-                    sheetData:exportdata,
+                option.datas = [{
+                    sheetData: exportdata,
                     // sheetName:'sheet1',
                     // sheetFilter:['two','one'],
-                    sheetHeader:['医生姓名','省份','城市','所属医院','手机号码','评分']
+                    sheetHeader: ['医生姓名', '省份', '城市', '所属医院', '手机号码', '评分']
                 }]
-                var toExcel=new ExportJsonExcel(option)
+                var toExcel = new ExportJsonExcel(option)
                 toExcel.saveExcel();
-        }}
+            }
+        }
     }])
 
     // 数据监控——医生收费统计
@@ -7604,38 +7612,38 @@ angular.module('controllers', ['ngResource', 'services'])
                         counts: [],
                         dataset: data.results
                     })
-                for(i = 0;i < data.results.length; i++){
-                    var tempevery = {}
-                    tempevery.name = data.results[i].name
-                    tempevery.province = data.results[i].province 
-                    tempevery.city = data.results[i].city
-                    tempevery.hospital = data.results[i].hospital 
-                    tempevery.count  = data.results[i].count
-                    tempevery.open  = data.results[i].open
-                    tempevery.consultation  = data.results[i].consultation
-                    tempevery.urgentcon  = data.results[i].urgentcon
-                    tempevery.communication  = data.results[i].communication
-                    tempevery.personaldiag  = data.results[i].personaldiag
-                    tempevery.doctorsincharge  = data.results[i].doctorsincharge
-                    exportdata.push(tempevery)
-                }
+                    for (i = 0; i < data.results.length; i++) {
+                        var tempevery = {}
+                        tempevery.name = data.results[i].name
+                        tempevery.province = data.results[i].province
+                        tempevery.city = data.results[i].city
+                        tempevery.hospital = data.results[i].hospital
+                        tempevery.count = data.results[i].count
+                        tempevery.open = data.results[i].open
+                        tempevery.consultation = data.results[i].consultation
+                        tempevery.urgentcon = data.results[i].urgentcon
+                        tempevery.communication = data.results[i].communication
+                        tempevery.personaldiag = data.results[i].personaldiag
+                        tempevery.doctorsincharge = data.results[i].doctorsincharge
+                        exportdata.push(tempevery)
+                    }
                 } else if ($scope.ifzero == 'notzero') {
                     var tempdata = new Array
                     for (i = 0; i < data.results.length; i++) {
                         if (!((data.results[i].count == 0) && (data.results[i].open == 0) && (data.results[i].consultation == 0) && (data.results[i].urgentcon == 0) && (data.results[i].communication == 0) && (data.results[i].personaldiag == 0) && (data.results[i].doctorsincharge == 0))) {
                             tempdata.push(data.results[i])
-                        var tempevery = {}
+                            var tempevery = {}
                             tempevery.name = data.results[i].name
-                            tempevery.province = data.results[i].province 
+                            tempevery.province = data.results[i].province
                             tempevery.city = data.results[i].city
-                            tempevery.hospital = data.results[i].hospital 
-                            tempevery.count  = data.results[i].count
-                            tempevery.open  = data.results[i].open
-                            tempevery.consultation  = data.results[i].consultation
-                            tempevery.urgentcon  = data.results[i].urgentcon
-                            tempevery.communication  = data.results[i].communication
-                            tempevery.personaldiag  = data.results[i].personaldiag
-                            tempevery.doctorsincharge  = data.results[i].doctorsincharge
+                            tempevery.hospital = data.results[i].hospital
+                            tempevery.count = data.results[i].count
+                            tempevery.open = data.results[i].open
+                            tempevery.consultation = data.results[i].consultation
+                            tempevery.urgentcon = data.results[i].urgentcon
+                            tempevery.communication = data.results[i].communication
+                            tempevery.personaldiag = data.results[i].personaldiag
+                            tempevery.doctorsincharge = data.results[i].doctorsincharge
                             exportdata.push(tempevery)
                         }
                     }
@@ -7848,25 +7856,26 @@ angular.module('controllers', ['ngResource', 'services'])
             getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         }
 
-        $scope.exportExcel = function(){
-            if(exportdata.length == 0){
-                    $('#nodata').modal('show')
-                    $timeout(function() {
-                        $('#nodata').modal('hide')
-                    }, 1000)
-            }else{
+        $scope.exportExcel = function() {
+            if (exportdata.length == 0) {
+                $('#nodata').modal('show')
+                $timeout(function() {
+                    $('#nodata').modal('hide')
+                }, 1000)
+            } else {
                 console.log(exportdata)
-                var option={}
+                var option = {}
                 option.fileName = '工作量统计'
-                option.datas=[{
-                    sheetData:exportdata,
+                option.datas = [{
+                    sheetData: exportdata,
                     // sheetName:'sheet1',
                     // sheetFilter:['two','one'],
-                    sheetHeader:['医生姓名','省份','城市','所属医院','关注数量','扫码未关注数量','咨询量','加急咨询量','问诊量','面诊量','主管患者量']
+                    sheetHeader: ['医生姓名', '省份', '城市', '所属医院', '关注数量', '扫码未关注数量', '咨询量', '加急咨询量', '问诊量', '面诊量', '主管患者量']
                 }]
-                var toExcel=new ExportJsonExcel(option)
+                var toExcel = new ExportJsonExcel(option)
                 toExcel.saveExcel();
-        }}
+            }
+        }
 
     }])
 
@@ -8160,7 +8169,7 @@ angular.module('controllers', ['ngResource', 'services'])
         }
 
         $scope.exportExcel = function() {
-            if (exportdata.length == 0)  {
+            if (exportdata.length == 0) {
                 $('#nodata').modal('show')
                 $timeout(function() {
                     $('#nodata').modal('hide')
@@ -8282,6 +8291,9 @@ angular.module('controllers', ['ngResource', 'services'])
         var exportdata = new Array()
 
         $scope.viewPatTrend = function() {
+            console.log($scope.Province)
+            console.log($scope.City)
+
             $scope.loadingflag = true
             if (Storage.get('ROLE').indexOf("admin") != -1) {
                 if (($scope.Province.province == undefined) && ($scope.City == undefined) && (($scope.starttime == undefined) || ($scope.endtime == undefined))) {
@@ -8296,7 +8308,6 @@ angular.module('controllers', ['ngResource', 'services'])
                             if (($scope.City == undefined) || ($scope.City == {}) || ($scope.City.city == null)) {
                                 TrendInfo = {
                                     province: $scope.Province.province.name,
-                                    // city: $scope.City.city.name,
                                     startTime: CurrentMonthFirst,
                                     endTime: now,
                                     token: Storage.get('TOKEN')
@@ -8315,7 +8326,6 @@ angular.module('controllers', ['ngResource', 'services'])
                         } else if (($scope.City == undefined) || ($scope.City == {}) || ($scope.City.city == null)) {
                             TrendInfo = {
                                 province: $scope.Province.province.name,
-                                // city: $scope.City.city.name,
                                 startTime: $scope.starttime,
                                 endTime: $scope.endtime,
                                 token: Storage.get('TOKEN')
@@ -8332,14 +8342,14 @@ angular.module('controllers', ['ngResource', 'services'])
                             textInfo = $scope.Province.province.name + $scope.City.city.name + '患者注册变化趋势折线图'
                         }
                     } else if (($scope.starttime == undefined) && ($scope.endtime == undefined)) {
-                        RegionInfo = {
-                            startTime: '2017/01/01',
+                        TrendInfo = {
+                            startTime: CurrentMonthFirst,
                             endTime: now,
                             token: Storage.get('TOKEN')
                         }
-                        textInfo = '患者注册变化趋势折线图'
+                        textInfo = '患者本月注册变化趋势折线图'
                     } else {
-                        RegionInfo = {
+                        TrendInfo = {
                             startTime: $scope.starttime,
                             endTime: $scope.endtime,
                             token: Storage.get('TOKEN')
@@ -8417,6 +8427,7 @@ angular.module('controllers', ['ngResource', 'services'])
 
                 }
             }
+            console.log(TrendInfo)
             Monitor2.GetPatTrend(TrendInfo).then(function(data) {
                     $scope.loadingflag = false
 
@@ -8453,22 +8464,24 @@ angular.module('controllers', ['ngResource', 'services'])
                         _time[i] = timecount[i].t
                     }
 
-                    Monitor2.GetPatTrend({
-                        province: '浙江省',
-                        city: '',
-                        startTime: yesterday,
-                        endTime: now,
-                        token: Storage.get('TOKEN')
-                    }).then(function(data1) {
-                        sumtoday = data1.results.length
-                    })
+                    var todaytrendinfo = {}
+                    todaytrendinfo = TrendInfo
+                    todaytrendinfo.startTime = now
+                    todaytrendinfo.endTime = now
 
+                    Monitor2.GetPatTrend(todaytrendinfo).then(function(data1) {
+
+                        if (data1.results.length == 0) {
+                            sumtoday = 0
+                        } else {
+                            sumtoday = data1.results[0].count
+                        }
 
                     var PatTrend = echarts.init(document.getElementById('Pattrend'))
                     var option = {
                         title: {
                             text: textInfo,
-                            subtext: '今日新增注册患者' + sumtoday + '人',
+                            subtext: '今日('+now+')新增注册患者' + sumtoday + '人',
                             x: 'center'
                         },
                         tooltip: {
@@ -8503,6 +8516,10 @@ angular.module('controllers', ['ngResource', 'services'])
                         }]
                     }
                     PatTrend.setOption(option)
+
+                    })
+
+
                 }),
                 function(err) {
                     console.log(err)
@@ -8532,7 +8549,7 @@ angular.module('controllers', ['ngResource', 'services'])
     }])
 
     // 数据监控——患者保险统计
-    .controller('PatinsuranceCtrl', ['Dict', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', 'Department','$filter',function(Dict, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams, Department, $filter) {
+    .controller('PatinsuranceCtrl', ['Dict', 'Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', 'Department', '$filter', function(Dict, Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams, Department, $filter) {
         var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
 
         $scope.loadingflag = true
@@ -8633,16 +8650,16 @@ angular.module('controllers', ['ngResource', 'services'])
                         $('#nodata').modal('hide')
                     }, 1000)
                 }
-                for(i = 0;i < data.results.length; i++){
+                for (i = 0; i < data.results.length; i++) {
                     var tempevery = {}
                     tempevery.patientname = data.results[i].patientname
-                    tempevery.patientphone = data.results[i].patientphone 
+                    tempevery.patientphone = data.results[i].patientphone
                     tempevery.doctorname = data.results[i].doctorname
-                    tempevery.doctorphone = data.results[i].doctorphone 
-                    tempevery.province  = data.results[i].province
-                    tempevery.city  = data.results[i].city
-                    tempevery.hospital  = data.results[i].hospital                    
-                    tempevery.time  =  $filter('timeFormat')(data.results[i].time,'YYYY-MM-DD h:m')
+                    tempevery.doctorphone = data.results[i].doctorphone
+                    tempevery.province = data.results[i].province
+                    tempevery.city = data.results[i].city
+                    tempevery.hospital = data.results[i].hospital
+                    tempevery.time = $filter('timeFormat')(data.results[i].time, 'YYYY-MM-DD h:m')
                     exportdata.push(tempevery)
                 }
             }, function(err) {})
@@ -8798,29 +8815,30 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.currentPage = 1
             getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         }
-        $scope.exportExcel = function(){
-            if(exportdata.length == 0){
-                    $('#nodata').modal('show')
-                    $timeout(function() {
-                        $('#nodata').modal('hide')
-                    }, 1000)
-            }else{
+        $scope.exportExcel = function() {
+            if (exportdata.length == 0) {
+                $('#nodata').modal('show')
+                $timeout(function() {
+                    $('#nodata').modal('hide')
+                }, 1000)
+            } else {
                 console.log(exportdata)
-                var option={}
+                var option = {}
                 option.fileName = '肾病保险'
-                option.datas=[{
-                    sheetData:exportdata,
+                option.datas = [{
+                    sheetData: exportdata,
                     // sheetName:'sheet1',
                     // sheetFilter:['two','one'],
-                    sheetHeader:['申请人姓名','申请人联系方式','医生姓名','医生联系方式','省份','城市','所属医院','申请时间']
+                    sheetHeader: ['申请人姓名', '申请人联系方式', '医生姓名', '医生联系方式', '省份', '城市', '所属医院', '申请时间']
                 }]
-                var toExcel=new ExportJsonExcel(option)
+                var toExcel = new ExportJsonExcel(option)
                 toExcel.saveExcel();
-        }}        
+            }
+        }
     }])
 
     // 数据监控——患者分组统计
-    .controller('PatgroupCtrl', ['Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams','$filter',function(Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams,$filter) {
+    .controller('PatgroupCtrl', ['Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', '$filter', function(Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams, $filter) {
         var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
         var exportdata = new Array()
         $scope.loadingflag = true
@@ -8889,13 +8907,13 @@ angular.module('controllers', ['ngResource', 'services'])
                     dataset: data.results
                 })
                 console.log(data.results)
-                for(i = 0;i < data.results.length; i++){
+                for (i = 0; i < data.results.length; i++) {
                     var tempevery = {}
                     tempevery.name = data.results[i].name
-                    tempevery.diseasetype = $filter('diseasetype')(data.results[i].class) 
-                    tempevery.content =  data.results[i].content
-                    tempevery.doctorname = data.results[i].doctorname 
-                    tempevery.creationTime  = data.results[i].creationTime.replace("T00:00:00.000Z", "")
+                    tempevery.diseasetype = $filter('diseasetype')(data.results[i].class)
+                    tempevery.content = data.results[i].content
+                    tempevery.doctorname = data.results[i].doctorname
+                    tempevery.creationTime = data.results[i].creationTime.replace("T00:00:00.000Z", "")
                     exportdata.push(tempevery)
                 }
             })
@@ -8931,25 +8949,26 @@ angular.module('controllers', ['ngResource', 'services'])
             getLists($scope.currentPage, $scope.itemsPerPage, tempinfo)
 
         }
-        $scope.exportExcel = function(){
-            if(exportdata.length == 0){
-                    $('#nodata').modal('show')
-                    $timeout(function() {
-                        $('#nodata').modal('hide')
-                    }, 1000)
-            }else{
+        $scope.exportExcel = function() {
+            if (exportdata.length == 0) {
+                $('#nodata').modal('show')
+                $timeout(function() {
+                    $('#nodata').modal('hide')
+                }, 1000)
+            } else {
                 console.log(exportdata)
-                var option={}
+                var option = {}
                 option.fileName = '患者分组查看'
-                option.datas=[{
-                    sheetData:exportdata,
+                option.datas = [{
+                    sheetData: exportdata,
                     // sheetName:'sheet1',
                     // sheetFilter:['two','one'],
-                    sheetHeader:['患者姓名','诊断类型','内容','主管医生','诊断时间']
+                    sheetHeader: ['患者姓名', '诊断类型', '内容', '主管医生', '诊断时间']
                 }]
-                var toExcel=new ExportJsonExcel(option)
+                var toExcel = new ExportJsonExcel(option)
                 toExcel.saveExcel();
-        }}
+            }
+        }
     }])
 
     // 保险管理
