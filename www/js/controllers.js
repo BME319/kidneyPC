@@ -6368,9 +6368,8 @@ angular.module('controllers', ['ngResource', 'services'])
         var now = myDate.toLocaleDateString();
         var tempyesterday = new Date(new Date() - 24 * 60 * 60 * 1000);
         var yesterday = tempyesterday.toLocaleDateString();
-
         var isClick = false
-
+        var exportdata = new Array()
         Storage.set('Tab', 1)
 
         // ---------------获取搜索(或未搜索)列表及列表数------------------------
@@ -6434,10 +6433,25 @@ angular.module('controllers', ['ngResource', 'services'])
                 }
             }, function(err) {})
             // 获取总条目数
+            exportdata = []
             var promise = Monitor1.GetOvertime(countInfo)
             promise.then(function(data) {
+                console.log(countInfo)
                 $scope.totalItems = data.results.length
                 console.log($scope.totalItems)
+                console.log(data.results)
+                for(i = 0;i < data.results.length; i++){
+                    var tempevery = {}
+                    tempevery.doctorname = data.results[i].doctorname
+                    tempevery.province = data.results[i].province 
+                    tempevery.city = data.results[i].city
+                    tempevery.hospital = data.results[i].hospital 
+                    tempevery.phoneNo  = data.results[i].phoneNo
+                    tempevery.patientname  = data.results[i].patientname
+                    tempevery.help  = data.results[i].help
+                    tempevery.time  = data.results[i].time.replace("T00:00:00.000Z", "")                  
+                    exportdata.push(tempevery)
+                }                
             }, function() {})
         }
 
@@ -6621,6 +6635,25 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.currentPage = 1
             getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         }
+        $scope.exportExcel = function(){
+                if (exportdata.length == 0) {
+                $('#nodata').modal('show')
+                $timeout(function() {
+                    $('#nodata').modal('hide')
+                }, 1000)
+            } else {
+                console.log(exportdata)
+                var option={}
+                option.fileName = '超时咨询统计'
+                option.datas=[{
+                    sheetData:exportdata,
+                    // sheetName:'sheet1',
+                    // sheetFilter:['two','one'],
+                    sheetHeader:['医生姓名','省份','城市','所属医院','手机号码','患者','咨询问题','时间']
+                }]
+                var toExcel=new ExportJsonExcel(option)
+                toExcel.saveExcel();
+        }}
     }])
 
     // 数据监控——医生评分统计
@@ -6670,6 +6703,7 @@ angular.module('controllers', ['ngResource', 'services'])
         tempCurrentMonthFirst.setDate(1);
         var CurrentMonthFirst = tempCurrentMonthFirst.toLocaleDateString();
         var isClick = false
+        var exportdata = new Array()
         Storage.set('Tab', 1)
 
         // ---------------获取搜索(或未搜索)列表及列表数------------------------
@@ -6717,6 +6751,7 @@ angular.module('controllers', ['ngResource', 'services'])
 
             console.log(Info);
             //获取搜索列表
+            exportdata = []
             var promise = Monitor1.GetEvaluation(Info)
             promise.then(function(data) {
                 $scope.loadingflag = false
@@ -6727,11 +6762,29 @@ angular.module('controllers', ['ngResource', 'services'])
                         counts: [],
                         dataset: data.results
                     })
+                for(i = 0;i < data.results.length; i++){
+                    var tempevery = {}
+                    tempevery.doctorname = data.results[i].doctorname
+                    tempevery.province = data.results[i].province 
+                    tempevery.city = data.results[i].city
+                    tempevery.hospital = data.results[i].hospital
+                    tempevery.phoneNo = data.results[i].phoneNo
+                    tempevery.score  = data.results[i].score
+                    exportdata.push(tempevery)
+                } 
                 } else if ($scope.ifnegative == 'negative') {
                     var tempdata = new Array
                     for (i = 0; i < data.results.length; i++) {
                         if (data.results[i].score <= 5) {
                             tempdata.push(data.results[i])
+                            var tempevery = {}
+                            tempevery.doctorname = data.results[i].doctorname
+                            tempevery.province = data.results[i].province 
+                            tempevery.city = data.results[i].city
+                            tempevery.hospital = data.results[i].hospital
+                            tempevery.phoneNo = data.results[i].phoneNo
+                            tempevery.score  = data.results[i].score
+                            exportdata.push(tempevery)
                         }
                     }
                     $scope.scoretableParams = new NgTableParams({
@@ -6740,9 +6793,7 @@ angular.module('controllers', ['ngResource', 'services'])
                         counts: [],
                         dataset: tempdata
                     })
-
                 }
-
                 if (data.results.length == 0) {
                     $('#nodata').modal('show')
                     $timeout(function() {
@@ -6754,7 +6805,7 @@ angular.module('controllers', ['ngResource', 'services'])
             var promise = Monitor1.GetEvaluation(countInfo)
             promise.then(function(data) {
                 $scope.totalItems = data.results.length
-                console.log($scope.totalItems)
+                console.log($scope.totalItems)               
             }, function() {})
         }
 
@@ -6952,8 +7003,26 @@ angular.module('controllers', ['ngResource', 'services'])
                     $('#score_detail').modal('show')
                 }
             })
-
         }
+        $scope.exportExcel = function(){
+            if (exportdata.length == 0) {
+                $('#nodata').modal('show')
+                $timeout(function() {
+                    $('#nodata').modal('hide')
+                }, 1000)
+            } else {
+                console.log(exportdata)
+                var option={}
+                option.fileName = '评价统计'
+                option.datas=[{
+                    sheetData:exportdata,
+                    // sheetName:'sheet1',
+                    // sheetFilter:['two','one'],
+                    sheetHeader:['医生姓名','省份','城市','所属医院','手机号码','评分']
+                }]
+                var toExcel=new ExportJsonExcel(option)
+                toExcel.saveExcel();
+        }}
     }])
 
     // 数据监控——医生收费统计
@@ -7331,7 +7400,7 @@ angular.module('controllers', ['ngResource', 'services'])
         tempCurrentMonthFirst.setDate(1);
         var CurrentMonthFirst = tempCurrentMonthFirst.toLocaleDateString();
         var isClick = false
-
+        var exportdata = new Array()
         Storage.set('Tab', 1)
 
         // ---------------获取搜索(或未搜索)列表及列表数------------------------
@@ -7377,10 +7446,11 @@ angular.module('controllers', ['ngResource', 'services'])
             }
             console.log(Info);
             //获取搜索列表
+            exportdata = []
             var promise = Monitor1.GetWorkload(Info)
             promise.then(function(data) {
+                console.log(data.results)
                 $scope.loadingflag = false
-
                 if ($scope.ifzero == 'all') {
                     $scope.workloadtableParams = new NgTableParams({
                         count: 20
@@ -7388,12 +7458,39 @@ angular.module('controllers', ['ngResource', 'services'])
                         counts: [],
                         dataset: data.results
                     })
+                for(i = 0;i < data.results.length; i++){
+                    var tempevery = {}
+                    tempevery.name = data.results[i].name
+                    tempevery.province = data.results[i].province 
+                    tempevery.city = data.results[i].city
+                    tempevery.hospital = data.results[i].hospital 
+                    tempevery.count  = data.results[i].count
+                    tempevery.open  = data.results[i].open
+                    tempevery.consultation  = data.results[i].consultation
+                    tempevery.urgentcon  = data.results[i].urgentcon
+                    tempevery.communication  = data.results[i].communication
+                    tempevery.personaldiag  = data.results[i].personaldiag
+                    tempevery.doctorsincharge  = data.results[i].doctorsincharge
+                    exportdata.push(tempevery)
+                }
                 } else if ($scope.ifzero == 'notzero') {
                     var tempdata = new Array
-
                     for (i = 0; i < data.results.length; i++) {
                         if (!((data.results[i].count == 0) && (data.results[i].open == 0) && (data.results[i].consultation == 0) && (data.results[i].urgentcon == 0) && (data.results[i].communication == 0) && (data.results[i].personaldiag == 0) && (data.results[i].doctorsincharge == 0))) {
                             tempdata.push(data.results[i])
+                        var tempevery = {}
+                            tempevery.name = data.results[i].name
+                            tempevery.province = data.results[i].province 
+                            tempevery.city = data.results[i].city
+                            tempevery.hospital = data.results[i].hospital 
+                            tempevery.count  = data.results[i].count
+                            tempevery.open  = data.results[i].open
+                            tempevery.consultation  = data.results[i].consultation
+                            tempevery.urgentcon  = data.results[i].urgentcon
+                            tempevery.communication  = data.results[i].communication
+                            tempevery.personaldiag  = data.results[i].personaldiag
+                            tempevery.doctorsincharge  = data.results[i].doctorsincharge
+                            exportdata.push(tempevery)
                         }
                     }
 
@@ -7403,7 +7500,6 @@ angular.module('controllers', ['ngResource', 'services'])
                         counts: [],
                         dataset: tempdata
                     })
-
                 }
 
 
@@ -7604,7 +7700,25 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.currentPage = 1
             getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         }
-
+        $scope.exportExcel = function(){
+            if(exportdata.length == 0){
+                    $('#nodata').modal('show')
+                    $timeout(function() {
+                        $('#nodata').modal('hide')
+                    }, 1000)
+            }else{
+                console.log(exportdata)
+                var option={}
+                option.fileName = '工作量统计'
+                option.datas=[{
+                    sheetData:exportdata,
+                    // sheetName:'sheet1',
+                    // sheetFilter:['two','one'],
+                    sheetHeader:['医生姓名','省份','城市','所属医院','关注数量','扫码未关注数量','咨询量','加急咨询量','问诊量','面诊量','主管患者量']
+                }]
+                var toExcel=new ExportJsonExcel(option)
+                toExcel.saveExcel();
+        }}
     }])
 
     // 数据监控——患者地区分布
@@ -8202,6 +8316,7 @@ angular.module('controllers', ['ngResource', 'services'])
         var tempCurrentMonthFirst = new Date()
         tempCurrentMonthFirst.setDate(1);
         var CurrentMonthFirst = tempCurrentMonthFirst.toLocaleDateString();
+        var exportdata = new Array()
         Storage.set('Tab', 1)
 
         // ---------------获取搜索(或未搜索)列表及列表数------------------------
@@ -8245,6 +8360,7 @@ angular.module('controllers', ['ngResource', 'services'])
 
             console.log(Info);
             //获取搜索列表
+            exportdata = []
             var promise = Monitor2.GetPatInsurance(Info)
             promise.then(function(data) {
                 $scope.loadingflag = false
@@ -8261,8 +8377,20 @@ angular.module('controllers', ['ngResource', 'services'])
                         $('#nodata').modal('hide')
                     }, 1000)
                 }
+                for(i = 0;i < data.results.length; i++){
+                    var tempevery = {}
+                    tempevery.patientname = data.results[i].patientname
+                    tempevery.patientphone = data.results[i].patientphone 
+                    tempevery.doctorname = data.results[i].doctorname
+                    tempevery.doctorphone = data.results[i].doctorphone 
+                    tempevery.province  = data.results[i].province
+                    tempevery.city  = data.results[i].city
+                    tempevery.time  = data.results[i].time.replace("T00:00:00.000Z", "")
+                    exportdata.push(tempevery)
+                }
             }, function(err) {})
             // 获取总条目数
+
             var promise = Monitor2.GetPatInsurance(countInfo)
             promise.then(function(data) {
                 $scope.totalItems = data.results.length
@@ -8413,12 +8541,31 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.currentPage = 1
             getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         }
+        $scope.exportExcel = function(){
+            if(exportdata.length == 0){
+                    $('#nodata').modal('show')
+                    $timeout(function() {
+                        $('#nodata').modal('hide')
+                    }, 1000)
+            }else{
+                console.log(exportdata)
+                var option={}
+                option.fileName = '肾病保险'
+                option.datas=[{
+                    sheetData:exportdata,
+                    // sheetName:'sheet1',
+                    // sheetFilter:['two','one'],
+                    sheetHeader:['申请人姓名','申请人联系方式','医生姓名','医生联系方式','省份','城市','所属医院','申请时间']
+                }]
+                var toExcel=new ExportJsonExcel(option)
+                toExcel.saveExcel();
+        }}        
     }])
 
     // 数据监控——患者分组统计
-    .controller('PatgroupCtrl', ['Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams', function(Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams) {
+    .controller('PatgroupCtrl', ['Monitor2', '$scope', '$state', 'Review', 'Storage', '$timeout', 'NgTableParams','$filter',function(Monitor2, $scope, $state, Review, Storage, $timeout, NgTableParams,$filter) {
         var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
-
+        var exportdata = new Array()
         $scope.loadingflag = true
 
         // 患者分组显示--图表
@@ -8467,10 +8614,10 @@ angular.module('controllers', ['ngResource', 'services'])
             // }
             console.log(tempinfo);
             //获取列表
+            exportdata = []
             var promise = Monitor2.GetPatGroup(tempinfo)
             promise.then(function(data) {
                 $scope.loadingflag = false
-
                 console.log(data.results.length)
                 if (data.results.length == 0) {
                     $('#nodata').modal('show')
@@ -8484,6 +8631,16 @@ angular.module('controllers', ['ngResource', 'services'])
                     counts: [],
                     dataset: data.results
                 })
+                console.log(data.results)
+                for(i = 0;i < data.results.length; i++){
+                    var tempevery = {}
+                    tempevery.name = data.results[i].name
+                    tempevery.diseasetype = $filter('diseasetype')(data.results[i].class) 
+                    tempevery.content =  data.results[i].content
+                    tempevery.doctorname = data.results[i].doctorname 
+                    tempevery.creationTime  = data.results[i].creationTime.replace("T00:00:00.000Z", "")
+                    exportdata.push(tempevery)
+                }
             })
         }
 
@@ -8517,7 +8674,25 @@ angular.module('controllers', ['ngResource', 'services'])
             getLists($scope.currentPage, $scope.itemsPerPage, tempinfo)
 
         }
-
+        $scope.exportExcel = function(){
+            if(exportdata.length == 0){
+                    $('#nodata').modal('show')
+                    $timeout(function() {
+                        $('#nodata').modal('hide')
+                    }, 1000)
+            }else{
+                console.log(exportdata)
+                var option={}
+                option.fileName = '患者分组查看'
+                option.datas=[{
+                    sheetData:exportdata,
+                    // sheetName:'sheet1',
+                    // sheetFilter:['two','one'],
+                    sheetHeader:['患者姓名','诊断类型','内容','主管医生','诊断时间']
+                }]
+                var toExcel=new ExportJsonExcel(option)
+                toExcel.saveExcel();
+        }}
     }])
 
     // 保险管理
