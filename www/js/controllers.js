@@ -137,14 +137,14 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.myIndex = 7
         }
 
-            $scope.flagdoctor = false
-            $scope.flaguser = false
-            $scope.flagdistrdp = false
-            $scope.flaghealth = false
-            $scope.flagdata = false
-            $scope.flaginsu = false
-            $scope.flagpatrefund = false
-            $scope.flagadvice = false
+        $scope.flagdoctor = false
+        $scope.flaguser = false
+        $scope.flagdistrdp = false
+        $scope.flaghealth = false
+        $scope.flagdata = false
+        $scope.flaginsu = false
+        $scope.flagpatrefund = false
+        $scope.flagadvice = false
         if (tempuserrole.indexOf("admin") != -1) {
             $scope.flagdoctor = true
             $scope.flaguser = true
@@ -155,10 +155,10 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.flagpatrefund = true
             $scope.flagadvice = true
         }
-      if (tempuserrole.indexOf("health") != -1) {
+        if (tempuserrole.indexOf("health") != -1) {
             $scope.flaghealth = true
         }
-      if ((tempuserrole.indexOf("master") != -1) || (tempuserrole.indexOf("Leader") != -1)) {
+        if ((tempuserrole.indexOf("master") != -1) || (tempuserrole.indexOf("Leader") != -1)) {
             $scope.flagdata = true
         }
 
@@ -5839,7 +5839,6 @@ angular.module('controllers', ['ngResource', 'services'])
 
                             $scope.Cities.push({ city: i, name: data.results[i].district })
                         }
-                        console.log($scope.Cities)
                         showpie()
                     },
                     function(err) {
@@ -5870,9 +5869,9 @@ angular.module('controllers', ['ngResource', 'services'])
                     }, 1000)
                     $scope.loadingflag = false
                 } else {
-                    if (!($scope.Province.province == undefined)) {
+                    if (!(($scope.Province == undefined) || ($scope.Province == '') || ($scope.Province.province == null))) {
                         if (($scope.starttime == undefined) && ($scope.endtime == undefined)) {
-                            if ($scope.City.city == undefined) {
+                            if (($scope.City == undefined) || ($scope.City == '') || ($scope.City.city == null)) {
                                 RegionInfo = {
                                     province: $scope.Province.province.name,
                                     // city: $scope.City.city.name,
@@ -5891,7 +5890,7 @@ angular.module('controllers', ['ngResource', 'services'])
                                 }
                                 textInfo = $scope.Province.province.name + $scope.City.city.name + '医生地区分布'
                             }
-                        } else if ($scope.City.city == undefined) {
+                        } else if (($scope.City == undefined) || ($scope.City == '') || ($scope.City.city == null)) {
                             RegionInfo = {
                                 province: $scope.Province.province.name,
                                 city: $scope.City.city.name,
@@ -5923,21 +5922,42 @@ angular.module('controllers', ['ngResource', 'services'])
                 }
             } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
                 if (($scope.starttime == undefined) && ($scope.endtime == undefined)) {
-                    RegionInfo = {
-                        city: $scope.City.city.name,
-                        startTime: '2017/01/01',
-                        endTime: now,
-                        token: Storage.get('TOKEN')
+                    if (($scope.City == undefined) || ($scope.City == '') || ($scope.City.city == null)) {
+                        RegionInfo = {
+                            city: $scope.Cities[0].name,
+                            startTime: "2017/01/01",
+                            endTime: now,
+                            token: Storage.get('TOKEN')
+                        }
+                        textInfo = $scope.Cities[0].name + '医生地区分布'
+                    } else {
+                        RegionInfo = {
+                            city: $scope.City.city.name,
+                            startTime: "2017/01/01",
+                            endTime: now,
+                            token: Storage.get('TOKEN')
+                        }
+                        textInfo = $scope.City.city.name + '医生地区分布'
                     }
                 } else {
-                    RegionInfo = {
-                        city: $scope.City.city.name,
-                        startTime: $scope.starttime,
-                        endTime: $scope.endtime,
-                        token: Storage.get('TOKEN')
+                    if (($scope.City == undefined) || ($scope.City == '') || ($scope.City.city == null)) {
+                        RegionInfo = {
+                            city: $scope.Cities[0].name,
+                            startTime: $scope.starttime,
+                            endTime: $scope.endtime,
+                            token: Storage.get('TOKEN')
+                        }
+                        textInfo = $scope.Cities[0].name + '医生地区分布'
+                    } else {
+                        RegionInfo = {
+                            city: $scope.City.city.name,
+                            startTime: $scope.starttime,
+                            endTime: $scope.endtime,
+                            token: Storage.get('TOKEN')
+                        }
+                        textInfo = $scope.City.city.name + '医生地区分布'
                     }
                 }
-                textInfo = $scope.City.city.name + '医生地区分布'
 
             }
 
@@ -5973,6 +5993,7 @@ angular.module('controllers', ['ngResource', 'services'])
 
                 }
             }
+
             Monitor1.GetRegion(RegionInfo).then(function(data) {
                     $scope.loadingflag = false
                     if (data.results.length == 0) {
@@ -6123,7 +6144,14 @@ angular.module('controllers', ['ngResource', 'services'])
         var textInfo = ''
         $scope.Province = {}
         $scope.viewTrend = function() {
+            console.log($scope.starttime)
+            console.log($scope.endtime)
+            console.log($scope.City)
+            console.log($scope.Province.province)
             $scope.loadingflag = true
+
+
+
             if (Storage.get('ROLE').indexOf("admin") != -1) {
                 if (($scope.Province.province == undefined) && ($scope.City == undefined) && (($scope.starttime == undefined) || ($scope.endtime == undefined))) {
                     $('#inputerror').modal('show')
@@ -6132,12 +6160,12 @@ angular.module('controllers', ['ngResource', 'services'])
                     }, 1000)
                     $scope.loadingflag = false
                 } else {
-                    if (!($scope.Province.province == undefined)) {
+                    if (!(($scope.Province == undefined) || ($scope.Province == '') || ($scope.Province.province == null))) {
                         if (($scope.starttime == undefined) && ($scope.endtime == undefined)) {
-                            if ($scope.City.city == undefined) {
+                            if (($scope.City == undefined) || ($scope.City == '') || ($scope.City.city == null)) {
                                 TrendInfo = {
                                     province: $scope.Province.province.name,
-                                    // city: $scope.City.city.name,
+                                    city: '',
                                     startTime: CurrentMonthFirst,
                                     endTime: now,
                                     token: Storage.get('TOKEN')
@@ -6153,7 +6181,16 @@ angular.module('controllers', ['ngResource', 'services'])
                                 }
                                 textInfo = $scope.Province.province.name + $scope.City.city.name + '本月医生注册变化趋势折线图'
                             }
-                        } else if ($scope.City.city == undefined) {
+                        } else if (($scope.City == undefined) || ($scope.City == '') || ($scope.City.city == null)) {
+                            TrendInfo = {
+                                province: $scope.Province.province.name,
+                                city: '',
+                                startTime: $scope.starttime,
+                                endTime: $scope.endtime,
+                                token: Storage.get('TOKEN')
+                            }
+                            textInfo = $scope.Province.province.name + '医生注册变化趋势折线图'
+                        } else {
                             TrendInfo = {
                                 province: $scope.Province.province.name,
                                 city: $scope.City.city.name,
@@ -6162,15 +6199,6 @@ angular.module('controllers', ['ngResource', 'services'])
                                 token: Storage.get('TOKEN')
                             }
                             textInfo = $scope.Province.province.name + $scope.City.city.name + '医生注册变化趋势折线图'
-                        } else {
-                            TrendInfo = {
-                                province: $scope.Province.province.name,
-                                // city: $scope.City.city.name,
-                                startTime: $scope.starttime,
-                                endTime: $scope.endtime,
-                                token: Storage.get('TOKEN')
-                            }
-                            textInfo = $scope.Province.province.name + '医生注册变化趋势折线图'
                         }
                     } else if ((!($scope.City == undefined)) && (!($scope.starttime == undefined))) {
                         TrendInfo = {
@@ -6184,25 +6212,47 @@ angular.module('controllers', ['ngResource', 'services'])
                     }
                 }
             } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
+
                 if (($scope.starttime == undefined) && ($scope.endtime == undefined)) {
-                    TrendInfo = {
-                        city: $scope.City.city.name,
-                        startTime: CurrentMonthFirst,
-                        endTime: now,
-                        token: Storage.get('TOKEN')
+                    if (($scope.City == undefined) || ($scope.City == '') || ($scope.City.city == null)) {
+                        TrendInfo = {
+                            city: $scope.Cities[0].name,
+                            startTime: CurrentMonthFirst,
+                            endTime: now,
+                            token: Storage.get('TOKEN')
+                        }
+                        textInfo = $scope.Cities[0].name + '本月医生注册变化趋势折线图'
+                    } else {
+                        TrendInfo = {
+                            city: $scope.City.city.name,
+                            startTime: CurrentMonthFirst,
+                            endTime: now,
+                            token: Storage.get('TOKEN')
+                        }
+                        textInfo = $scope.City.city.name + '本月医生注册变化趋势折线图'
                     }
-                    textInfo = $scope.City.city.name + '本月医生注册变化趋势折线图'
                 } else {
-                    TrendInfo = {
-                        city: $scope.City.city.name,
-                        startTime: $scope.starttime,
-                        endTime: $scope.endtime,
-                        token: Storage.get('TOKEN')
+                    if (($scope.City == undefined) || ($scope.City == '') || ($scope.City.city == null)) {
+                        TrendInfo = {
+                            city: $scope.Cities[0].name,
+                            startTime: $scope.starttime,
+                            endTime: $scope.endtime,
+                            token: Storage.get('TOKEN')
+                        }
+                        textInfo = $scope.Cities[0].name + '医生注册变化趋势折线图'
+                    } else {
+                        TrendInfo = {
+                            city: $scope.City.city.name,
+                            startTime: $scope.starttime,
+                            endTime: $scope.endtime,
+                            token: Storage.get('TOKEN')
+                        }
+                        textInfo = $scope.City.city.name + '医生注册变化趋势折线图'
                     }
                 }
-                textInfo = $scope.City.city.name + '医生注册变化趋势折线图'
-
             }
+
+
 
             isClick = true
             showlinegraph()
@@ -6210,6 +6260,7 @@ angular.module('controllers', ['ngResource', 'services'])
 
 
         var showlinegraph = function() {
+            console.log(isClick)
             if (isClick == false) {
                 if (Storage.get('ROLE').indexOf("admin") != -1) {
                     TrendInfo = {
@@ -6290,7 +6341,7 @@ angular.module('controllers', ['ngResource', 'services'])
                         },
                         xAxis: {
                             axisLabel: {
-                                interval: 0
+                                interval: "auto"
                             },
                             type: 'category',
                             // boundaryGap: false,
@@ -6534,19 +6585,21 @@ angular.module('controllers', ['ngResource', 'services'])
             getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         }
 
-          $scope.searchList = function() {
+        $scope.searchList = function() {
             console.log($scope.Province)
             $scope.loadingflag = true
             countInfo = {}
             isClick = true
+
+
             if (Storage.get('ROLE').indexOf("admin") != -1) {
-                if (($scope.Province == undefined) || ($scope.Province == '')||($scope.Province.province==null)) {
+                if (($scope.Province == undefined) || ($scope.Province == '') || ($scope.Province.province == null)) {
                     countInfo.province = ''
                 } else {
                     countInfo.province = $scope.Province.province.name
                 }
 
-                if (($scope.City == undefined) || ($scope.City == '')||($scope.City.city==null)) {
+                if (($scope.City == undefined) || ($scope.City == '') || ($scope.City.city == null)) {
                     countInfo.city = ''
                 } else {
                     countInfo.city = $scope.City.city.name
@@ -6569,7 +6622,7 @@ angular.module('controllers', ['ngResource', 'services'])
 
             } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
 
-                if (($scope.City == undefined) || ($scope.City == '')||($scope.City.city==null)) {
+                if (($scope.City == undefined) || ($scope.City == '') || ($scope.City.city == null)) {
                     countInfo.city = ''
                 } else {
                     countInfo.city = $scope.City.city.name
@@ -6603,7 +6656,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     countInfo.endTime = $scope.endtime
                 }
 
-                if (($scope.Hospital == undefined) || ($scope.Hospital == '')||($scope.Hospital.hospital == null )) {
+                if (($scope.Hospital == undefined) || ($scope.Hospital == '') || ($scope.Hospital.hospital == null)) {
                     countInfo.hospital = $scope.Hospitals[0].name
                     countInfo.city = $scope.Hospitals[0].district
                 } else {
@@ -6851,19 +6904,19 @@ angular.module('controllers', ['ngResource', 'services'])
             getLists($scope.currentPage, $scope.itemsPerPage, countInfo)
         }
 
-         $scope.searchList = function() {
+        $scope.searchList = function() {
             console.log($scope.Province)
             $scope.loadingflag = true
             countInfo = {}
             isClick = true
             if (Storage.get('ROLE').indexOf("admin") != -1) {
-                if (($scope.Province == undefined) || ($scope.Province == '')||($scope.Province.province==null)) {
+                if (($scope.Province == undefined) || ($scope.Province == '') || ($scope.Province.province == null)) {
                     countInfo.province = ''
                 } else {
                     countInfo.province = $scope.Province.province.name
                 }
 
-                if (($scope.City == undefined) || ($scope.City == '')||($scope.City.city==null)) {
+                if (($scope.City == undefined) || ($scope.City == '') || ($scope.City.city == null)) {
                     countInfo.city = ''
                 } else {
                     countInfo.city = $scope.City.city.name
@@ -6886,7 +6939,7 @@ angular.module('controllers', ['ngResource', 'services'])
 
             } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
 
-                if (($scope.City == undefined) || ($scope.City == '')||($scope.City.city==null)) {
+                if (($scope.City == undefined) || ($scope.City == '') || ($scope.City.city == null)) {
                     countInfo.city = ''
                 } else {
                     countInfo.city = $scope.City.city.name
@@ -6920,7 +6973,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     countInfo.endTime = $scope.endtime
                 }
 
-                if (($scope.Hospital == undefined) || ($scope.Hospital == '')||($scope.Hospital.hospital == null )) {
+                if (($scope.Hospital == undefined) || ($scope.Hospital == '') || ($scope.Hospital.hospital == null)) {
                     countInfo.hospital = $scope.Hospitals[0].name
                     countInfo.city = $scope.Hospitals[0].district
                 } else {
@@ -7093,13 +7146,13 @@ angular.module('controllers', ['ngResource', 'services'])
             promise.then(function(data) {
                 $scope.totalItems = data.results.length
                 console.log($scope.totalItems)
-                for(i = 0;i < data.results.length; i++){
+                for (i = 0; i < data.results.length; i++) {
                     var tempevery = {}
                     tempevery.doctorname = data.results[i].doctorname
-                    tempevery.province = data.results[i].province 
+                    tempevery.province = data.results[i].province
                     tempevery.city = data.results[i].city
-                    tempevery.hospital = data.results[i].hospital 
-                    tempevery.money  = data.results[i].money/100
+                    tempevery.hospital = data.results[i].hospital
+                    tempevery.money = data.results[i].money / 100
                     exportdata.push(tempevery)
                 }
             }, function() {})
@@ -7208,13 +7261,13 @@ angular.module('controllers', ['ngResource', 'services'])
             countInfo = {}
             isClick = true
             if (Storage.get('ROLE').indexOf("admin") != -1) {
-                if (($scope.Province == undefined) || ($scope.Province == '')||($scope.Province.province==null)) {
+                if (($scope.Province == undefined) || ($scope.Province == '') || ($scope.Province.province == null)) {
                     countInfo.province = ''
                 } else {
                     countInfo.province = $scope.Province.province.name
                 }
 
-                if (($scope.City == undefined) || ($scope.City == '')||($scope.City.city==null)) {
+                if (($scope.City == undefined) || ($scope.City == '') || ($scope.City.city == null)) {
                     countInfo.city = ''
                 } else {
                     countInfo.city = $scope.City.city.name
@@ -7237,7 +7290,7 @@ angular.module('controllers', ['ngResource', 'services'])
 
             } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
 
-                if (($scope.City == undefined) || ($scope.City == '')||($scope.City.city==null)) {
+                if (($scope.City == undefined) || ($scope.City == '') || ($scope.City.city == null)) {
                     countInfo.city = ''
                 } else {
                     countInfo.city = $scope.City.city.name
@@ -7271,7 +7324,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     countInfo.endTime = $scope.endtime
                 }
 
-                if (($scope.Hospital == undefined) || ($scope.Hospital == '')||($scope.Hospital.hospital == null)) {
+                if (($scope.Hospital == undefined) || ($scope.Hospital == '') || ($scope.Hospital.hospital == null)) {
                     countInfo.hospital = $scope.Hospitals[0].name
                     countInfo.city = $scope.Hospitals[0].district
                 } else {
@@ -7290,25 +7343,26 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.info = detail
             $('#charge_detail').modal('show')
         }
-        $scope.exportExcel = function(){
-            if(exportdata == []){
-                    $('#nodata').modal('show')
-                    $timeout(function() {
-                        $('#nodata').modal('hide')
-                    }, 1000)
-            }else{
+        $scope.exportExcel = function() {
+            if (exportdata == []) {
+                $('#nodata').modal('show')
+                $timeout(function() {
+                    $('#nodata').modal('hide')
+                }, 1000)
+            } else {
                 console.log(exportdata)
-                var option={}
+                var option = {}
                 option.fileName = '收费统计'
-                option.datas=[{
-                    sheetData:exportdata,
+                option.datas = [{
+                    sheetData: exportdata,
                     // sheetName:'sheet1',
                     // sheetFilter:['two','one'],
-                    sheetHeader:['医生姓名','省份','城市','所属医院','收入（¥）']
+                    sheetHeader: ['医生姓名', '省份', '城市', '所属医院', '收入（¥）']
                 }]
-                var toExcel=new ExportJsonExcel(option)
+                var toExcel = new ExportJsonExcel(option)
                 toExcel.saveExcel();
-        }}
+            }
+        }
     }])
 
     // 数据监控——医生工作量统计
@@ -7548,13 +7602,13 @@ angular.module('controllers', ['ngResource', 'services'])
             countInfo = {}
             isClick = true
             if (Storage.get('ROLE').indexOf("admin") != -1) {
-                if (($scope.Province == undefined) || ($scope.Province == '')||($scope.Province.province==null)) {
+                if (($scope.Province == undefined) || ($scope.Province == '') || ($scope.Province.province == null)) {
                     countInfo.province = ''
                 } else {
                     countInfo.province = $scope.Province.province.name
                 }
 
-                if (($scope.City == undefined) || ($scope.City == '')||($scope.City.city==null)) {
+                if (($scope.City == undefined) || ($scope.City == '') || ($scope.City.city == null)) {
                     countInfo.city = ''
                 } else {
                     countInfo.city = $scope.City.city.name
@@ -7577,7 +7631,7 @@ angular.module('controllers', ['ngResource', 'services'])
 
             } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
 
-                if (($scope.City == undefined) || ($scope.City == '')||($scope.City.city==null)) {
+                if (($scope.City == undefined) || ($scope.City == '') || ($scope.City.city == null)) {
                     countInfo.city = ''
                 } else {
                     countInfo.city = $scope.City.city.name
@@ -7611,7 +7665,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     countInfo.endTime = $scope.endtime
                 }
 
-                if (($scope.Hospital == undefined) || ($scope.Hospital == '')||($scope.Hospital.hospital == null)) {
+                if (($scope.Hospital == undefined) || ($scope.Hospital == '') || ($scope.Hospital.hospital == null)) {
                     countInfo.hospital = $scope.Hospitals[0].name
                     countInfo.city = $scope.Hospitals[0].district
                 } else {
@@ -7731,7 +7785,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 } else {
                     if (!($scope.Province.province == undefined)) {
                         if (($scope.starttime == undefined) && ($scope.endtime == undefined)) {
-                            if ($scope.City.city == undefined) {
+                            if (($scope.City == undefined) || ($scope.City == '') || ($scope.City.city == null)) {
                                 RegionInfo = {
                                     province: $scope.Province.province.name,
                                     // city: $scope.City.city.name,
@@ -7750,7 +7804,7 @@ angular.module('controllers', ['ngResource', 'services'])
                                 }
                                 textInfo = $scope.Province.province.name + $scope.City.city.name + '患者地区分布'
                             }
-                        } else if ($scope.City.city == undefined) {
+                        } else if (($scope.City == undefined) || ($scope.City == '') || ($scope.City.city == null)) {
                             RegionInfo = {
                                 province: $scope.Province.province.name,
                                 city: $scope.City.city.name,
@@ -7782,22 +7836,42 @@ angular.module('controllers', ['ngResource', 'services'])
                 }
             } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
                 if (($scope.starttime == undefined) && ($scope.endtime == undefined)) {
-                    RegionInfo = {
-                        city: $scope.City.city.name,
-                        startTime: '2017/01/01',
-                        endTime: now,
-                        token: Storage.get('TOKEN')
+                    if (($scope.City == undefined) || ($scope.City == '') || ($scope.City.city == null)) {
+                        RegionInfo = {
+                            city: $scope.Cities[0].name,
+                            startTime: "2017/01/01",
+                            endTime: now,
+                            token: Storage.get('TOKEN')
+                        }
+                        textInfo = $scope.Cities[0].name + '患者地区分布'
+                    } else {
+                        RegionInfo = {
+                            city: $scope.City.city.name,
+                            startTime: "2017/01/01",
+                            endTime: now,
+                            token: Storage.get('TOKEN')
+                        }
+                        textInfo = $scope.City.city.name + '患者地区分布'
                     }
                 } else {
-                    RegionInfo = {
-                        city: $scope.City.city.name,
-                        startTime: $scope.starttime,
-                        endTime: $scope.endtime,
-                        token: Storage.get('TOKEN')
+                    if (($scope.City == undefined) || ($scope.City == '') || ($scope.City.city == null)) {
+                        RegionInfo = {
+                            city: $scope.Cities[0].name,
+                            startTime: $scope.starttime,
+                            endTime: $scope.endtime,
+                            token: Storage.get('TOKEN')
+                        }
+                        textInfo = $scope.Cities[0].name + '患者地区分布'
+                    } else {
+                        RegionInfo = {
+                            city: $scope.City.city.name,
+                            startTime: $scope.starttime,
+                            endTime: $scope.endtime,
+                            token: Storage.get('TOKEN')
+                        }
+                        textInfo = $scope.City.city.name + '患者地区分布'
                     }
                 }
-                textInfo = $scope.City.city.name + '患者地区分布'
-
             }
 
             isClick = true
@@ -7991,9 +8065,9 @@ angular.module('controllers', ['ngResource', 'services'])
                     }, 1000)
                     $scope.loadingflag = false
                 } else {
-                    if (!($scope.Province.province == undefined)) {
+                    if (!(($scope.Province == undefined) || ($scope.Province == '') || ($scope.Province.province == null))) {
                         if (($scope.starttime == undefined) && ($scope.endtime == undefined)) {
-                            if ($scope.City.city == undefined) {
+                            if (($scope.City == undefined) || ($scope.City == '') || ($scope.City.city == null)) {
                                 TrendInfo = {
                                     province: $scope.Province.province.name,
                                     // city: $scope.City.city.name,
@@ -8044,23 +8118,42 @@ angular.module('controllers', ['ngResource', 'services'])
                 }
             } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
                 if (($scope.starttime == undefined) && ($scope.endtime == undefined)) {
-                    TrendInfo = {
-                        city: $scope.City.city.name,
-                        startTime: CurrentMonthFirst,
-                        endTime: now,
-                        token: Storage.get('TOKEN')
+                    if (($scope.City == undefined) || ($scope.City == '') || ($scope.City.city == null)) {
+                        TrendInfo = {
+                            city: $scope.Cities[0].name,
+                            startTime: CurrentMonthFirst,
+                            endTime: now,
+                            token: Storage.get('TOKEN')
+                        }
+                        textInfo = $scope.Cities[0].name + '本月患者注册变化趋势折线图'
+                    } else {
+                        TrendInfo = {
+                            city: $scope.City.city.name,
+                            startTime: CurrentMonthFirst,
+                            endTime: now,
+                            token: Storage.get('TOKEN')
+                        }
+                        textInfo = $scope.City.city.name + '本月患者注册变化趋势折线图'
                     }
-                    textInfo = $scope.City.city.name + '本月患者注册变化趋势折线图'
                 } else {
-                    TrendInfo = {
-                        city: $scope.City.city.name,
-                        startTime: $scope.starttime,
-                        endTime: $scope.endtime,
-                        token: Storage.get('TOKEN')
+                    if (($scope.City == undefined) || ($scope.City == '') || ($scope.City.city == null)) {
+                        TrendInfo = {
+                            city: $scope.Cities[0].name,
+                            startTime: $scope.starttime,
+                            endTime: $scope.endtime,
+                            token: Storage.get('TOKEN')
+                        }
+                        textInfo = $scope.Cities[0].name + '患者注册变化趋势折线图'
+                    } else {
+                        TrendInfo = {
+                            city: $scope.City.city.name,
+                            startTime: $scope.starttime,
+                            endTime: $scope.endtime,
+                            token: Storage.get('TOKEN')
+                        }
+                        textInfo = $scope.City.city.name + '患者注册变化趋势折线图'
                     }
                 }
-                textInfo = $scope.City.city.name + '患者注册变化趋势折线图'
-
             }
 
             isClick = true
@@ -8149,6 +8242,9 @@ angular.module('controllers', ['ngResource', 'services'])
                             trigger: 'axis'
                         },
                         xAxis: {
+                            axisLabel: {
+                                interval: "auto"
+                            },
                             type: 'category',
                             boundaryGap: false,
                             data: _time
@@ -8378,13 +8474,13 @@ angular.module('controllers', ['ngResource', 'services'])
             countInfo = {}
             isClick = true
             if (Storage.get('ROLE').indexOf("admin") != -1) {
-                if (($scope.Province == undefined) || ($scope.Province == '')||($scope.Province.province)) {
+                if (($scope.Province == undefined) || ($scope.Province == '') || ($scope.Province.province == null)) {
                     countInfo.province = ''
                 } else {
                     countInfo.province = $scope.Province.province.name
                 }
 
-                if (($scope.City == undefined) || ($scope.City == '')||($scope.City.city==null)) {
+                if (($scope.City == undefined) || ($scope.City == '') || ($scope.City.city == null)) {
                     countInfo.city = ''
                 } else {
                     countInfo.city = $scope.City.city.name
@@ -8407,7 +8503,7 @@ angular.module('controllers', ['ngResource', 'services'])
 
             } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
 
-                if (($scope.City == undefined) || ($scope.City == '')||($scope.City.city==null)) {
+                if (($scope.City == undefined) || ($scope.City == '') || ($scope.City.city == null)) {
                     countInfo.city = ''
                 } else {
                     countInfo.city = $scope.City.city.name
@@ -9129,14 +9225,14 @@ angular.module('controllers', ['ngResource', 'services'])
         $scope.LastLoginTime = Storage.get('LASTLOGIN')
 
 
-            $scope.flagdoctor = false
-            $scope.flaguser = false
-            $scope.flagdistrdp = false
-            $scope.flaghealth = false
-            $scope.flagdata = false
-            $scope.flaginsu = false
-            $scope.flagpatrefund = false
-            $scope.flagadvice = false
+        $scope.flagdoctor = false
+        $scope.flaguser = false
+        $scope.flagdistrdp = false
+        $scope.flaghealth = false
+        $scope.flagdata = false
+        $scope.flaginsu = false
+        $scope.flagpatrefund = false
+        $scope.flagadvice = false
         if (tempuserrole.indexOf("admin") != -1) {
             $scope.flagdoctor = true
             $scope.flaguser = true
@@ -9147,10 +9243,10 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.flagpatrefund = true
             $scope.flagadvice = true
         }
-      if (tempuserrole.indexOf("health") != -1) {
+        if (tempuserrole.indexOf("health") != -1) {
             $scope.flaghealth = true
         }
-      if ((tempuserrole.indexOf("master") != -1) || (tempuserrole.indexOf("Leader") != -1)) {
+        if ((tempuserrole.indexOf("master") != -1) || (tempuserrole.indexOf("Leader") != -1)) {
             $scope.flagdata = true
         }
         // $scope.godata = function() {
