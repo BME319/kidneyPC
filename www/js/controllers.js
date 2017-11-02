@@ -950,6 +950,23 @@ angular.module('controllers', ['ngResource', 'services'])
         $scope.toall = function() {
             $state.go('main.enterornot.all');
         }
+
+        var tempuserrole = Storage.get('ROLE')
+
+        $scope.ifnot = false
+        $scope.ifdone = false
+        $scope.healthinfos = false
+        if (tempuserrole.indexOf("admin") != -1) {
+            $scope.ifdone = true
+            $scope.healthinfos = true
+        }
+        if (tempuserrole.indexOf("health") != -1) {
+            $scope.ifnot = true
+            $scope.ifdone = true
+            $scope.healthinfos = true
+        }
+
+
     }])
     // 未录入-LZN
     .controller('UnenteredCtrl', ['$scope', '$state', 'Storage', 'LabtestImport', 'NgTableParams', '$timeout', function($scope, $state, Storage, LabtestImport, NgTableParams, $timeout) {
@@ -1385,8 +1402,6 @@ angular.module('controllers', ['ngResource', 'services'])
 
 
     .controller('LabInfoCtrl', ['$scope', '$state', 'Storage', 'LabtestImport', 'NgTableParams', '$uibModal', '$timeout', function($scope, $state, Storage, LabtestImport, NgTableParams, $uibModal, $timeout) {
-        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
-
 
         $scope.Lab = '';
         $scope.patname = Storage.get('patName');
@@ -1826,35 +1841,40 @@ angular.module('controllers', ['ngResource', 'services'])
                                     })
                                 LabtestImport.GetPhotoList(patient).then(
                                     function(data) {
-                                        $scope.slides = data.results;
-                                        // var test=data.results;
-                                        // $scope.slides = test;
-                                        console.log(patient);
-                                        console.log($scope.slides);
-                                        // console.log($scope.slides[$index]);
-                                        $scope.photoId = '';
-                                        $scope.phototype = '';
-                                        $scope.getphoto = function(index) {
-                                            $scope.photoId = $scope.slides[index].photoId;
-                                            console.log($scope.photoId);
-                                            $('#selecttype').modal('show');
-                                        }
-                                        $scope.skipphoto = function(index) {
-                                            $scope.photoId = $scope.slides[index].photoId;
-                                            console.log($scope.photoId);
-                                            $('#skip').modal('show');
-                                        }
-                                        $scope.gettype = function() {
-                                            if ($scope.custype == '') {
-                                                if (typeof($scope.select.selected) != 'undefined') $scope.phototype = $scope.select.selected.option;
-                                                else $scope.phototype = '';
-                                            } else $scope.phototype = $scope.custype;
-                                            $('#selecttype').modal('hide');
-                                            $('#selecttype').on('hidden.bs.modal', function() {
-                                                $scope.select = {};
-                                                $scope.custype = '';
-                                                console.log($scope.phototype);
-                                            })
+                                        console.log(data.results)
+                                        if (data.results.length == 0) {
+                                            $('#alldone').modal('show');
+                                        } else {
+                                            $scope.slides = data.results;
+                                            // var test=data.results;
+                                            // $scope.slides = test;
+                                            console.log(patient);
+                                            console.log($scope.slides);
+                                            // console.log($scope.slides[$index]);
+                                            $scope.photoId = '';
+                                            $scope.phototype = '';
+                                            $scope.getphoto = function(index) {
+                                                $scope.photoId = $scope.slides[index].photoId;
+                                                console.log($scope.photoId);
+                                                $('#selecttype').modal('show');
+                                            }
+                                            $scope.skipphoto = function(index) {
+                                                $scope.photoId = $scope.slides[index].photoId;
+                                                console.log($scope.photoId);
+                                                $('#skip').modal('show');
+                                            }
+                                            $scope.gettype = function() {
+                                                if ($scope.custype == '') {
+                                                    if (typeof($scope.select.selected) != 'undefined') $scope.phototype = $scope.select.selected.option;
+                                                    else $scope.phototype = '';
+                                                } else $scope.phototype = $scope.custype;
+                                                $('#selecttype').modal('hide');
+                                                $('#selecttype').on('hidden.bs.modal', function() {
+                                                    $scope.select = {};
+                                                    $scope.custype = '';
+                                                    console.log($scope.phototype);
+                                                })
+                                            }
                                         }
                                     },
                                     function(e) {
@@ -1868,6 +1888,14 @@ angular.module('controllers', ['ngResource', 'services'])
 
                 })
         }
+        $scope.ifalldone = function() {
+            $('#alldone').modal('hide');
+            $timeout(function() {
+                $state.go("main.enterornot.unentered")
+            }, 1000);
+
+        }
+
         $scope.skip = function() {
             var label = {
                 "photoId": $scope.photoId,
@@ -6381,50 +6409,50 @@ angular.module('controllers', ['ngResource', 'services'])
                             sumtoday = data1.results[0].count
                         }
 
-                         var myTrend = echarts.init(document.getElementById('trend'))
-                    var option = {
-                        title: {
-                            text: textInfo,
-                            subtext: '今日('+now+')新增注册医生' + sumtoday + '人',
-                            x: 'center'
-                        },
-                        tooltip: {
-                            trigger: 'axis'
-                        },
-                        xAxis: {
-                            axisLabel: {
-                                interval: "auto"
+                        var myTrend = echarts.init(document.getElementById('trend'))
+                        var option = {
+                            title: {
+                                text: textInfo,
+                                subtext: '今日(' + now + ')新增注册医生' + sumtoday + '人',
+                                x: 'center'
                             },
-                            type: 'category',
-                            // boundaryGap: false,
-                            data: _time
-                        },
-                        yAxis: {
-                            type: 'value',
-                            axisLabel: {
-                                formatter: '{value} 人'
-                            }
-                        },
+                            tooltip: {
+                                trigger: 'axis'
+                            },
+                            xAxis: {
+                                axisLabel: {
+                                    interval: "auto"
+                                },
+                                type: 'category',
+                                // boundaryGap: false,
+                                data: _time
+                            },
+                            yAxis: {
+                                type: 'value',
+                                axisLabel: {
+                                    formatter: '{value} 人'
+                                }
+                            },
 
-                        series: [{
-                            name: '注册人数',
-                            type: 'line',
-                            data: _count,
-                            markPoint: {
-                                data: []
-                                // markLine: {
-                                //   data: [
-                                //               { type: 'average', name: '平均值' }
-                                //   ]
-                                // }
-                            }
-                        }]
-                    }
-                    myTrend.setOption(option)
+                            series: [{
+                                name: '注册人数',
+                                type: 'line',
+                                data: _count,
+                                markPoint: {
+                                    data: []
+                                    // markLine: {
+                                    //   data: [
+                                    //               { type: 'average', name: '平均值' }
+                                    //   ]
+                                    // }
+                                }
+                            }]
+                        }
+                        myTrend.setOption(option)
                     })
 
 
-                   
+
                 }),
                 function(err) {
                     console.log(err)
@@ -8477,45 +8505,45 @@ angular.module('controllers', ['ngResource', 'services'])
                             sumtoday = data1.results[0].count
                         }
 
-                    var PatTrend = echarts.init(document.getElementById('Pattrend'))
-                    var option = {
-                        title: {
-                            text: textInfo,
-                            subtext: '今日('+now+')新增注册患者' + sumtoday + '人',
-                            x: 'center'
-                        },
-                        tooltip: {
-                            trigger: 'axis'
-                        },
-                        xAxis: {
-                            axisLabel: {
-                                interval: "auto"
+                        var PatTrend = echarts.init(document.getElementById('Pattrend'))
+                        var option = {
+                            title: {
+                                text: textInfo,
+                                subtext: '今日(' + now + ')新增注册患者' + sumtoday + '人',
+                                x: 'center'
                             },
-                            type: 'category',
-                            boundaryGap: false,
-                            data: _time
-                        },
-                        yAxis: {
-                            type: 'value',
-                            axisLabel: {
-                                formatter: '{value} 人'
-                            }
-                        },
-                        series: [{
-                            name: '注册人数',
-                            type: 'line',
-                            data: _count,
-                            markPoint: {
-                                data: []
-                                // markLine: {
-                                //   data: [
-                                //               { type: 'average', name: '平均值' }
-                                //   ]
-                                // }
-                            }
-                        }]
-                    }
-                    PatTrend.setOption(option)
+                            tooltip: {
+                                trigger: 'axis'
+                            },
+                            xAxis: {
+                                axisLabel: {
+                                    interval: "auto"
+                                },
+                                type: 'category',
+                                boundaryGap: false,
+                                data: _time
+                            },
+                            yAxis: {
+                                type: 'value',
+                                axisLabel: {
+                                    formatter: '{value} 人'
+                                }
+                            },
+                            series: [{
+                                name: '注册人数',
+                                type: 'line',
+                                data: _count,
+                                markPoint: {
+                                    data: []
+                                    // markLine: {
+                                    //   data: [
+                                    //               { type: 'average', name: '平均值' }
+                                    //   ]
+                                    // }
+                                }
+                            }]
+                        }
+                        PatTrend.setOption(option)
 
                     })
 

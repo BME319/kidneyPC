@@ -3,9 +3,9 @@
     <div class="row">
       <div class="col-xs-2" style="text-align: center;font-size: 15px;margin-top: 10px;margin-left: 10px;width:auto;">       
           <uib-tabset active="activePill" vertical="true" type="pills">
-            <uib-tab index="0" heading="未录入" select="tounentered()"></uib-tab>
-            <uib-tab index="1" heading="已录入" select="toentered()"></uib-tab>
-            <uib-tab index="2" heading="全部健康信息" select="toall()"></uib-tab>
+            <uib-tab index="0" heading="未录入" ng-show="ifnot" select="tounentered()"></uib-tab>
+            <uib-tab index="1" heading="已录入" ng-show="ifdone" select="toentered()"></uib-tab>
+            <uib-tab index="2" heading="全部健康信息" ng-show="healthinfos" select="toall()"></uib-tab>
 
           </uib-tabset>
         
