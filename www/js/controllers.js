@@ -5880,11 +5880,18 @@ angular.module('controllers', ['ngResource', 'services'])
 
         // 获取当前日期
         var myDate = new Date();
-        var now = myDate.toLocaleDateString();
+        var formatDate = function (date) {  
+            var y = date.getFullYear();  
+            var m = date.getMonth() + 1;  
+            m = m < 10 ? '0' + m : m;  
+            var d = date.getDate();  
+            d = d < 10 ? ('0' + d) : d;  
+            return y + '-' + m + '-' + d;  
+        };  
 
-        console.log(myDate)
+        var now =formatDate(myDate);
         console.log(now)
-        
+
 
         var isClick = false
         var RegionInfo = {}
