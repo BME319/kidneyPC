@@ -5882,6 +5882,10 @@ angular.module('controllers', ['ngResource', 'services'])
         var myDate = new Date();
         var now = myDate.toLocaleDateString();
 
+        console.log(myDate)
+        console.log(now)
+        
+
         var isClick = false
         var RegionInfo = {}
         var textInfo = ''
