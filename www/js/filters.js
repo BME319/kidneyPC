@@ -27,13 +27,14 @@ angular.module('filters', [])
             }
         };
     })
-        .filter('numberfixed2', function() {
+    .filter('numberfixed2', function() {
         return function(type) {
             var name
-             if (type == null) {
+            if (type == null) {
                 name = null
             } else {
-            name=type.toFixed(2);}
+                name = type.toFixed(2);
+            }
             return name
         };
     })
@@ -115,19 +116,19 @@ angular.module('filters', [])
             return name
         }
     }])
-     // 退款金额
+    // 退款金额
     .filter('refundmoney', [function() {
         return function(type) {
             var name
-            name = type/100
+            name = type / 100
             return name
         }
     }])
-         // 退款金额
+    // 退款金额
     .filter('chargemoney', [function() {
         return function(type) {
             var name
-            name = type/100
+            name = type / 100
             return name
         }
     }])
