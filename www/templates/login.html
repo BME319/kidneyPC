@@ -1,31 +1,23 @@
 <div class="container ">
     <h1> 肾事联盟 </h1>
     <form>
+        <div class="col col-40" style="font-size: 13px;text-align: center;">
+            <br>
+                为获得更好的体验，建议使用Chrome浏览器浏览本网站。
+            </div>
         <div class="form-group">
             <label>手机</label>
             <input type="text" class="form-control" placeholder="请输入手机" ng-model="logOn.username">
         </div>
         <div class="form-group">
             <label>密码</label>
-            <div class="col col-40">
-            </div>
+
             <!-- <a ng-click="toReset()" class="label-link">忘记密码</a> -->
             <input type="password" class="form-control" placeholder="请输入密码" ng-model="logOn.password">
         </div>
-<!--         <div class="form-group">
-            <label>
-                <B>角色</B>
-            </label>
-            <select style="height:34px;width: 100%" ng-model="logOn.role">
-                <option value="health">健康专员</option>
-                <option value="admin">管理员</option>
-            </select>
-        </div> -->
-            </form>
+    </form>
     <div>
         <button type="submit" class="btn btn-success" ng-click="LogIn(logOn)" ng-disabled="disable">登录</button>
-        <!--             <button class="btn btn-default" ng-click="toRegister()">注册</button>
- -->
         <div class="col col-40">
             <p style="color:#B8B8B8">
                 <br>{{logStatus}}</p>
