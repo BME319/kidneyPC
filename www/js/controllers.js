@@ -5880,16 +5880,16 @@ angular.module('controllers', ['ngResource', 'services'])
 
         // 获取当前日期
         var myDate = new Date();
-        var formatDate = function (date) {  
-            var y = date.getFullYear();  
-            var m = date.getMonth() + 1;  
-            m = m < 10 ? '0' + m : m;  
-            var d = date.getDate();  
-            d = d < 10 ? ('0' + d) : d;  
-            return y + '-' + m + '-' + d;  
-        };  
+        var formatDate = function(date) {
+            var y = date.getFullYear();
+            var m = date.getMonth() + 1;
+            m = m < 10 ? '0' + m : m;
+            var d = date.getDate();
+            d = d < 10 ? ('0' + d) : d;
+            return y + '-' + m + '-' + d;
+        };
 
-        var now =formatDate(myDate);
+        var now = formatDate(myDate);
         console.log(now)
 
 
@@ -5922,7 +5922,7 @@ angular.module('controllers', ['ngResource', 'services'])
                                 RegionInfo = {
                                     province: $scope.Province.province.name,
                                     // city: $scope.City.city.name,
-                                    startTime: '2017/01/01',
+                                    startTime: '2017-01-01',
                                     endTime: now,
                                     token: Storage.get('TOKEN')
                                 }
@@ -5931,7 +5931,7 @@ angular.module('controllers', ['ngResource', 'services'])
                                 RegionInfo = {
                                     province: $scope.Province.province.name,
                                     city: $scope.City.city.name,
-                                    startTime: '2017/01/01',
+                                    startTime: '2017-01-01',
                                     endTime: now,
                                     token: Storage.get('TOKEN')
                                 }
@@ -5958,7 +5958,7 @@ angular.module('controllers', ['ngResource', 'services'])
                         }
                     } else if (($scope.starttime == undefined) && ($scope.endtime == undefined)) {
                         RegionInfo = {
-                            startTime: '2017/01/01',
+                            startTime: '2017-01-01',
                             endTime: now,
                             token: Storage.get('TOKEN')
                         }
@@ -5977,7 +5977,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     if (($scope.City == undefined) || ($scope.City == '') || ($scope.City.city == null)) {
                         RegionInfo = {
                             city: $scope.Cities[0].name,
-                            startTime: "2017/01/01",
+                            startTime: "2017-01-01",
                             endTime: now,
                             token: Storage.get('TOKEN')
                         }
@@ -5985,7 +5985,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     } else {
                         RegionInfo = {
                             city: $scope.City.city.name,
-                            startTime: "2017/01/01",
+                            startTime: "2017-01-01",
                             endTime: now,
                             token: Storage.get('TOKEN')
                         }
@@ -6025,21 +6025,21 @@ angular.module('controllers', ['ngResource', 'services'])
                     RegionInfo = {
                         province: '浙江省',
                         city: '',
-                        startTime: '2017/01/01',
+                        startTime: '2017-01-01',
                         endTime: now,
                         token: Storage.get('TOKEN')
                     }
-                    $scope.starttime = '2017/01/01'
+                    $scope.starttime = '2017-01-01'
                     $scope.endtime = now
                     textInfo = '浙江省医生地区分布'
                 } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
                     RegionInfo = {
                         city: $scope.Cities[0].name,
-                        startTime: '2017/01/01',
+                        startTime: '2017-01-01',
                         endTime: now,
                         token: Storage.get('TOKEN')
                     }
-                    $scope.starttime = '2017/01/01'
+                    $scope.starttime = '2017-01-01'
                     $scope.endtime = now
                     textInfo = $scope.Cities[0].name + '注册医生地区分布'
 
@@ -6208,13 +6208,21 @@ angular.module('controllers', ['ngResource', 'services'])
 
 
         // 获取当前日期\昨日日期\本月第一日日期
+        var formatDate = function(date) {
+            var y = date.getFullYear();
+            var m = date.getMonth() + 1;
+            m = m < 10 ? '0' + m : m;
+            var d = date.getDate();
+            d = d < 10 ? ('0' + d) : d;
+            return y + '-' + m + '-' + d;
+        };
         var myDate = new Date();
-        var now = myDate.toLocaleDateString();
+        var now = formatDate(myDate);
         var tempyesterday = new Date(new Date() - 24 * 60 * 60 * 1000);
-        var yesterday = tempyesterday.toLocaleDateString();
+        var yesterday = formatDate(tempyesterday);
         var tempCurrentMonthFirst = new Date()
         tempCurrentMonthFirst.setDate(1);
-        var CurrentMonthFirst = tempCurrentMonthFirst.toLocaleDateString();
+        var CurrentMonthFirst = formatDate(tempCurrentMonthFirst);
 
         var isClick = false
         var TrendInfo = {}
@@ -6526,18 +6534,28 @@ angular.module('controllers', ['ngResource', 'services'])
 
 
         // 获取当前日期
+        // 获取当前日期\昨日日期\本月第一日日期
+        var formatDate = function(date) {
+            var y = date.getFullYear();
+            var m = date.getMonth() + 1;
+            m = m < 10 ? '0' + m : m;
+            var d = date.getDate();
+            d = d < 10 ? ('0' + d) : d;
+            return y + '-' + m + '-' + d;
+        };
         var myDate = new Date();
-        var now = myDate.toLocaleDateString();
+        var now = formatDate(myDate);
         var tempyesterday = new Date(new Date() - 24 * 60 * 60 * 1000);
-        var yesterday = tempyesterday.toLocaleDateString();
+        var yesterday = formatDate(tempyesterday);
+
         var isClick = false
         var exportdata = new Array()
         Storage.set('Tab', 1)
 
         // ---------------获取搜索(或未搜索)列表及列表数------------------------
         var getLists = function(currentPage, itemsPerPage, countInfo) {
-            countInfo.token = Storage.get('TOKEN'),
-                Info = Object.assign({}, countInfo)
+            countInfo.token = Storage.get('TOKEN')
+            Info = Object.assign({}, countInfo)
             Info.limit = itemsPerPage
             Info.skip = (currentPage - 1) * itemsPerPage
 
@@ -6861,14 +6879,24 @@ angular.module('controllers', ['ngResource', 'services'])
 
 
 
-        // 获取当前日期
+        // 获取当前日期\昨日日期\本月第一日日期
+        var formatDate = function(date) {
+            var y = date.getFullYear();
+            var m = date.getMonth() + 1;
+            m = m < 10 ? '0' + m : m;
+            var d = date.getDate();
+            d = d < 10 ? ('0' + d) : d;
+            return y + '-' + m + '-' + d;
+        };
         var myDate = new Date();
-        var now = myDate.toLocaleDateString();
+        var now = formatDate(myDate);
         var tempyesterday = new Date(new Date() - 24 * 60 * 60 * 1000);
-        var yesterday = tempyesterday.toLocaleDateString();
+        var yesterday = formatDate(tempyesterday);
         var tempCurrentMonthFirst = new Date()
         tempCurrentMonthFirst.setDate(1);
-        var CurrentMonthFirst = tempCurrentMonthFirst.toLocaleDateString();
+        var CurrentMonthFirst = formatDate(tempCurrentMonthFirst);
+
+
         var isClick = false
         var exportdata = new Array()
         Storage.set('Tab', 1)
@@ -6876,10 +6904,10 @@ angular.module('controllers', ['ngResource', 'services'])
         // ---------------获取搜索(或未搜索)列表及列表数------------------------
         var getLists = function(currentPage, itemsPerPage, countInfo) {
             console.log(countInfo)
-            countInfo.token = Storage.get('TOKEN'),
-                Info = Object.assign({}, countInfo)
-            Info.limit = itemsPerPage,
-                Info.skip = (currentPage - 1) * itemsPerPage
+            countInfo.token = Storage.get('TOKEN')
+            Info = Object.assign({}, countInfo)
+            Info.limit = itemsPerPage
+            Info.skip = (currentPage - 1) * itemsPerPage
 
             if (isClick == false) {
 
@@ -7252,14 +7280,24 @@ angular.module('controllers', ['ngResource', 'services'])
             }
         )
 
-        // 获取当前日期
+        // 获取当前日期\昨日日期\本月第一日日期
+        var formatDate = function(date) {
+            var y = date.getFullYear();
+            var m = date.getMonth() + 1;
+            m = m < 10 ? '0' + m : m;
+            var d = date.getDate();
+            d = d < 10 ? ('0' + d) : d;
+            return y + '-' + m + '-' + d;
+        };
         var myDate = new Date();
-        var now = myDate.toLocaleDateString();
+        var now = formatDate(myDate);
         var tempyesterday = new Date(new Date() - 24 * 60 * 60 * 1000);
-        var yesterday = tempyesterday.toLocaleDateString();
+        var yesterday = formatDate(tempyesterday);
         var tempCurrentMonthFirst = new Date()
         tempCurrentMonthFirst.setDate(1);
-        var CurrentMonthFirst = tempCurrentMonthFirst.toLocaleDateString();
+        var CurrentMonthFirst = formatDate(tempCurrentMonthFirst);
+
+
         var isClick = false
         var exportdata = new Array()
 
@@ -7269,10 +7307,10 @@ angular.module('controllers', ['ngResource', 'services'])
 
         // ---------------获取搜索(或未搜索)列表及列表数------------------------
         var getLists = function(currentPage, itemsPerPage, countInfo) {
-            countInfo.token = Storage.get('TOKEN'),
-                Info = Object.assign({}, countInfo)
-            Info.limit = itemsPerPage,
-                Info.skip = (currentPage - 1) * itemsPerPage
+            countInfo.token = Storage.get('TOKEN')
+            Info = Object.assign({}, countInfo)
+            Info.limit = itemsPerPage
+            Info.skip = (currentPage - 1) * itemsPerPage
 
             if (isClick == false) {
 
@@ -7584,14 +7622,24 @@ angular.module('controllers', ['ngResource', 'services'])
             }
         )
 
-        // 获取当前日期
+        // 获取当前日期\昨日日期\本月第一日日期
+        var formatDate = function(date) {
+            var y = date.getFullYear();
+            var m = date.getMonth() + 1;
+            m = m < 10 ? '0' + m : m;
+            var d = date.getDate();
+            d = d < 10 ? ('0' + d) : d;
+            return y + '-' + m + '-' + d;
+        };
         var myDate = new Date();
-        var now = myDate.toLocaleDateString();
+        var now = formatDate(myDate);
         var tempyesterday = new Date(new Date() - 24 * 60 * 60 * 1000);
-        var yesterday = tempyesterday.toLocaleDateString();
+        var yesterday = formatDate(tempyesterday);
         var tempCurrentMonthFirst = new Date()
         tempCurrentMonthFirst.setDate(1);
-        var CurrentMonthFirst = tempCurrentMonthFirst.toLocaleDateString();
+        var CurrentMonthFirst = formatDate(tempCurrentMonthFirst);
+
+
         var isClick = false
         var exportdata = new Array()
         Storage.set('Tab', 1)
@@ -8003,8 +8051,16 @@ angular.module('controllers', ['ngResource', 'services'])
         });
 
         // 获取当前日期
+        var formatDate = function(date) {
+            var y = date.getFullYear();
+            var m = date.getMonth() + 1;
+            m = m < 10 ? '0' + m : m;
+            var d = date.getDate();
+            d = d < 10 ? ('0' + d) : d;
+            return y + '-' + m + '-' + d;
+        };
         var myDate = new Date();
-        var now = myDate.toLocaleDateString();
+        var now = formatDate(myDate);
 
         var isClick = false
         var RegionInfo = {}
@@ -8029,7 +8085,7 @@ angular.module('controllers', ['ngResource', 'services'])
                                 RegionInfo = {
                                     province: $scope.Province.province.name,
                                     // city: $scope.City.city.name,
-                                    startTime: '2017/01/01',
+                                    startTime: '2017-01-01',
                                     endTime: now,
                                     token: Storage.get('TOKEN')
                                 }
@@ -8038,7 +8094,7 @@ angular.module('controllers', ['ngResource', 'services'])
                                 RegionInfo = {
                                     province: $scope.Province.province.name,
                                     city: $scope.City.city.name,
-                                    startTime: '2017/01/01',
+                                    startTime: '2017-01-01',
                                     endTime: now,
                                     token: Storage.get('TOKEN')
                                 }
@@ -8065,7 +8121,7 @@ angular.module('controllers', ['ngResource', 'services'])
                         }
                     } else if (($scope.starttime == undefined) && ($scope.endtime == undefined)) {
                         RegionInfo = {
-                            startTime: '2017/01/01',
+                            startTime: '2017-01-01',
                             endTime: now,
                             token: Storage.get('TOKEN')
                         }
@@ -8084,7 +8140,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     if (($scope.City == undefined) || ($scope.City == {}) || ($scope.City.city == null)) {
                         RegionInfo = {
                             city: $scope.Cities[0].name,
-                            startTime: "2017/01/01",
+                            startTime: "2017-01-01",
                             endTime: now,
                             token: Storage.get('TOKEN')
                         }
@@ -8092,7 +8148,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     } else {
                         RegionInfo = {
                             city: $scope.City.city.name,
-                            startTime: "2017/01/01",
+                            startTime: "2017-01-01",
                             endTime: now,
                             token: Storage.get('TOKEN')
                         }
@@ -8130,21 +8186,21 @@ angular.module('controllers', ['ngResource', 'services'])
                     RegionInfo = {
                         province: '浙江省',
                         city: '',
-                        startTime: '2017/01/01',
+                        startTime: '2017-01-01',
                         endTime: now,
                         token: Storage.get('TOKEN')
                     }
-                    $scope.starttime = '2017/01/01'
+                    $scope.starttime = '2017-01-01'
                     $scope.endtime = now
                     textInfo = '浙江省患者地区分布'
                 } else if (Storage.get('ROLE').indexOf("Leader") != -1) {
                     RegionInfo = {
                         city: $scope.Cities[0].name,
-                        startTime: '2017/01/01',
+                        startTime: '2017-01-01',
                         endTime: now,
                         token: Storage.get('TOKEN')
                     }
-                    $scope.starttime = '2017/01/01'
+                    $scope.starttime = '2017-01-01'
                     $scope.endtime = now
                     textInfo = $scope.Cities[0].name + '注册患者地区分布'
 
@@ -8313,14 +8369,22 @@ angular.module('controllers', ['ngResource', 'services'])
         });
 
 
-        // 获取当前日期
+        // 获取当前日期\昨日日期\本月第一日日期
+        var formatDate = function(date) {
+            var y = date.getFullYear();
+            var m = date.getMonth() + 1;
+            m = m < 10 ? '0' + m : m;
+            var d = date.getDate();
+            d = d < 10 ? ('0' + d) : d;
+            return y + '-' + m + '-' + d;
+        };
         var myDate = new Date();
-        var now = myDate.toLocaleDateString();
+        var now = formatDate(myDate);
         var tempyesterday = new Date(new Date() - 24 * 60 * 60 * 1000);
-        var yesterday = tempyesterday.toLocaleDateString();
+        var yesterday = formatDate(tempyesterday);
         var tempCurrentMonthFirst = new Date()
         tempCurrentMonthFirst.setDate(1);
-        var CurrentMonthFirst = tempCurrentMonthFirst.toLocaleDateString();
+        var CurrentMonthFirst = formatDate(tempCurrentMonthFirst);
 
         var isClick = false
         var TrendInfo = {}
@@ -8619,18 +8683,26 @@ angular.module('controllers', ['ngResource', 'services'])
             }
         )
 
-        // 获取当前日期
+        // 获取当前日期\昨日日期\本月第一日日期
+        var formatDate = function(date) {
+            var y = date.getFullYear();
+            var m = date.getMonth() + 1;
+            m = m < 10 ? '0' + m : m;
+            var d = date.getDate();
+            d = d < 10 ? ('0' + d) : d;
+            return y + '-' + m + '-' + d;
+        };
         var myDate = new Date();
-        var now = myDate.toLocaleDateString();
-        var isClick = false
+        var now = formatDate(myDate);
         var tempyesterday = new Date(new Date() - 24 * 60 * 60 * 1000);
-        var yesterday = tempyesterday.toLocaleDateString();
+        var yesterday = formatDate(tempyesterday);
         var tempCurrentMonthFirst = new Date()
         tempCurrentMonthFirst.setDate(1);
-        var CurrentMonthFirst = tempCurrentMonthFirst.toLocaleDateString();
+        var CurrentMonthFirst = formatDate(tempCurrentMonthFirst);
+
         var exportdata = new Array()
         Storage.set('Tab', 1)
-
+        var isClick = false
         // ---------------获取搜索(或未搜索)列表及列表数------------------------
         var getLists = function(currentPage, itemsPerPage, countInfo) {
             countInfo.token = Storage.get('TOKEN'),
@@ -8776,25 +8848,6 @@ angular.module('controllers', ['ngResource', 'services'])
 
 
         $scope.searchList = function() {
-            //     $scope.loadingflag = true
-
-            //     if (($scope.Province.province == undefined) || ($scope.starttime == undefined) || ($scope.endtime == undefined) || ($scope.starttime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null) || ($scope.endtime.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/) == null)) {
-            //         $('#inputerror').modal('show')
-            //         $timeout(function() {
-            //             $('#inputerror').modal('hide')
-            //         }, 1000)
-            //     } else {
-            //         isClick = true
-            //         countInfo.province = $scope.Province.province.name
-            //         countInfo.startTime = $scope.starttime
-            //         countInfo.endTime = $scope.endtime
-            //         if ($scope.City.city == undefined) {
-            //             countInfo.city = ''
-            //         } else {
-            //             countInfo.city = $scope.City.city.name
-            //         }
-            //     }
-            // }
             $scope.loadingflag = true
             countInfo = {}
             isClick = true
@@ -8891,41 +8944,12 @@ angular.module('controllers', ['ngResource', 'services'])
         }
         var countInfo = {}
 
-        // $scope.$on('$viewContentLoaded', function() {
-        //     showlist()
-        // });
-
-        // if (isClick == false) {
-        //     // statemen{
-        //     Info = {
-        //         classNo: 'class_1',
-        //         token: Storage.get('TOKEN')
-        //     }
-        // } else {
-        //     Info = {
-        //         classNo: type,
-        //         token: Storage.get('TOKEN')
-        //     }
-        // }
-
         // ---------------获取列表------------------------
         var getLists = function(currentPage, itemsPerPage, countInfo) {
-            countInfo.token = Storage.get('TOKEN'),
-                tempinfo = Object.assign({}, countInfo)
-            tempinfo.limit = itemsPerPage,
-                tempinfo.skip = (currentPage - 1) * itemsPerPage
-            // if (isClick == false) {
-            //     countInfo = {
-            //         province: '浙江省',
-            //         city: '',
-            //         startTime: '2017-01-01',
-            //         endTime: now,
-            //         token: Storage.get('TOKEN')
-            //     }
-            //     tempinfo = Object.assign({}, countInfo),
-            //         tempinfo.limit = itemsPerPage,
-            //         Info.skip = (currentPage - 1) * itemsPerPage
-            // }
+            countInfo.token = Storage.get('TOKEN')
+            tempinfo = Object.assign({}, countInfo)
+            tempinfo.limit = itemsPerPage
+            tempinfo.skip = (currentPage - 1) * itemsPerPage
             console.log(tempinfo);
             //获取列表
             exportdata = []
