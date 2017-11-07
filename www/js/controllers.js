@@ -9582,7 +9582,6 @@ angular.module('controllers', ['ngResource', 'services'])
         var tempuserrole = Storage.get('ROLE')
         var roles = new Array(); //定义一数组 
         roles = tempuserrole.split(","); //字符分割 
-        console.log(roles)
         // 角色字符串处理
         for (var i = 0; i <= roles.length; i++) {
             type = roles[i]
@@ -9644,46 +9643,14 @@ angular.module('controllers', ['ngResource', 'services'])
             $scope.flagpatrefund = true
             $scope.flagadvice = true
         }
+
+
         if (tempuserrole.indexOf("health") != -1) {
             $scope.flaghealth = true
         }
         if ((tempuserrole.indexOf("master") != -1) || (tempuserrole.indexOf("Leader") != -1)) {
             $scope.flagdata = true
         }
-        // $scope.godata = function() {
-        //     // debugger
-        //     if ((Storage.get('ROLE').indexOf("admin") != -1) || (Storage.get('ROLE').indexOf("Leader") != -1)) {
-        //         console.log(1)
-        //         $state.go('main.datamanage.region')
-        //     } else if (Storage.get('ROLE').indexOf("master") != -1) {
-        //         console.log(2)
-        //         $state.go('main.datamanage.workload')
-        //     }
-        // }
-        // $scope.tounchecked = function() {
-        //     $state.go('main.checkornot.unchecked')
-        // }
-        // $scope.touser = function() {
-        //     $state.go('main.usermanage.allUsers')
-        // }
-        // $scope.todistrdep = function() {
-        //     $state.go('main.distrdepmanage.districts')
-        // }
-        // $scope.tounentered = function() {
-        //     $state.go('main.enterornot.unentered')
-        // }
-        // $scope.todata = function() {
-        //     $state.go('main.datamanage.region')
-        // }
-        // $scope.toinsurance = function() {
-        //     $state.go('main.insumanage')
-        // }
-        // $scope.topatrefund = function() {
-        //     $state.go('main.patrefund.refundtoprocess')
-        // }
-        // $scope.toadvice = function() {
-        //     $state.go('main.adviceindex.advice')
-        // }
 
         //注销
         $scope.ifOut = function() {
@@ -9904,7 +9871,7 @@ angular.module('controllers', ['ngResource', 'services'])
             var promise = Advice.getadvices({ token: Storage.get('TOKEN') })
             promise.then(function(data) {
                 $scope.tableParams = new NgTableParams({
-                    count: 10000
+                    count: 20
                 }, {
                     // counts: [],
                     dataset: data.results
