@@ -7709,6 +7709,7 @@ angular.module('controllers', ['ngResource', 'services'])
                         tempevery.open = data.results[i].open
                         tempevery.consultation = data.results[i].consultation
                         tempevery.urgentcon = data.results[i].urgentcon
+                        tempevery.counselout = data.results[i].counselout
                         tempevery.communication = data.results[i].communication
                         tempevery.personaldiag = data.results[i].personaldiag
                         tempevery.doctorsincharge = data.results[i].doctorsincharge
@@ -7728,6 +7729,7 @@ angular.module('controllers', ['ngResource', 'services'])
                             tempevery.open = data.results[i].open
                             tempevery.consultation = data.results[i].consultation
                             tempevery.urgentcon = data.results[i].urgentcon
+                            tempevery.counselout = data.results[i].counselout
                             tempevery.communication = data.results[i].communication
                             tempevery.personaldiag = data.results[i].personaldiag
                             tempevery.doctorsincharge = data.results[i].doctorsincharge
@@ -7957,7 +7959,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     sheetData: exportdata,
                     // sheetName:'sheet1',
                     // sheetFilter:['two','one'],
-                    sheetHeader: ['医生姓名', '省份', '城市', '所属医院', '关注数量', '扫码未关注数量', '咨询量', '加急咨询量', '问诊量', '面诊量', '主管患者量']
+                    sheetHeader: ['医生姓名', '省份', '城市', '所属医院', '关注数量', '扫码未关注数量', '咨询量', '加急咨询量', '超时咨询量','问诊量', '面诊量', '主管患者量']
                 }]
                 var toExcel = new ExportJsonExcel(option)
                 toExcel.saveExcel();
