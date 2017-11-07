@@ -39,6 +39,7 @@ angular.module('controllers', ['ngResource', 'services'])
                             Storage.set('PASSWORD', logOn.password)
                             Storage.set('LASTLOGIN', data.results.lastlogin)
                             Storage.set('TOKEN', data.results.token)
+                            Storage.set('refreshToken', data.results.refreshToken)
                             Storage.set('isSignIN', 'Yes')
                             Storage.set('USERID', data.results.userId)
                             var username = data.results.userName ? data.results.userName : data.results.userId
