@@ -8987,7 +8987,7 @@ angular.module('controllers', ['ngResource', 'services'])
 
         //初始化列表
         $scope.currentPage = 1
-        $scope.itemsPerPage = 100
+        $scope.itemsPerPage = 10000
         getLists($scope.currentPage, $scope.itemsPerPage, tempinfo)
 
         // 页面改变
