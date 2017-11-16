@@ -8965,6 +8965,7 @@ angular.module('controllers', ['ngResource', 'services'])
                         $('#nodata').modal('hide')
                     }, 1000)
                 }
+                $scope.totalNums=data.results.length
                 $scope.grouptableParams = new NgTableParams({
                     count: 20
                 }, {
@@ -8976,7 +8977,6 @@ angular.module('controllers', ['ngResource', 'services'])
                     var tempevery = {}
                     tempevery.name = data.results[i].name
                     tempevery.diseasetype = $filter('diseasetype')(data.results[i].class)
-                    tempevery.content = data.results[i].content
                     tempevery.doctorname = data.results[i].doctorname
                     tempevery.creationTime = data.results[i].creationTime.replace("T00:00:00.000Z", "")
                     exportdata.push(tempevery)
@@ -9036,7 +9036,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     sheetData: exportdata,
                     // sheetName:'sheet1',
                     // sheetFilter:['two','one'],
-                    sheetHeader: ['患者姓名', '诊断类型', '内容', '主管医生', '诊断时间']
+                    sheetHeader: ['患者姓名', '诊断类型', '主管医生', '诊断时间']
                 }]
                 var toExcel = new ExportJsonExcel(option)
                 toExcel.saveExcel();
