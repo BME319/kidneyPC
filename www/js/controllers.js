@@ -9333,7 +9333,7 @@ angular.module('controllers', ['ngResource', 'services'])
             var control = $("#poimageupload");
             control.fileinput({
                 language: 'zh', //设置语言
-                uploadUrl: "http://docker2.haihonghospitalmanagement.com/api/v2/upload?token=" + Storage.get('TOKEN') + "&type=policy", //上传的地址
+                uploadUrl: "http://application.haihonghospitalmanagement.com/api/v2/upload?token=" + Storage.get('TOKEN') + "&type=policy", //上传的地址
                 allowedFileExtensions: ['jpg', 'png', 'gif', 'jpeg'], //接收的文件后缀
                 // showUpload: false, //是否显示上传按钮
                 showCaption: false, //是否显示标题
@@ -9346,7 +9346,7 @@ angular.module('controllers', ['ngResource', 'services'])
             //提交完成后的回调函数    
             control.on("fileuploaded", function(event, data, previewId, index) {
                 console.log(data);
-                $scope.policyInfo.photoUrls[0] = "http://df2.haihonghospitalmanagement.com/" + data.response
+                $scope.policyInfo.photoUrls[0] = "http://media.haihonghospitalmanagement.com/" + data.response
                     .path_resized
             });
         }
