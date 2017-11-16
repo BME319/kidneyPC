@@ -7960,7 +7960,7 @@ angular.module('controllers', ['ngResource', 'services'])
                     sheetData: exportdata,
                     // sheetName:'sheet1',
                     // sheetFilter:['two','one'],
-                    sheetHeader: ['医生姓名', '省份', '城市', '所属医院', '关注数量', '扫码未关注数量', '咨询量', '加急咨询量', '超时咨询量','问诊量', '面诊量', '主管患者量']
+                    sheetHeader: ['医生姓名', '省份', '城市', '所属医院', '关注数量', '扫码未关注数量', '咨询量', '加急咨询量', '超时咨询量', '问诊量', '面诊量', '主管患者量']
                 }]
                 var toExcel = new ExportJsonExcel(option)
                 toExcel.saveExcel();
@@ -8939,10 +8939,9 @@ angular.module('controllers', ['ngResource', 'services'])
         $scope.loadingflag = true
 
         // 患者分组显示--图表
-        // var isClick = false
         var type = ''
         var tempinfo = {
-            classNo: 'class_1',
+            // classNo: 'class_1',
             token: Storage.get('TOKEN')
         }
         var countInfo = {}
@@ -9007,11 +9006,19 @@ angular.module('controllers', ['ngResource', 'services'])
 
             // isClick = true
             var value = $scope.value
-            type = 'class_' + value
-            tempinfo = {
-                classNo: type,
-                token: Storage.get('TOKEN')
+            if (value != '') {
+                type = 'class_' + value
+                tempinfo = {
+                    classNo: type,
+                    token: Storage.get('TOKEN')
+                }
+            } else {
+                var tempinfo = {
+                    // classNo: 'class_1',
+                    token: Storage.get('TOKEN')
+                }
             }
+
             getLists($scope.currentPage, $scope.itemsPerPage, tempinfo)
 
         }
