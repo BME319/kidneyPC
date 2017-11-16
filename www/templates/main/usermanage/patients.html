@@ -43,6 +43,8 @@
 		</td>
 		<td title="'身份证号'" sortable="'IDNo'">{{user.IDNo}}
 		</td>
+		<td title="'注册时间'" sortable="'creationTime'">{{user.creationTime|timeFormat:'YYYY-MM-DD'}}
+		</td>
 		<td title="'肾病类型'">{{user.class|classname}}
 		</td>
 		<td title="'是否高血压'">{{user.hypertension|hypertension}}
@@ -102,6 +104,7 @@
 		  <li class="list-group-item">性别：{{patientInfo.gender|gender}}</li>
 		  <li class="list-group-item">手机号码：{{patientInfo.phoneNo}}</li>
 		  <li class="list-group-item">身份证号：{{patientInfo.IDNo}}</li>
+		  <li class="list-group-item">注册时间：{{patientInfo.creationTime|timeFormat:'YYYY-MM-DD'}}</li>
 		  <li class="list-group-item">肾病类型：{{patientInfo.class|classname}}</li>
 		  <li class="list-group-item">是否高血压：{{patientInfo.hypertension|hypertension}}</li>
 		  <li class="list-group-item">血型：{{patientInfo.bloodType|bloodType}}</li>
