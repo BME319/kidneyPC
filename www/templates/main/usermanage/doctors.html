@@ -43,29 +43,32 @@
     </div>
     <button type="submit" class="btn btn-default" ng-click="searchList()">搜索</button>
     <button type="button" class="btn btn-default" ng-click="searchClear()">清空搜索</button>
+    <button type="button" class="btn btn-default" style="width: 100px;margin-left: 20px" ng-click="exportExcel()">导出Excel</button>
 </form>
+<!-- 进度条 -->
+    <div  style="margin-left: 300px;margin-top: 10px;" ng-show="loadingflag"><img src="templates/main/datamanage/loading.gif" alt="" /></div>
 <!-- 医生列表-张桠童 -->
 <table ng-table="tableParams" class="table table-condensed table-bordered table-striped" style="margin-top: 10px">
     <tr ng-repeat="user in $data" style="text-align: center;">
-        <td title="'用户ID'" sortable="'userId'">{{user.userId}}
+        <td title="'用户ID'"  sortable="'userId'">{{user.userId}}
         </td>
-        <td title="'姓名'" sortable="'name'">{{user.name}}
+        <td title="'姓名'"  sortable="'name'">{{user.name}}
         </td>
-        <td title="'性别'" sortable="'gender'">{{user.gender|gender}}
+        <td title="'性别'"  sortable="'gender'">{{user.gender|gender}}
         </td>
-        <td title="'手机号码'" sortable="'phoneNo'">{{user.phoneNo}}
+        <td title="'手机号码'"  sortable="'phoneNo'">{{user.phoneNo}}
         </td>
-        <td title="'医院'" sortable="'workUnit'">{{user.workUnit}}
+        <td title="'医院'"  sortable="'workUnit'">{{user.workUnit}}
         </td>
-        <td title="'科室'" sortable="'department'">{{user.department}}
+        <td title="'科室'"  sortable="'department'">{{user.department}}
         </td>
-        <td title="'职称'" sortable="'title'">{{user.title}}
+        <td title="'职称'"  sortable="'title'">{{user.title}}
         </td>
-        <td title="'咨询量'" sortable="'count1'">{{user.count1}}
+        <td title="'咨询量'"  sortable="'count1'">{{user.count1}}
         </td>
-        <td title="'问诊量'" sortable="'count2'">{{user.count2}}
+        <td title="'问诊量'"  sortable="'count2'">{{user.count2}}
         </td>
-        <td title="'评分'" sortable="'score'">{{user.score}}
+        <td title="'评分'"  sortable="'score'">{{user.score}}
         </td>
         <td title="'操作'">
             <button class="btn btn-link" style="text-decoration:none; outline:none; padding:0px; border:0px; font-size:10px;" ng-click="openQR(user)">查看二维码</button>
@@ -74,15 +77,15 @@
     </tr>
 </table>
 <!-- 每页数量 -->
-<div class="btn-group  btn-group-sm pull-right" style="margin-top: 18px">
+<!-- <div class="btn-group  btn-group-sm pull-right" style="margin-top: 18px">
     <button type="button" class="btn btn-default" ng-click="changeLimit(20)">20</button>
     <button type="button" class="btn btn-default" ng-click="changeLimit(30)">30</button>
     <button type="button" class="btn btn-default" ng-click="changeLimit(50)">50</button>
     <button type="button" class="btn btn-default" ng-click="changeLimit(100)">100</button>
-</div>
+</div> -->
 <!-- 分页条 -->
-<ul uib-pagination max-size="10" class="pagination" boundary-links="true" boundary-link-numbers="true" direction-links="true" first-text="首页" last-text="末页" previous-text="上一页" next-text="下一页" force-ellipses="true" rotate="true" total-items="totalItems" items-per-page="itemsPerPage" ng-change="pageChanged()" ng-model="currentPage">
-</ul>
+<!-- <ul uib-pagination max-size="10" class="pagination" boundary-links="true" boundary-link-numbers="true" direction-links="true" first-text="首页" last-text="末页" previous-text="上一页" next-text="下一页" force-ellipses="true" rotate="true" total-items="totalItems" items-per-page="itemsPerPage" ng-change="pageChanged()" ng-model="currentPage">
+</ul> -->
 <!-- 医生二维码modal -->
 <div class="modal fade" id="doctorQR" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog">
