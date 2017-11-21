@@ -2470,6 +2470,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 // 完善countInfo
                 var countInfo = userlist
                 countInfo.role1 = role_count
+                countInfo.sortTime = 'false'
                 if (userlist.role != undefined) countInfo.role2 = userlist.role
                 // 获取总条目数
                 console.log(countInfo)
@@ -2825,6 +2826,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 // 完善countInfo
                 var countInfo = userlist
                 countInfo.role1 = role_count
+                countInfo.sortTime = 'false'
                 if (userlist.role != undefined) countInfo.role2 = userlist.role
                 // 获取总条目数
                 console.log(countInfo)
@@ -3103,6 +3105,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 // 完善countInfo
                 var countInfo = userlist
                 countInfo.role1 = role_count
+                countInfo.sortTime = 'false'
                 if (userlist.role != undefined) countInfo.role2 = userlist.role
                 // 获取总条目数
                 console.log(countInfo)
@@ -3330,6 +3333,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 // 完善countInfo
                 var countInfo = userlist
                 countInfo.role1 = role_count
+                countInfo.sortTime = 'false'
                 if (userlist.role != undefined) countInfo.role2 = userlist.role
                 // 获取总条目数
                 console.log(countInfo)
@@ -3557,8 +3561,8 @@ angular.module('controllers', ['ngResource', 'services'])
         }
     ])
     // 保险人员--张桠童
-    .controller('insuranceOfficersCtrl', ['$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', 'Roles','$filter',
-        function($scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, Roles,$filter) {
+    .controller('insuranceOfficersCtrl', ['$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', 'Roles', '$filter',
+        function($scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, Roles, $filter) {
 
             // -----------获取列表总条数------------------
             var getTotalNums = function(role1) {
@@ -3586,6 +3590,8 @@ angular.module('controllers', ['ngResource', 'services'])
                 // 完善countInfo
                 var countInfo = userlist
                 countInfo.role1 = role_count
+                countInfo.sortTime = 'false'
+
                 if (userlist.role != undefined) countInfo.role2 = userlist.role
                 // 获取总条目数
                 console.log(countInfo)
@@ -4039,8 +4045,8 @@ angular.module('controllers', ['ngResource', 'services'])
         }
     ])
     // 健康专员--张桠童
-    .controller('healthOfficersCtrl', ['$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', 'Roles','$filter',
-        function($scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, Roles,$filter) {
+    .controller('healthOfficersCtrl', ['$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', 'Roles', '$filter',
+        function($scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, Roles, $filter) {
 
             // -----------获取列表总条数------------------
             var getTotalNums = function(role1) {
@@ -4068,6 +4074,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 // 完善countInfo
                 var countInfo = userlist
                 countInfo.role1 = role_count
+                countInfo.sortTime = 'false'
                 if (userlist.role != undefined) countInfo.role2 = userlist.role
                 // 获取总条目数
                 console.log(countInfo)
@@ -4083,7 +4090,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 var promise = Alluser.getHealthList(userlist)
                 promise.then(function(data) {
                     console.log(data.results)
-$scope.loadingflag = false
+                    $scope.loadingflag = false
                     for (i = 0; i < data.results.length; i++) {
                         var tempevery = {}
                         tempevery.userId = data.results[i].userId
@@ -4129,7 +4136,7 @@ $scope.loadingflag = false
                 { id: 2, name: '女' }
             ]
             $scope.searchList = function() {
-$scope.loadingflag = true
+                $scope.loadingflag = true
 
                 console.log($scope.userlist)
                 getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 5)
@@ -4466,7 +4473,7 @@ $scope.loadingflag = true
                         sheetData: exportdata,
                         // sheetName:'sheet1',
                         // sheetFilter:['two','one'],
-                        sheetHeader: ['用户ID', '姓名', '性别', '手机号码', '入职时间','工作量']
+                        sheetHeader: ['用户ID', '姓名', '性别', '手机号码', '入职时间', '工作量']
                     }]
                     var toExcel = new ExportJsonExcel(option)
                     toExcel.saveExcel();
@@ -4498,8 +4505,8 @@ $scope.loadingflag = true
         }
     ])
     // 管理员--张桠童
-    .controller('administratorsCtrl', ['$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', 'Roles','$filter',
-        function($scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, Roles,$filter) {
+    .controller('administratorsCtrl', ['$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', 'Roles', '$filter',
+        function($scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, Roles, $filter) {
 
             // -----------获取列表总条数------------------
             var getTotalNums = function(role1) {
@@ -4527,6 +4534,8 @@ $scope.loadingflag = true
                 // 完善countInfo
                 var countInfo = userlist
                 countInfo.role1 = role_count
+                countInfo.sortTime = 'false'
+
                 if (userlist.role != undefined) countInfo.role2 = userlist.role
                 // 获取总条目数
                 console.log(countInfo)
@@ -4538,11 +4547,11 @@ $scope.loadingflag = true
                 // 获取搜索列表
                 console.log(userlist)
                 exportdata = []
-              
+
                 var promise = Alluser.getAdminList(userlist)
                 promise.then(function(data) {
                     console.log(data.results)
-                      $scope.loadingflag = false
+                    $scope.loadingflag = false
                     for (i = 0; i < data.results.length; i++) {
                         var tempevery = {}
                         tempevery.userId = data.results[i].userId
@@ -4909,7 +4918,7 @@ $scope.loadingflag = true
                     }, function(err) {})
                 }
             }
-              $scope.exportExcel = function() {
+            $scope.exportExcel = function() {
                 if (exportdata.length == 0) {
                     $('#nodata').modal('show')
                     $timeout(function() {
