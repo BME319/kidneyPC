@@ -2439,8 +2439,8 @@ angular.module('controllers', ['ngResource', 'services'])
         }
     }])
     // 所有用户--张桠童
-    .controller('allUsersCtrl', ['$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', 'Roles', '$window',
-        function($scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, Roles, $window) {
+    .controller('allUsersCtrl', ['$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', 'Roles', '$window', '$filter',
+        function($scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, Roles, $window, $filter) {
             var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
 
             Storage.set('Tab', 1)
@@ -2458,14 +2458,15 @@ angular.module('controllers', ['ngResource', 'services'])
                 }, function() {})
             }
             // -------------------------------------------
+            var exportdata = new Array()
 
             // ---------------获取搜索(或未搜索)列表及列表数------------------------
             var getLists = function(currentPage, itemsPerPage, _userlist, role_count) {
                 // 完善userlist
                 var userlist = _userlist
                 userlist.token = Storage.get('TOKEN')
-                userlist.limit = itemsPerPage
-                userlist.skip = (currentPage - 1) * itemsPerPage
+                // userlist.limit = itemsPerPage
+                // userlist.skip = (currentPage - 1) * itemsPerPage
                 // 完善countInfo
                 var countInfo = userlist
                 countInfo.role1 = role_count
@@ -2479,11 +2480,26 @@ angular.module('controllers', ['ngResource', 'services'])
                 }, function() {})
                 // 获取搜索列表
                 console.log(userlist)
+                exportdata = []
                 var promise = Alluser.getUserList(userlist)
                 promise.then(function(data) {
                     console.log(data.results)
+                    $scope.loadingflag = false
+
+                    for (i = 0; i < data.results.length; i++) {
+                        var tempevery = {}
+                        tempevery.userId = data.results[i].userId
+                        tempevery.name = data.results[i].name
+                        tempevery.gender = $filter('gender')(data.results[i].gender, 'YYYY-MM-DD h:m')
+                        tempevery.phoneNo = data.results[i].phoneNo
+                        tempevery.role = ''
+                        for (j = 0; j < data.results[i].role.length; j++) {
+                            tempevery.role = tempevery.role + ' ' + $filter('role')(data.results[i].role[j])
+                        }
+                        exportdata.push(tempevery)
+                    }
                     $scope.tableParams = new NgTableParams({
-                        count: 10000
+                        count: 50
                     }, {
                         counts: [],
                         dataset: data.results
@@ -2538,6 +2554,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 { id: 2, name: '女' }
             ]
             $scope.searchList = function() {
+                $scope.loadingflag = true
                 console.log($scope.userlist)
                 getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 0)
             }
@@ -2741,6 +2758,27 @@ angular.module('controllers', ['ngResource', 'services'])
                     getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 0)
                 }, 1000)
             }
+
+            $scope.exportExcel = function() {
+                if (exportdata.length == 0) {
+                    $('#nodata').modal('show')
+                    $timeout(function() {
+                        $('#nodata').modal('hide')
+                    }, 1000)
+                } else {
+                    console.log(exportdata)
+                    var option = {}
+                    option.fileName = '所有用户列表'
+                    option.datas = [{
+                        sheetData: exportdata,
+                        // sheetName:'sheet1',
+                        // sheetFilter:['two','one'],
+                        sheetHeader: ['用户ID', '姓名', '性别', '手机号码', '角色']
+                    }]
+                    var toExcel = new ExportJsonExcel(option)
+                    toExcel.saveExcel();
+                }
+            }
         }
     ])
     // 所有用户--注销modal--张桠童
@@ -2755,8 +2793,8 @@ angular.module('controllers', ['ngResource', 'services'])
         }
     ])
     // 医生--张桠童
-    .controller('doctorsCtrl', ['$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', 'Roles', 'Doctor', 'Mywechat',
-        function($scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, Roles, Doctor, Mywechat) {
+    .controller('doctorsCtrl', ['$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', 'Roles', 'Doctor', 'Mywechat', '$filter',
+        function($scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, Roles, Doctor, Mywechat, $filter) {
             var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
 
             Storage.set('Tab', 1)
@@ -2775,14 +2813,15 @@ angular.module('controllers', ['ngResource', 'services'])
                 }, function() {})
             }
             // -------------------------------------------
+            var exportdata = new Array()
 
             // ---------------获取搜索(或未搜索)列表及列表数------------------------
             var getLists = function(currentPage, itemsPerPage, _userlist, role_count) {
                 // 完善userlist
                 var userlist = _userlist
                 userlist.token = Storage.get('TOKEN')
-                userlist.limit = itemsPerPage
-                userlist.skip = (currentPage - 1) * itemsPerPage
+                // userlist.limit = itemsPerPage
+                // userlist.skip = (currentPage - 1) * itemsPerPage
                 // 完善countInfo
                 var countInfo = userlist
                 countInfo.role1 = role_count
@@ -2798,24 +2837,25 @@ angular.module('controllers', ['ngResource', 'services'])
                 console.log(userlist)
                 var promise = Alluser.getDoctorList(userlist)
                 promise.then(function(data) {
+                    $scope.loadingflag = false
+
                     console.log(data.results)
-                    // 首先处理一下要显示的roles
-                    for (var i = 0; i < data.results.length; i++) {
-                        var roles = data.results[i].role
-                        for (var j = 0; j < roles.length; j++) {
-                            if (roles[j] == 'Leader') {
-                                data.results[i].role = 'Leader'
-                            }
-                            if (roles[j] == 'master') {
-                                data.results[i].role = 'master'
-                            }
-                            if (roles[j] == 'doctor') {
-                                data.results[i].role = 'doctor'
-                            }
-                        }
+                    for (i = 0; i < data.results.length; i++) {
+                        var tempevery = {}
+                        tempevery.userId = data.results[i].userId
+                        tempevery.name = data.results[i].name
+                        tempevery.gender = $filter('gender')(data.results[i].gender)
+                        tempevery.phoneNo = data.results[i].phoneNo
+                        tempevery.workUnit = data.results[i].workUnit
+                        tempevery.department = data.results[i].department
+                        tempevery.title = data.results[i].title
+                        tempevery.count1 = data.results[i].count1
+                        tempevery.count2 = data.results[i].count2
+                        tempevery.score = data.results[i].score
+                        exportdata.push(tempevery)
                     }
                     $scope.tableParams = new NgTableParams({
-                        count: 10000
+                        count: 50
                     }, {
                         counts: [],
                         dataset: data.results
@@ -2852,6 +2892,8 @@ angular.module('controllers', ['ngResource', 'services'])
                 { id: 2, name: '女' }
             ]
             $scope.searchList = function() {
+                $scope.loadingflag = true
+
                 console.log($scope.userlist)
                 getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 1)
             }
@@ -2989,6 +3031,27 @@ angular.module('controllers', ['ngResource', 'services'])
                     };
                 }, function(err) {})
             }
+
+            $scope.exportExcel = function() {
+                if (exportdata.length == 0) {
+                    $('#nodata').modal('show')
+                    $timeout(function() {
+                        $('#nodata').modal('hide')
+                    }, 1000)
+                } else {
+                    console.log(exportdata)
+                    var option = {}
+                    option.fileName = '医生列表'
+                    option.datas = [{
+                        sheetData: exportdata,
+                        // sheetName:'sheet1',
+                        // sheetFilter:['two','one'],
+                        sheetHeader: ['用户ID', '姓名', '性别', '手机号码', '医院', '科室', '职称', '咨询量', '问诊量', '评分']
+                    }]
+                    var toExcel = new ExportJsonExcel(option)
+                    toExcel.saveExcel();
+                }
+            }
         }
     ])
     // 医生--详细信息modal--张桠童
@@ -3011,9 +3074,8 @@ angular.module('controllers', ['ngResource', 'services'])
         }
     ])
     // 护士--张桠童
-    .controller('nursesCtrl', ['$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', 'Roles',
-        function($scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, Roles) {
-            var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
+    .controller('nursesCtrl', ['$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', 'Roles', '$filter',
+        function($scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, Roles, $filter) {
 
             // -----------获取列表总条数------------------
             var getTotalNums = function(role1) {
@@ -3029,14 +3091,15 @@ angular.module('controllers', ['ngResource', 'services'])
                 }, function() {})
             }
             // -------------------------------------------
+            var exportdata = new Array()
 
             // ---------------获取搜索(或未搜索)列表及列表数------------------------
             var getLists = function(currentPage, itemsPerPage, _userlist, role_count) {
                 // 完善userlist
                 var userlist = _userlist
                 userlist.token = Storage.get('TOKEN')
-                userlist.limit = itemsPerPage
-                userlist.skip = (currentPage - 1) * itemsPerPage
+                // userlist.limit = itemsPerPage
+                // userlist.skip = (currentPage - 1) * itemsPerPage
                 // 完善countInfo
                 var countInfo = userlist
                 countInfo.role1 = role_count
@@ -3050,11 +3113,24 @@ angular.module('controllers', ['ngResource', 'services'])
                 }, function() {})
                 // 获取搜索列表
                 console.log(userlist)
+                exportdata = []
                 var promise = Alluser.getNurseList(userlist)
                 promise.then(function(data) {
                     console.log(data.results)
+                    $scope.loadingflag = false
+                    for (i = 0; i < data.results.length; i++) {
+                        var tempevery = {}
+                        tempevery.userId = data.results[i].userId
+                        tempevery.name = data.results[i].name
+                        tempevery.gender = $filter('gender')(data.results[i].gender)
+                        tempevery.phoneNo = data.results[i].phoneNo
+                        tempevery.workUnit = data.results[i].workUnit
+                        tempevery.department = data.results[i].department
+                        tempevery.workAmounts = data.results[i].workAmounts
+                        exportdata.push(tempevery)
+                    }
                     $scope.tableParams = new NgTableParams({
-                        count: 10000
+                        count: 50
                     }, {
                         counts: [],
                         dataset: data.results
@@ -3086,6 +3162,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 { id: 2, name: '女' }
             ]
             $scope.searchList = function() {
+                $scope.loadingflag = true
                 console.log($scope.userlist)
                 getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 3)
             }
@@ -3182,6 +3259,27 @@ angular.module('controllers', ['ngResource', 'services'])
                     };
                 }, function(err) {})
             }
+
+            $scope.exportExcel = function() {
+                if (exportdata.length == 0) {
+                    $('#nodata').modal('show')
+                    $timeout(function() {
+                        $('#nodata').modal('hide')
+                    }, 1000)
+                } else {
+                    console.log(exportdata)
+                    var option = {}
+                    option.fileName = '护士列表'
+                    option.datas = [{
+                        sheetData: exportdata,
+                        // sheetName:'sheet1',
+                        // sheetFilter:['two','one'],
+                        sheetHeader: ['用户ID', '姓名', '性别', '手机号码', '医院', '科室', '工作量']
+                    }]
+                    var toExcel = new ExportJsonExcel(option)
+                    toExcel.saveExcel();
+                }
+            }
         }
     ])
     // 护士--详细信息modal--张桠童
@@ -3204,9 +3302,8 @@ angular.module('controllers', ['ngResource', 'services'])
         }
     ])
     // 患者--张桠童
-    .controller('patientsCtrl', ['$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', 'Roles', 'Patient',
-        function($scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, Roles, Patient) {
-            var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
+    .controller('patientsCtrl', ['$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', 'Roles', 'Patient', '$filter',
+        function($scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, Roles, Patient, $filter) {
 
             // -----------获取列表总条数------------------
             var getTotalNums = function(role1) {
@@ -3222,14 +3319,14 @@ angular.module('controllers', ['ngResource', 'services'])
                 }, function() {})
             }
             // -------------------------------------------
-
+            var exportdata = new Array()
             // ---------------获取搜索(或未搜索)列表及列表数------------------------
             var getLists = function(currentPage, itemsPerPage, _userlist, role_count) {
                 // 完善userlist
                 var userlist = _userlist
                 userlist.token = Storage.get('TOKEN')
-                userlist.limit = itemsPerPage
-                userlist.skip = (currentPage - 1) * itemsPerPage
+                // userlist.limit = itemsPerPage
+                // userlist.skip = (currentPage - 1) * itemsPerPage
                 // 完善countInfo
                 var countInfo = userlist
                 countInfo.role1 = role_count
@@ -3243,10 +3340,34 @@ angular.module('controllers', ['ngResource', 'services'])
                 }, function() {})
                 // 获取搜索列表
                 console.log(userlist)
+                exportdata = []
                 var promise = Alluser.getPatientList(userlist)
                 promise.then(function(data) {
+                    console.log(data.results)
+                    $scope.loadingflag = false
+                    for (i = 0; i < data.results.length; i++) {
+                        var tempevery = {}
+                        tempevery.userId = data.results[i].userId
+                        tempevery.VIP = data.results[i].VIP
+                        tempevery.name = data.results[i].name
+                        tempevery.gender = $filter('gender')(data.results[i].gender)
+                        tempevery.phoneNo = data.results[i].phoneNo
+                        tempevery.IDNo = data.results[i].IDNo
+                        tempevery.creationTime = $filter('timeFormat')(data.results[i].creationTime, 'YYYY-MM-DD h:m')
+                        tempevery.class = $filter('classname')(data.results[i].class)
+                        tempevery.hypertension = $filter('hypertension')(data.results[i].hypertension)
+                        tempevery.bloodType = $filter('bloodType')(data.results[i].bloodType)
+                        tempevery.height = data.results[i].height
+                        tempevery.weight = data.results[i].weight
+                        if (data.results[i].doctorInCharge != null) {
+                            tempevery.doctorInChargename = data.results[i].doctorInCharge.name
+                            tempevery.doctorInChargephoneNo = data.results[i].doctorInCharge.phoneNo
+                        }
+
+                        exportdata.push(tempevery)
+                    }
                     $scope.tableParams = new NgTableParams({
-                        count: 10000
+                        count: 50
                     }, {
                         counts: [],
                         dataset: data.results
@@ -3286,6 +3407,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 { id: 'class_6', name: '腹透' }
             ]
             $scope.searchList = function() {
+                $scope.loadingflag = true
                 console.log($scope.userlist)
                 getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 2)
             }
@@ -3382,6 +3504,27 @@ angular.module('controllers', ['ngResource', 'services'])
                     };
                 }, function(err) {})
             }
+
+            $scope.exportExcel = function() {
+                if (exportdata.length == 0) {
+                    $('#nodata').modal('show')
+                    $timeout(function() {
+                        $('#nodata').modal('hide')
+                    }, 1000)
+                } else {
+                    console.log(exportdata)
+                    var option = {}
+                    option.fileName = '患者列表'
+                    option.datas = [{
+                        sheetData: exportdata,
+                        // sheetName:'sheet1',
+                        // sheetFilter:['two','one'],
+                        sheetHeader: ['用户ID', 'VIP', '姓名', '性别', '手机号码', '身份证号', '注册时间', '肾病类型', '是否高血压', '血型', '身高', '体重', '主管医生', '医生联系方式']
+                    }]
+                    var toExcel = new ExportJsonExcel(option)
+                    toExcel.saveExcel();
+                }
+            }
         }
     ])
     // 患者--详细信息modal--张桠童
@@ -3414,9 +3557,8 @@ angular.module('controllers', ['ngResource', 'services'])
         }
     ])
     // 保险人员--张桠童
-    .controller('insuranceOfficersCtrl', ['$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', 'Roles',
-        function($scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, Roles) {
-            var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
+    .controller('insuranceOfficersCtrl', ['$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', 'Roles','$filter',
+        function($scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, Roles,$filter) {
 
             // -----------获取列表总条数------------------
             var getTotalNums = function(role1) {
@@ -3432,14 +3574,15 @@ angular.module('controllers', ['ngResource', 'services'])
                 }, function() {})
             }
             // -------------------------------------------
+            var exportdata = new Array()
 
             // ---------------获取搜索(或未搜索)列表及列表数------------------------
             var getLists = function(currentPage, itemsPerPage, _userlist, role_count) {
                 // 完善userlist
                 var userlist = _userlist
                 userlist.token = Storage.get('TOKEN')
-                userlist.limit = itemsPerPage
-                userlist.skip = (currentPage - 1) * itemsPerPage
+                // userlist.limit = itemsPerPage
+                // userlist.skip = (currentPage - 1) * itemsPerPage
                 // 完善countInfo
                 var countInfo = userlist
                 countInfo.role1 = role_count
@@ -3453,6 +3596,8 @@ angular.module('controllers', ['ngResource', 'services'])
                 }, function() {})
                 // 获取搜索列表
                 console.log(userlist)
+                exportdata = []
+
                 var promise = Alluser.getInsuranceList(userlist)
                 promise.then(function(data) {
                     console.log(data.results)
@@ -3468,6 +3613,22 @@ angular.module('controllers', ['ngResource', 'services'])
 
                     }
                     console.log(data.results)
+                    $scope.loadingflag = false
+                    for (i = 0; i < data.results.length; i++) {
+                        var tempevery = {}
+                        tempevery.userId = data.results[i].userId
+                        tempevery.name = data.results[i].name
+                        tempevery.gender = $filter('gender')(data.results[i].gender, 'YYYY-MM-DD h:m')
+                        tempevery.phoneNo = data.results[i].phoneNo
+                        tempevery.boardingTime = $filter('timeFormat')(data.results[i].boardingTime, 'YYYY-MM-DD h:m')
+                        tempevery.role = ''
+                        for (j = 0; j < data.results[i].role.length; j++) {
+                            tempevery.role = tempevery.role + ' ' + $filter('role')(data.results[i].role[j])
+                        }
+                        tempevery.workAmounts = data.results[i].workAmounts
+
+                        exportdata.push(tempevery)
+                    }
                     $scope.tableParams = new NgTableParams({
                         count: 10000
                     }, {
@@ -3507,7 +3668,7 @@ angular.module('controllers', ['ngResource', 'services'])
                 { id: 2, name: '女' }
             ]
             $scope.searchList = function() {
-                console.log($scope.userlist)
+                $scope.loadingflag = true
                 getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 4)
             }
             // 清空搜索
@@ -3831,6 +3992,27 @@ angular.module('controllers', ['ngResource', 'services'])
                     }, function(err) {})
                 }
             }
+
+            $scope.exportExcel = function() {
+                if (exportdata.length == 0) {
+                    $('#nodata').modal('show')
+                    $timeout(function() {
+                        $('#nodata').modal('hide')
+                    }, 1000)
+                } else {
+                    console.log(exportdata)
+                    var option = {}
+                    option.fileName = '保险人员列表'
+                    option.datas = [{
+                        sheetData: exportdata,
+                        // sheetName:'sheet1',
+                        // sheetFilter:['two','one'],
+                        sheetHeader: ['用户ID', '姓名', '性别', '手机号码', '入职时间', '保险角色', '工作量']
+                    }]
+                    var toExcel = new ExportJsonExcel(option)
+                    toExcel.saveExcel();
+                }
+            }
         }
     ])
     // 保险人员--详细信息modal--张桠童
@@ -3857,9 +4039,8 @@ angular.module('controllers', ['ngResource', 'services'])
         }
     ])
     // 健康专员--张桠童
-    .controller('healthOfficersCtrl', ['$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', 'Roles',
-        function($scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, Roles) {
-            var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
+    .controller('healthOfficersCtrl', ['$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', 'Roles','$filter',
+        function($scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, Roles,$filter) {
 
             // -----------获取列表总条数------------------
             var getTotalNums = function(role1) {
@@ -3875,14 +4056,15 @@ angular.module('controllers', ['ngResource', 'services'])
                 }, function() {})
             }
             // -------------------------------------------
+            var exportdata = new Array()
 
             // ---------------获取搜索(或未搜索)列表及列表数------------------------
             var getLists = function(currentPage, itemsPerPage, _userlist, role_count) {
                 // 完善userlist
                 var userlist = _userlist
                 userlist.token = Storage.get('TOKEN')
-                userlist.limit = itemsPerPage
-                userlist.skip = (currentPage - 1) * itemsPerPage
+                // userlist.limit = itemsPerPage
+                // userlist.skip = (currentPage - 1) * itemsPerPage
                 // 完善countInfo
                 var countInfo = userlist
                 countInfo.role1 = role_count
@@ -3896,11 +4078,25 @@ angular.module('controllers', ['ngResource', 'services'])
                 }, function() {})
                 // 获取搜索列表
                 console.log(userlist)
+                exportdata = []
+
                 var promise = Alluser.getHealthList(userlist)
                 promise.then(function(data) {
                     console.log(data.results)
+$scope.loadingflag = false
+                    for (i = 0; i < data.results.length; i++) {
+                        var tempevery = {}
+                        tempevery.userId = data.results[i].userId
+                        tempevery.name = data.results[i].name
+                        tempevery.gender = $filter('gender')(data.results[i].gender, 'YYYY-MM-DD h:m')
+                        tempevery.phoneNo = data.results[i].phoneNo
+                        tempevery.boardingTime = $filter('timeFormat')(data.results[i].boardingTime, 'YYYY-MM-DD h:m')
+                        tempevery.workAmounts = data.results[i].workAmounts
+
+                        exportdata.push(tempevery)
+                    }
                     $scope.tableParams = new NgTableParams({
-                        count: 10000
+                        count: 50
                     }, {
                         counts: [],
                         dataset: data.results
@@ -3933,6 +4129,8 @@ angular.module('controllers', ['ngResource', 'services'])
                 { id: 2, name: '女' }
             ]
             $scope.searchList = function() {
+$scope.loadingflag = true
+
                 console.log($scope.userlist)
                 getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 5)
             }
@@ -4253,6 +4451,27 @@ angular.module('controllers', ['ngResource', 'services'])
                     }, function(err) {})
                 }
             }
+
+            $scope.exportExcel = function() {
+                if (exportdata.length == 0) {
+                    $('#nodata').modal('show')
+                    $timeout(function() {
+                        $('#nodata').modal('hide')
+                    }, 1000)
+                } else {
+                    console.log(exportdata)
+                    var option = {}
+                    option.fileName = '健康专员列表'
+                    option.datas = [{
+                        sheetData: exportdata,
+                        // sheetName:'sheet1',
+                        // sheetFilter:['two','one'],
+                        sheetHeader: ['用户ID', '姓名', '性别', '手机号码', '入职时间','工作量']
+                    }]
+                    var toExcel = new ExportJsonExcel(option)
+                    toExcel.saveExcel();
+                }
+            }
         }
     ])
     // 健康专员--详细信息modal--张桠童
@@ -4279,9 +4498,8 @@ angular.module('controllers', ['ngResource', 'services'])
         }
     ])
     // 管理员--张桠童
-    .controller('administratorsCtrl', ['$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', 'Roles',
-        function($scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, Roles) {
-            var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI2ZWNmZTkzYmNkNjM3ZTA2ODM5NDAiLCJ1c2VySWQiOiJVMjAxNzA1MjUwMDA5IiwibmFtZSI6IuiMueeUuyIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTUwNTE4NTk2MjAwNCwiaWF0IjoxNTA1MDk5NTYyfQ.N0LeWbA6We2hCkYJNTM5wXfcx8a6KVDvayfFCjnq7lU"
+    .controller('administratorsCtrl', ['$scope', '$state', 'Storage', 'NgTableParams', '$timeout', '$uibModal', 'Alluser', 'Roles','$filter',
+        function($scope, $state, Storage, NgTableParams, $timeout, $uibModal, Alluser, Roles,$filter) {
 
             // -----------获取列表总条数------------------
             var getTotalNums = function(role1) {
@@ -4297,14 +4515,15 @@ angular.module('controllers', ['ngResource', 'services'])
                 }, function() {})
             }
             // -------------------------------------------
+            var exportdata = new Array()
 
             // ---------------获取搜索(或未搜索)列表及列表数------------------------
             var getLists = function(currentPage, itemsPerPage, _userlist, role_count) {
                 // 完善userlist
                 var userlist = _userlist
                 userlist.token = Storage.get('TOKEN')
-                userlist.limit = itemsPerPage
-                userlist.skip = (currentPage - 1) * itemsPerPage
+                // userlist.limit = itemsPerPage
+                // userlist.skip = (currentPage - 1) * itemsPerPage
                 // 完善countInfo
                 var countInfo = userlist
                 countInfo.role1 = role_count
@@ -4318,11 +4537,24 @@ angular.module('controllers', ['ngResource', 'services'])
                 }, function() {})
                 // 获取搜索列表
                 console.log(userlist)
+                exportdata = []
+              
                 var promise = Alluser.getAdminList(userlist)
                 promise.then(function(data) {
                     console.log(data.results)
+                      $scope.loadingflag = false
+                    for (i = 0; i < data.results.length; i++) {
+                        var tempevery = {}
+                        tempevery.userId = data.results[i].userId
+                        tempevery.name = data.results[i].name
+                        tempevery.gender = $filter('gender')(data.results[i].gender, 'YYYY-MM-DD h:m')
+                        tempevery.phoneNo = data.results[i].phoneNo
+                        tempevery.workUnit = data.results[i].workUnit
+                        tempevery.creationTime = $filter('timeFormat')(data.results[i].creationTime, 'YYYY-MM-DD h:m')
+                        exportdata.push(tempevery)
+                    }
                     $scope.tableParams = new NgTableParams({
-                        count: 10000
+                        count: 50
                     }, {
                         counts: [],
                         dataset: data.results
@@ -4355,6 +4587,8 @@ angular.module('controllers', ['ngResource', 'services'])
                 { id: 2, name: '女' }
             ]
             $scope.searchList = function() {
+                $scope.loadingflag = true
+
                 console.log($scope.userlist)
                 getLists($scope.currentPage, $scope.itemsPerPage, $scope.userlist, 6)
             }
@@ -4673,6 +4907,26 @@ angular.module('controllers', ['ngResource', 'services'])
                             }, 1000)
                         }
                     }, function(err) {})
+                }
+            }
+              $scope.exportExcel = function() {
+                if (exportdata.length == 0) {
+                    $('#nodata').modal('show')
+                    $timeout(function() {
+                        $('#nodata').modal('hide')
+                    }, 1000)
+                } else {
+                    console.log(exportdata)
+                    var option = {}
+                    option.fileName = '管理人员列表'
+                    option.datas = [{
+                        sheetData: exportdata,
+                        // sheetName:'sheet1',
+                        // sheetFilter:['two','one'],
+                        sheetHeader: ['用户ID', '姓名', '性别', '手机号码', '所属单位', '创建时间']
+                    }]
+                    var toExcel = new ExportJsonExcel(option)
+                    toExcel.saveExcel();
                 }
             }
         }
@@ -8965,7 +9219,7 @@ angular.module('controllers', ['ngResource', 'services'])
                         $('#nodata').modal('hide')
                     }, 1000)
                 }
-                $scope.totalNums=data.results.length
+                $scope.totalNums = data.results.length
                 $scope.grouptableParams = new NgTableParams({
                     count: 20
                 }, {

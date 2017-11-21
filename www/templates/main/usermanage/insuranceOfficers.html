@@ -43,6 +43,7 @@
   </div>
   <button type="submit" class="btn btn-default" ng-click="searchList()">搜索</button>
   <button type="button" class="btn btn-default" ng-click="searchClear()">清空搜索</button>
+  <button type="button" class="btn btn-default" style="width: 100px;margin-left: 20px" ng-click="exportExcel()">导出Excel</button>
 </form>
 <!-- 注册新用户modal -->
 <div class="modal fade" id="new_register" tabindex="-1" role="dialog" aria-hidden="true">
@@ -214,7 +215,7 @@
 				    <div class="form-group">
 				        <div class="col-xs-9 col-xs-offset-3">
 				            <button type="submit" class="btn btn-primary" ng-click="perfect()">提交</button>
-				            <button type="button" class="btn btn-default" ng-click="modal_close('#new_perfect')">以后在说</button>
+				            <button type="button" class="btn btn-default" ng-click="modal_close('#new_perfect')">以后再说</button>
 				        </div>
 				    </div>
 				</form>
@@ -321,6 +322,8 @@
     </div>
   </div>
 </div>
+<!-- 进度条 -->
+    <div  style="margin-left: 300px;margin-top: 10px;" ng-show="loadingflag"><img src="templates/main/datamanage/loading.gif" alt="" /></div>
 <!-- 保险人员列表 -->
 <table ng-table="tableParams" class="table table-condensed table-bordered table-striped" style="margin-top: 10px">
 	<tr ng-repeat="user in $data" style="text-align: center;">
@@ -344,14 +347,14 @@
 	</tr>
 </table>
 <!-- 每页数量 -->
-<div class="btn-group  btn-group-sm pull-right" style="margin-top: 18px">
+<!-- <div class="btn-group  btn-group-sm pull-right" style="margin-top: 18px">
     <button type="button" class="btn btn-default" ng-click="changeLimit(20)">20</button>
     <button type="button" class="btn btn-default" ng-click="changeLimit(30)">30</button>
     <button type="button" class="btn btn-default" ng-click="changeLimit(50)">50</button>
     <button type="button" class="btn btn-default" ng-click="changeLimit(100)">100</button>
-</div>
+</div> -->
 <!-- 分页条 -->
-<ul uib-pagination  
+<!-- <ul uib-pagination  
 	max-size="10" 
 	class="pagination" 
 	boundary-links="true" 
@@ -368,7 +371,7 @@
 	ng-change="pageChanged()"
 	ng-model="currentPage"
 	>
-</ul>
+</ul> -->
 <!-- 查看详细信息modal（包括注销用户、去除角色功能） -->
 <script type="text/ng-template" id="detail_insurance.html">
 	<div class="modal-header">
